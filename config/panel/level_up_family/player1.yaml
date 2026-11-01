@@ -1,0 +1,2630 @@
+title: Level Up Family - player1
+button_card_templates:
+  champ_mission:
+    show_icon: true
+    show_name: true
+    show_state: false
+    size: 34px
+    variables:
+      xp: 10
+      task: ''
+    triggers_update: all
+    styles:
+      card:
+      - height: 64px
+      - border-radius: 16px
+      - padding: 8px 18px
+      - background: rgba(3, 12, 35, 0.86)
+      - border: 1px solid rgba(87, 190, 255, 0.38)
+      - box-shadow: 0 5px 16px rgba(0, 0, 0, 0.28)
+      - transition: all 0.2s ease
+      grid:
+      - grid-template-areas: '"i n xp"'
+      - grid-template-columns: 48px minmax(0, 1fr) auto
+      - align-items: center
+      icon:
+      - color: '#65d9ff'
+      name:
+      - justify-self: start
+      - text-align: left
+      - font-size: 16px
+      - font-weight: 700
+      - color: white
+      - white-space: normal
+      - overflow: visible
+      - text-overflow: unset
+      custom_fields:
+        xp:
+        - justify-self: end
+        - font-size: 13px
+        - font-weight: 900
+        - color: '#65d9ff'
+        - white-space: nowrap
+    custom_fields:
+      xp: |
+        [[[
+          return `+${variables.xp} XP`;
+        ]]]
+    state:
+    - operator: template
+      value: |
+        [[[
+          const day = new Date().getDay();
+          const index = (day + 6) % 7;
+          const bit = 1 << index;
+
+          return (Number(entity.state) & bit) !== 0;
+        ]]]
+      styles:
+        card:
+        - background: rgba(5, 105, 88, 0.90)
+        - border: 1px solid rgba(90, 255, 215, 0.80)
+        - box-shadow: 0 0 18px rgba(70, 255, 215, 0.18)
+        icon:
+        - color: '#72ffda'
+        custom_fields:
+          xp:
+          - color: '#72ffda'
+    tap_action:
+      action: call-service
+      service: |
+        [[[
+          const day = new Date().getDay();
+          const index = (day + 6) % 7;
+          const bit = 1 << index;
+
+          return (Number(entity.state) & bit) !== 0
+            ? 'script.champ_player1_desmarcar_mision'
+            : 'script.champ_player1_marcar_mision';
+        ]]]
+      service_data:
+        tarea: |
+          [[[
+            return variables.task;
+          ]]]
+        fecha: |
+          [[[
+            const d = new Date();
+
+            return `${d.getFullYear()}-${String(
+              d.getMonth() + 1
+            ).padStart(2,'0')}-${String(
+              d.getDate()
+            ).padStart(2,'0')}`;
+          ]]]
+views:
+- type: sections
+  max_columns: 4
+  title: player1 Level Up Family
+  path: player1-champion
+  background:
+    opacity: 55
+    alignment: center
+    size: cover
+    repeat: no-repeat
+    attachment: fixed
+    image: /local/level_up_family/season_01/fondo_vertical.png
+  sections:
+  - type: grid
+    cards:
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 4
+        columns: 12
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_season_path
+      - input_number.champ_season_number
+      - sensor.champ_season_days_remaining
+      - sensor.champ_season_status
+      styles:
+        card:
+        - padding: 0
+        - overflow: hidden
+        - border-radius: 24px
+        - background: rgba(3, 9, 29, 0.92)
+        - border: 1px solid rgba(100, 200, 255, 0.48)
+        - box-shadow: 0 10px 32px rgba(0, 0, 0, 0.40)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            const path =
+              states['sensor.champ_season_path']?.state ||
+              '/local/level_up_family/season_01';
+
+            const season =
+              Number(
+                states['input_number.champ_season_number']?.state || 1
+              );
+
+            const names = {
+              1: 'ZERO POINT',
+              2: 'THE CONVERGENCE',
+              3: 'CHROME STORM',
+              4: 'NEON BLOOM',
+              5: 'SOLAR DRIFT',
+              6: 'FRACTURE POINT',
+              7: 'THE DEEP',
+              8: 'STATIC',
+              9: 'HOLLOW EARTH',
+              10: 'AFTERGLOW',
+              11: 'OVERRIDE',
+              12: 'THE FINALE'
+            };
+
+            const remainingRaw = states['sensor.champ_season_days_remaining']?.state;
+            const remaining = Number(remainingRaw);
+            const seasonStatus = states['sensor.champ_season_status']?.state;
+            const validRemaining = typeof remainingRaw === 'string'
+              && remainingRaw.trim() !== '' && Number.isFinite(remaining)
+              && remaining >= 0 && remaining <= 28;
+            const seasonCountdown = seasonStatus === 'finalizada'
+              ? 'TEMPORADA FINALIZADA'
+              : seasonStatus === 'pendiente'
+                ? 'PENDIENTE DE INICIO'
+                : seasonStatus === 'activa' && validRemaining
+                  ? `${remaining} ${remaining === 1 ? 'DÍA RESTANTE' : 'DÍAS RESTANTES'}`
+                  : 'TEMPORADA SIN CONFIGURAR';
+
+            return `
+              <div style="
+                width:100%;
+                height:100%;
+                display:flex;
+                flex-direction:column;
+              ">
+
+                <div style="
+                  flex:1 1 auto;
+                  min-height:0;
+                  background-image:url('${path}/banner.png');
+                  background-size:cover;
+                  background-position:center;
+                  background-repeat:no-repeat;
+                ">
+                </div>
+
+                <div style="
+                  flex:0 0 auto;
+                  display:flex;
+                  justify-content:center;
+                  align-items:center;
+                  gap:16px;
+                  padding:12px 18px;
+                  color:white;
+                ">
+
+                  <img
+                    src="${path}/icono_temporada.png"
+                    style="
+                      width:52px;
+                      height:52px;
+                      object-fit:contain;
+                    "
+                  >
+
+                  <div style="text-align:left;">
+
+                    <div style="
+                      font-size:16px;
+                      font-weight:900;
+                      letter-spacing:1px;
+                    ">
+                      TEMPORADA ${season} · ${names[season] || ''}
+                    </div>
+
+                    <div style="
+                      margin-top:3px;
+                      font-size:13px;
+                      font-weight:900;
+                      letter-spacing:1.5px;
+                      color:#65ddff;
+                    ">
+                      ${seasonCountdown}
+                    </div>
+
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 3
+        columns: 12
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - sensor.champ_season_path
+      - binary_sensor.player1_objetivo_semanal_conseguido
+      - input_number.champ_player1_points_total
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - overflow: hidden
+        - background: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              return (
+                theme.card_background ||
+                'rgba(3, 12, 35, 0.92)'
+              );
+            ]]]
+        - border: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              const border =
+                theme.border ||
+                'rgba(90, 190, 255, 0.40)';
+
+              return `1px solid ${border}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            // ========================================================
+            // FUENTE CENTRAL DEL TEMA
+            // ========================================================
+
+            const themeEntity =
+              states['sensor.champ_theme'];
+
+            const theme =
+              themeEntity?.attributes || {};
+
+
+            // ========================================================
+            // SENSOR DE OBJETIVO SEMANAL
+            //
+            // Toda la lógica de objetivo está fuera del dashboard.
+            // ========================================================
+
+            const goalEntity =
+              states[
+                'binary_sensor.player1_objetivo_semanal_conseguido'
+              ];
+
+            const goal =
+              goalEntity?.attributes || {};
+
+            const achieved =
+              goalEntity?.state === 'on';
+
+
+            // ========================================================
+            // DATOS DE PROGRESO
+            // ========================================================
+
+            const completed =
+              Number(
+                goal.misiones_completadas || 0
+              );
+
+            const due =
+              Number(
+                goal.misiones_previstas || 60
+              );
+
+            const pct =
+              Number(
+                goal.porcentaje_actual || 0
+              );
+
+            const target =
+              Number(
+                goal.objetivo_pct || 75
+              );
+
+
+            // ========================================================
+            // NIVEL
+            // ========================================================
+
+            const totalXP =
+              Number(
+                states[
+                  'input_number.champ_player1_points_total'
+                ]?.state || 0
+              );
+
+            const level =
+              Math.floor(totalXP / 500) + 1;
+
+
+            // ========================================================
+            // ASSETS
+            // ========================================================
+
+            const path =
+              theme.season_path ||
+              states['sensor.champ_season_path']?.state ||
+              '/local/level_up_family/season_01';
+
+
+            // ========================================================
+            // TEMA DE TEMPORADA
+            // ========================================================
+
+            const primary =
+              theme.primary || '#7a28ff';
+
+            const secondary =
+              theme.secondary || '#d66cff';
+
+            const highlight =
+              theme.highlight || '#ff9cff';
+
+            const accent =
+              theme.accent || '#65ddff';
+
+            const glow =
+              theme.glow ||
+              'rgba(169, 62, 255, 0.85)';
+
+            const track =
+              theme.track || '#07132f';
+
+            const borderStrong =
+              theme.border_strong ||
+              'rgba(93, 125, 255, 0.72)';
+
+
+            // ========================================================
+            // TEMA UNIVERSAL DE OBJETIVO CONSEGUIDO
+            // ========================================================
+
+            const successPrimary =
+              theme.success_primary || '#d99000';
+
+            const successSecondary =
+              theme.success_secondary || '#ffbd18';
+
+            const successHighlight =
+              theme.success_highlight || '#fff0a0';
+
+            const successAccent =
+              theme.success_accent || '#ffd83d';
+
+            const successBorder =
+              theme.success_border ||
+              'rgba(255, 200, 35, 0.92)';
+
+            const successGlow =
+              theme.success_glow ||
+              'rgba(255, 183, 0, 0.95)';
+
+
+            // ========================================================
+            // COLORES ACTIVOS DE LA BARRA
+            //
+            // Objetivo NO conseguido:
+            //   tema de la temporada.
+            //
+            // Objetivo conseguido:
+            //   dorado universal.
+            // ========================================================
+
+            const barPrimary =
+              achieved
+                ? successPrimary
+                : primary;
+
+            const barSecondary =
+              achieved
+                ? successSecondary
+                : secondary;
+
+            const barHighlight =
+              achieved
+                ? successHighlight
+                : highlight;
+
+            const barGlow =
+              achieved
+                ? successGlow
+                : glow;
+
+            const barBorder =
+              achieved
+                ? successBorder
+                : borderStrong;
+
+            const percentageColor =
+              achieved
+                ? successAccent
+                : accent;
+
+
+            // ========================================================
+            // POSICIÓN DE LA MARCA DE OBJETIVO
+            //
+            // Ya NO existe ningún 75 fijo en el dashboard.
+            // ========================================================
+
+            const targetPosition =
+              Math.max(
+                0,
+                Math.min(100, target)
+              );
+
+
+            // ========================================================
+            // HTML
+            // ========================================================
+
+            return `
+              <div style="
+                box-sizing:border-box;
+
+                width:100%;
+                height:100%;
+
+                display:flex;
+                flex-direction:column;
+
+                justify-content:center;
+
+                padding:14px 20px 16px;
+
+                color:white;
+              ">
+
+
+                <!-- =================================================
+                     player1 + NIVEL
+                     ================================================= -->
+
+                <div style="
+                  display:flex;
+                  align-items:flex-start;
+                  justify-content:space-between;
+
+                  width:100%;
+                ">
+
+
+                  <!-- NOMBRE -->
+
+                  <div style="
+                    text-align:left;
+
+                    font-size:20px;
+                    line-height:22px;
+
+                    font-weight:900;
+
+                    letter-spacing:.3px;
+                  ">
+                    player1
+                  </div>
+
+
+                  <!-- NIVEL -->
+
+                  <div style="
+                    display:flex;
+                    align-items:center;
+
+                    gap:7px;
+
+                    margin-top:-2px;
+                  ">
+
+                    <img
+                      src="${path}/icono_nivel.png"
+
+                      style="
+                        width:30px;
+                        height:30px;
+
+                        object-fit:contain;
+
+                        filter:
+                          drop-shadow(
+                            0 0 6px
+                            ${glow}
+                          );
+                      "
+                    >
+
+                    <div style="
+                      display:flex;
+                      flex-direction:column;
+
+                      align-items:flex-start;
+
+                      line-height:1;
+                    ">
+
+                      <div style="
+                        font-size:10px;
+                        font-weight:800;
+
+                        opacity:.72;
+
+                        letter-spacing:.7px;
+                      ">
+                        NIVEL
+                      </div>
+
+                      <div style="
+                        margin-top:2px;
+
+                        font-size:18px;
+                        font-weight:900;
+
+                        color:${accent};
+                      ">
+                        ${level}
+                      </div>
+
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     PROGRESO
+                     ================================================= -->
+
+                <div style="
+                  display:flex;
+
+                  justify-content:space-between;
+                  align-items:flex-end;
+
+                  margin-top:10px;
+                ">
+
+
+                  <!-- IZQUIERDA -->
+
+                  <div style="
+                    text-align:left;
+                  ">
+
+                    <div style="
+                      font-size:16px;
+                      line-height:18px;
+
+                      font-weight:900;
+                    ">
+                      PROGRESO SEMANAL
+                    </div>
+
+                    <div style="
+                      margin-top:3px;
+
+                      font-size:11px;
+
+                      opacity:.72;
+                    ">
+                      ${completed} / ${due} MISIONES
+                    </div>
+
+                  </div>
+
+
+                  <!-- DERECHA -->
+
+                  <div style="
+                    text-align:right;
+                  ">
+
+                    <div style="
+                      font-size:28px;
+                      line-height:28px;
+
+                      font-weight:900;
+
+                      color:${percentageColor};
+
+                      text-shadow:
+                        0 0
+                        ${achieved ? '15px' : '10px'}
+                        ${barGlow};
+
+                      transition:
+                        color .35s ease,
+                        text-shadow .35s ease;
+                    ">
+                      ${pct}%
+                    </div>
+
+                    <div style="
+                      margin-top:3px;
+
+                      font-size:10px;
+
+                      color:${
+                        achieved
+                          ? successHighlight
+                          : 'white'
+                      };
+
+                      opacity:${
+                        achieved
+                          ? '1'
+                          : '.72'
+                      };
+
+                      font-weight:${
+                        achieved
+                          ? '900'
+                          : '400'
+                      };
+
+                      transition:
+                        color .35s ease;
+                    ">
+                      OBJETIVO ${target}%
+                    </div>
+
+                  </div>
+
+                </div>
+
+
+                <!-- =================================================
+                     BARRA DE PROGRESO
+                     ================================================= -->
+
+                <div style="
+                  position:relative;
+
+                  box-sizing:border-box;
+
+                  width:100%;
+                  height:14px;
+
+                  margin-top:10px;
+
+                  border-radius:10px;
+
+                  background:${track};
+
+                  border:
+                    1px solid
+                    ${barBorder};
+
+                  box-shadow:
+                    inset 0 0 7px
+                    rgba(0,0,0,.75),
+
+                    ${
+                      achieved
+                        ? `
+                          0 0 8px ${successGlow},
+                          0 0 16px ${successGlow}
+                        `
+                        : '0 0 0 transparent'
+                    };
+
+                  overflow:visible;
+
+                  transition:
+                    border .35s ease,
+                    box-shadow .35s ease;
+                ">
+
+
+                  <!-- =================================================
+                       RELLENO
+                       ================================================= -->
+
+                  <div style="
+                    position:absolute;
+
+                    left:1px;
+                    top:1px;
+                    bottom:1px;
+
+                    width:
+                      ${
+                        pct > 0
+                          ? `calc(${pct}% - 2px)`
+                          : '0'
+                      };
+
+                    max-width:
+                      calc(100% - 2px);
+
+                    border-radius:8px;
+
+                    background:
+                      linear-gradient(
+                        90deg,
+
+                        ${barPrimary} 0%,
+
+                        ${barSecondary} 68%,
+
+                        ${barHighlight} 100%
+                      );
+
+                    box-shadow:
+
+                      0 0
+                      ${achieved ? '9px' : '6px'}
+                      ${barGlow},
+
+                      0 0
+                      ${achieved ? '20px' : '13px'}
+                      ${barGlow},
+
+                      ${
+                        achieved
+                          ? `0 0 28px ${barGlow}`
+                          : '0 0 0 transparent'
+                      };
+
+                    transition:
+                      width .45s ease,
+                      background .35s ease,
+                      box-shadow .35s ease;
+                  ">
+
+
+                    <!-- EXTREMO LUMINOSO -->
+
+                    ${
+                      pct > 0
+                        ? `
+                          <div style="
+                            position:absolute;
+
+                            right:-1px;
+                            top:0;
+
+                            width:
+                              ${achieved ? '11px' : '9px'};
+
+                            height:100%;
+
+                            border-radius:50%;
+
+                            background:
+                              ${barHighlight};
+
+                            box-shadow:
+
+                              0 0 6px
+                              ${barHighlight},
+
+                              0 0
+                              ${achieved ? '18px' : '12px'}
+                              ${barGlow};
+                          ">
+                          </div>
+                        `
+                        : ''
+                    }
+
+                  </div>
+
+
+                  <!-- =================================================
+                       MARCA DINÁMICA DEL OBJETIVO
+                       ================================================= -->
+
+                  <div style="
+                    position:absolute;
+
+                    left:${targetPosition}%;
+
+                    top:-2px;
+                    bottom:-2px;
+
+                    width:2px;
+
+                    transform:
+                      translateX(-1px);
+
+                    background:
+                      rgba(255,255,255,.92);
+
+                    border-radius:2px;
+
+                    box-shadow:
+                      0 0 5px
+                      rgba(255,255,255,.9);
+
+                    z-index:5;
+
+                    transition:
+                      left .35s ease;
+                  ">
+                  </div>
+
+
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - sensor.player1_xp_semana_efectivo
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return t.card_background || 'rgba(3,12,35,0.92)';
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return `1px solid ${t.border || 'rgba(90,190,255,0.40)'}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const text =
+              t.text_primary ||
+              '#ffffff';
+
+            const secondary =
+              t.text_secondary ||
+              'rgba(255,255,255,.72)';
+
+            const xp = Math.round(
+              Number(
+                states['sensor.player1_xp_semana_efectivo']?.state || 0
+              )
+            );
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:12px;
+                padding:10px;
+                color:${text};
+              ">
+
+                <img
+                  src="${path}/icono_xp.png"
+                  style="
+                    width:48px;
+                    height:48px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                  "
+                >
+
+                <div style="text-align:left;">
+
+                  <div style="
+                    font-size:11px;
+                    font-weight:900;
+                    letter-spacing:.7px;
+                    color:${secondary};
+                    white-space:nowrap;
+                  ">
+                    XP SEMANA
+                  </div>
+
+                  <div style="
+                    margin-top:3px;
+                    font-size:25px;
+                    line-height:26px;
+                    font-weight:900;
+                  ">
+                    ${xp}
+                    <span style="
+                      font-size:10px;
+                      color:${secondary};
+                    ">
+                      XP
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - input_number.champ_player1_streak_days
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              return (
+                theme.card_background ||
+                'rgba(3, 12, 35, 0.92)'
+              );
+            ]]]
+        - border: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              const border =
+                theme.border ||
+                'rgba(90, 190, 255, 0.40)';
+
+              return `1px solid ${border}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            // ========================================================
+            // TEMA CENTRAL
+            // ========================================================
+
+            const theme =
+              states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              theme.season_path ||
+              '/local/level_up_family/season_01';
+
+            const accent =
+              theme.accent ||
+              '#65ddff';
+
+            const glow =
+              theme.glow ||
+              'rgba(169, 62, 255, 0.85)';
+
+
+            // ========================================================
+            // RACHA
+            // ========================================================
+
+            const streak =
+              Math.round(
+                Number(
+                  states[
+                    'input_number.champ_player1_streak_days'
+                  ]?.state || 0
+                )
+              );
+
+
+            // ========================================================
+            // HTML
+            // ========================================================
+
+            return `
+              <div style="
+                box-sizing:border-box;
+
+                width:100%;
+                height:100%;
+
+                display:flex;
+                align-items:center;
+                justify-content:center;
+
+                gap:12px;
+
+                padding:10px;
+
+                color:white;
+              ">
+
+
+                <!-- ICONO -->
+
+                <img
+                  src="${path}/icono_racha.png"
+
+                  style="
+                    width:48px;
+                    height:48px;
+
+                    object-fit:contain;
+
+                    flex:0 0 auto;
+
+                    filter:
+                      drop-shadow(
+                        0 0 5px
+                        ${glow}
+                      );
+                  "
+                >
+
+
+                <!-- DATOS -->
+
+                <div style="
+                  text-align:left;
+                ">
+
+                  <div style="
+                    font-size:11px;
+
+                    font-weight:900;
+
+                    letter-spacing:.7px;
+
+                    opacity:.75;
+
+                    white-space:nowrap;
+                  ">
+                    RACHA
+                  </div>
+
+
+                  <div style="
+                    margin-top:3px;
+
+                    font-size:25px;
+                    line-height:26px;
+
+                    font-weight:900;
+
+                    color:${accent};
+
+                    text-shadow:
+                      0 0 8px
+                      ${glow};
+                  ">
+
+                    ${streak}
+
+                    <span style="
+                      font-size:10px;
+
+                      color:white;
+
+                      opacity:.6;
+
+                      text-shadow:none;
+                    ">
+                      ${streak === 1 ? 'DÍA' : 'DÍAS'}
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - input_number.champ_player1_penalties_this_week
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              return (
+                theme.card_background ||
+                'rgba(3, 12, 35, 0.92)'
+              );
+            ]]]
+        - border: |
+            [[[
+              const theme =
+                states['sensor.champ_theme']?.attributes || {};
+
+              const penalties =
+                Number(
+                  states[
+                    'input_number.champ_player1_penalties_this_week'
+                  ]?.state || 0
+                );
+
+              if (penalties > 0) {
+                return '1px solid rgba(255, 80, 100, 0.65)';
+              }
+
+              const border =
+                theme.border ||
+                'rgba(90, 190, 255, 0.40)';
+
+              return `1px solid ${border}`;
+            ]]]
+        - box-shadow: |
+            [[[
+              const penalties =
+                Number(
+                  states[
+                    'input_number.champ_player1_penalties_this_week'
+                  ]?.state || 0
+                );
+
+              if (penalties > 0) {
+                return `
+                  0 7px 22px rgba(0,0,0,.32),
+                  0 0 10px rgba(255,50,75,.18)
+                `;
+              }
+
+              return '0 7px 22px rgba(0,0,0,.32)';
+            ]]]
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            // ========================================================
+            // TEMA CENTRAL
+            // ========================================================
+
+            const theme =
+              states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              theme.season_path ||
+              '/local/level_up_family/season_01';
+
+            const accent =
+              theme.accent ||
+              '#65ddff';
+
+            const glow =
+              theme.glow ||
+              'rgba(169, 62, 255, 0.85)';
+
+
+            // ========================================================
+            // PENALIZACIONES
+            // ========================================================
+
+            const penalties =
+              Math.round(
+                Number(
+                  states[
+                    'input_number.champ_player1_penalties_this_week'
+                  ]?.state || 0
+                )
+              );
+
+            const hasPenalties =
+              penalties > 0;
+
+
+            // ========================================================
+            // ESTADO VISUAL
+            // ========================================================
+
+            const valueColor =
+              hasPenalties
+                ? '#ff637a'
+                : accent;
+
+            const valueGlow =
+              hasPenalties
+                ? 'rgba(255, 55, 85, 0.85)'
+                : glow;
+
+
+            // ========================================================
+            // HTML
+            // ========================================================
+
+            return `
+              <div style="
+                box-sizing:border-box;
+
+                width:100%;
+                height:100%;
+
+                display:flex;
+                align-items:center;
+                justify-content:center;
+
+                gap:12px;
+
+                padding:10px;
+
+                color:white;
+              ">
+
+
+                <!-- ICONO -->
+
+                <img
+                  src="${path}/icono_penalizacion.png"
+
+                  style="
+                    width:48px;
+                    height:48px;
+
+                    object-fit:contain;
+
+                    flex:0 0 auto;
+
+                    filter:
+                      drop-shadow(
+                        0 0
+                        ${hasPenalties ? '8px' : '5px'}
+                        ${valueGlow}
+                      );
+
+                    transition:
+                      filter .3s ease;
+                  "
+                >
+
+
+                <!-- DATOS -->
+
+                <div style="
+                  text-align:left;
+                ">
+
+                  <div style="
+                    font-size:10px;
+
+                    font-weight:900;
+
+                    letter-spacing:.4px;
+
+                    opacity:.75;
+
+                    white-space:nowrap;
+                  ">
+                    MULTAS
+                  </div>
+
+
+                  <div style="
+                    margin-top:3px;
+
+                    font-size:25px;
+                    line-height:26px;
+
+                    font-weight:900;
+
+                    color:${valueColor};
+
+                    text-shadow:
+                      0 0
+                      ${hasPenalties ? '10px' : '8px'}
+                      ${valueGlow};
+
+                    transition:
+                      color .3s ease,
+                      text-shadow .3s ease;
+                  ">
+
+                    ${penalties}
+
+                    <span style="
+                      font-size:10px;
+
+                      color:white;
+
+                      opacity:.6;
+
+                      text-shadow:none;
+                    ">
+                      XP
+                    </span>
+
+                  </div>
+
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      styles:
+        card:
+        - height: 52px
+        - padding: 0 12px
+        - border-radius: 14px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return t.card_background || 'rgba(3,12,35,0.92)';
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return `1px solid ${t.border || 'rgba(90,190,255,0.40)'}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const accent =
+              t.accent ||
+              '#65ddff';
+
+            const glow =
+              t.glow ||
+              'rgba(169,62,255,.85)';
+
+            const text =
+              t.text_primary ||
+              '#ffffff';
+
+            const day = new Date().getDay();
+
+            const count =
+              day >= 1 && day <= 5 ? 9 : 8;
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                gap:11px;
+              ">
+
+                <img
+                  src="${path}/icono_mision.png"
+                  style="
+                    width:42px;
+                    height:42px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                    filter:drop-shadow(0 0 6px ${glow});
+                  "
+                >
+
+                <div style="
+                  color:${text};
+                  font-size:18px;
+                  font-weight:900;
+                  letter-spacing:.4px;
+                  white-space:nowrap;
+                ">
+                  MISIONES DE HOY
+                </div>
+
+                <div style="
+                  margin-left:auto;
+                  color:${accent};
+                  font-size:11px;
+                  font-weight:800;
+                  opacity:.85;
+                  white-space:nowrap;
+                ">
+                  ${count} MISIONES
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: vertical-stack
+      cards:
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_dormir_solo_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_dormir_solo_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done
+                  ? (t.completed_background || 'rgba(17,95,95,.72)')
+                  : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${
+                  done
+                    ? (t.completed_border || 'rgba(80,255,205,.75)')
+                    : (t.border_strong || 'rgba(93,125,255,.72)')
+                }`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done
+                ? (t.completed_color || '#68ffd5')
+                : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">
+                    ${done ? '✓' : '○'}
+                  </div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">
+                    Dormir solo
+                  </div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">
+                    +15 XP
+                  </div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_dormir_solo_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_tareas_cole_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_tareas_cole_week
+        styles:
+          card:
+          - height: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '48px' : '0px';
+              ]]]
+          - padding: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '0 10px' : '0';
+              ]]]
+          - margin: 0
+          - opacity: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '1' : '0';
+              ]]]
+          - visibility: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? 'visible' : 'hidden';
+              ]]]
+          - overflow: hidden
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done
+                  ? (t.completed_background || 'rgba(17,95,95,.72)')
+                  : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const day = new Date().getDay();
+                if (!(day >= 1 && day <= 5)) return 'none';
+
+                const bit = 1 << ((day + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+
+                return `1px solid ${
+                  done
+                    ? (t.completed_border || 'rgba(80,255,205,.75)')
+                    : (t.border_strong || 'rgba(93,125,255,.72)')
+                }`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done
+                ? (t.completed_color || '#68ffd5')
+                : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">
+                    ${done ? '✓' : '○'}
+                  </div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">
+                    Tareas del cole
+                  </div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">
+                    +20 XP
+                  </div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_tareas_cole_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_poner_mesa_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_poner_mesa_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Poner la mesa</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+10 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_poner_mesa_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_quitar_mesa_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_quitar_mesa_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Quitar la mesa</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+10 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_quitar_mesa_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_recoger_cosas_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_recoger_cosas_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Recoger sus cosas</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+10 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_recoger_cosas_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_agenda_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_agenda_week
+        styles:
+          card:
+          - height: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '48px' : '0px';
+              ]]]
+          - padding: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '0 10px' : '0';
+              ]]]
+          - margin: 0
+          - opacity: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? '1' : '0';
+              ]]]
+          - visibility: |
+              [[[
+                const day = new Date().getDay();
+                return day >= 1 && day <= 5 ? 'visible' : 'hidden';
+              ]]]
+          - overflow: hidden
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done
+                  ? (t.completed_background || 'rgba(17,95,95,.72)')
+                  : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const day = new Date().getDay();
+                if (!(day >= 1 && day <= 5)) return 'none';
+
+                const bit = 1 << ((day + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+
+                return `1px solid ${
+                  done
+                    ? (t.completed_border || 'rgba(80,255,205,.75)')
+                    : (t.border_strong || 'rgba(93,125,255,.72)')
+                }`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Escribir en la agenda</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+15 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_agenda_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_colocar_ropa_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_colocar_ropa_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Colocar la ropa</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+15 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_colocar_ropa_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_ducharse_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_ducharse_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Ducharse</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+10 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_ducharse_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_tratar_bien_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_tratar_bien_week
+        styles:
+          card:
+          - height: 48px
+          - padding: 0 10px
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done ? (t.completed_background || 'rgba(17,95,95,.72)') : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return `1px solid ${done ? (t.completed_border || 'rgba(80,255,205,.75)') : (t.border_strong || 'rgba(93,125,255,.72)')}`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Tratar bien a los demás</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+20 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_tratar_bien_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+      - type: custom:button-card
+        entity: input_number.champ_player1_task_mochila_week
+        show_name: false
+        show_icon: false
+        show_state: false
+        triggers_update:
+        - sensor.champ_theme
+        - input_number.champ_player1_task_mochila_week
+        styles:
+          card:
+          - height: |
+              [[[
+                const day = new Date().getDay();
+                return day === 0 || day === 6 ? '48px' : '0px';
+              ]]]
+          - padding: |
+              [[[
+                const day = new Date().getDay();
+                return day === 0 || day === 6 ? '0 10px' : '0';
+              ]]]
+          - margin: 0
+          - opacity: |
+              [[[
+                const day = new Date().getDay();
+                return day === 0 || day === 6 ? '1' : '0';
+              ]]]
+          - visibility: |
+              [[[
+                const day = new Date().getDay();
+                return day === 0 || day === 6 ? 'visible' : 'hidden';
+              ]]]
+          - overflow: hidden
+          - border-radius: 14px
+          - box-shadow: none
+          - background: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const bit = 1 << ((new Date().getDay() + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+                return done
+                  ? (t.completed_background || 'rgba(17,95,95,.72)')
+                  : (t.track || '#07132f');
+              ]]]
+          - border: |
+              [[[
+                const t = states['sensor.champ_theme']?.attributes || {};
+                const day = new Date().getDay();
+
+                if (!(day === 0 || day === 6)) return 'none';
+
+                const bit = 1 << ((day + 6) % 7);
+                const done = (Number(entity.state) & bit) !== 0;
+
+                return `1px solid ${
+                  done
+                    ? (t.completed_border || 'rgba(80,255,205,.75)')
+                    : (t.border_strong || 'rgba(93,125,255,.72)')
+                }`;
+              ]]]
+          grid:
+          - grid-template-areas: '"content"'
+          - grid-template-columns: 1fr
+          custom_fields:
+            content:
+            - width: 100%
+        custom_fields:
+          content: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const bit = 1 << ((new Date().getDay() + 6) % 7);
+              const done = (Number(entity.state) & bit) !== 0;
+              const color = done ? (t.completed_color || '#68ffd5') : (t.accent || '#65ddff');
+
+              return `
+                <div style="width:100%;display:flex;align-items:center;">
+                  <div style="width:22px;flex:0 0 22px;color:${color};font-size:20px;font-weight:900;text-align:center;">${done ? '✓' : '○'}</div>
+                  <div style="flex:1;min-width:0;padding-left:4px;color:white;font-size:12px;font-weight:800;text-align:left;white-space:nowrap;">Ordenar mochila y estuche</div>
+                  <div style="margin-left:auto;padding-left:8px;color:${color};font-size:11px;font-weight:900;white-space:nowrap;">+15 XP</div>
+                </div>
+              `;
+            ]]]
+        tap_action:
+          action: call-service
+          service: script.champ_player1_toggle_mision
+          service_data:
+            tarea: input_number.champ_player1_task_mochila_week
+            fecha: |
+              [[[
+                const d = new Date();
+                return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+              ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - sensor.player1_nivel_champion
+      - sensor.player1_xp_nivel_actual
+      - sensor.player1_xp_siguiente_nivel
+      - sensor.player1_progreso_de_nivel
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return t.card_background || 'rgba(3,12,35,.92)';
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return `1px solid ${t.border || 'rgba(90,190,255,.40)'}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0,0,0,.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const accent =
+              t.accent ||
+              '#65ddff';
+
+            const secondary =
+              t.text_secondary ||
+              'rgba(255,255,255,.72)';
+
+            const level = Math.round(
+              Number(states['sensor.player1_nivel_champion']?.state || 1)
+            );
+
+            const xp = Math.round(
+              Number(states['sensor.player1_xp_nivel_actual']?.state || 0)
+            );
+
+            const next = Math.round(
+              Number(states['sensor.player1_xp_siguiente_nivel']?.state || 500)
+            );
+
+            const progress = Math.max(
+              0,
+              Math.min(
+                100,
+                Number(states['sensor.player1_progreso_de_nivel']?.state || 0)
+              )
+            );
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                gap:9px;
+                padding:8px;
+              ">
+
+                <img
+                  src="${path}/icono_nivel.png"
+                  style="
+                    width:43px;
+                    height:43px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                  "
+                >
+
+                <div style="
+                  flex:1;
+                  min-width:0;
+                ">
+
+                  <div style="
+                    color:${secondary};
+                    font-size:10px;
+                    font-weight:900;
+                    letter-spacing:.6px;
+                    white-space:nowrap;
+                  ">
+                    NIVEL ${level}
+                  </div>
+
+                  <div style="
+                    margin-top:3px;
+                    color:white;
+                    font-size:11px;
+                    font-weight:900;
+                    white-space:nowrap;
+                  ">
+                    ${xp}
+                    <span style="
+                      color:${secondary};
+                      font-size:9px;
+                    ">
+                      / ${next} XP
+                    </span>
+                  </div>
+
+                  <div style="
+                    position:relative;
+                    width:100%;
+                    height:5px;
+                    margin-top:5px;
+                    border-radius:10px;
+                    overflow:hidden;
+                    background:${t.track || '#07132f'};
+                  ">
+                    <div style="
+                      width:${progress}%;
+                      height:100%;
+                      border-radius:10px;
+                      background:linear-gradient(
+                        90deg,
+                        ${t.primary || '#7a28ff'},
+                        ${accent}
+                      );
+                    "></div>
+                  </div>
+
+                </div>
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - input_number.champ_player1_streak_weeks
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return t.card_background || 'rgba(3,12,35,.92)';
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return `1px solid ${t.border || 'rgba(90,190,255,.40)'}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0,0,0,.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const secondary =
+              t.text_secondary ||
+              'rgba(255,255,255,.72)';
+
+            const streak = Math.round(
+              Number(
+                states['input_number.champ_player1_streak_weeks']?.state || 0
+              )
+            );
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:10px;
+                padding:8px;
+              ">
+
+                <img
+                  src="${path}/icono_semana.png"
+                  style="
+                    width:43px;
+                    height:43px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                  "
+                >
+
+                <div style="text-align:left;">
+
+                  <div style="
+                    color:${secondary};
+                    font-size:9px;
+                    font-weight:900;
+                    letter-spacing:.4px;
+                    white-space:nowrap;
+                  ">
+                    RACHA SEMANAL
+                  </div>
+
+                  <div style="
+                    margin-top:3px;
+                    color:white;
+                    font-size:23px;
+                    line-height:24px;
+                    font-weight:900;
+                  ">
+                    ${streak}
+                    <span style="
+                      color:${secondary};
+                      font-size:9px;
+                    ">
+                      SEM.
+                    </span>
+                  </div>
+
+                </div>
+              </div>
+            `;
+          ]]]
+    - type: custom:button-card
+      section_mode: true
+      grid_options:
+        rows: 1
+        columns: 4
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - input_number.champ_player1_streak_weeks
+      - input_number.champ_weekly_streak_multiplier
+      styles:
+        card:
+        - padding: 0
+        - border-radius: 18px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const streak = Number(
+                states['input_number.champ_player1_streak_weeks']?.state || 0
+              );
+
+              return streak >= 2
+                ? `linear-gradient(
+                    135deg,
+                    ${t.success_primary || '#d99000'},
+                    ${t.success_secondary || '#ffbd18'}
+                  )`
+                : (t.card_background || 'rgba(3,12,35,.92)');
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const streak = Number(
+                states['input_number.champ_player1_streak_weeks']?.state || 0
+              );
+
+              return `1px solid ${
+                streak >= 2
+                  ? (t.success_border || 'rgba(255,200,35,.92)')
+                  : (t.border || 'rgba(90,190,255,.40)')
+              }`;
+            ]]]
+        - box-shadow: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              const streak = Number(
+                states['input_number.champ_player1_streak_weeks']?.state || 0
+              );
+
+              return streak >= 2
+                ? `0 0 18px ${t.success_glow || 'rgba(255,183,0,.95)'}`
+                : '0 7px 22px rgba(0,0,0,.32)';
+            ]]]
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+          - height: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const streak = Math.round(
+              Number(
+                states['input_number.champ_player1_streak_weeks']?.state || 0
+              )
+            );
+
+            const multiplier = Number(
+              states['input_number.champ_weekly_streak_multiplier']?.state || 1
+            );
+
+            const active = streak >= 2;
+
+            const secondary = active
+              ? 'rgba(0,0,0,.68)'
+              : (t.text_secondary || 'rgba(255,255,255,.72)');
+
+            const mainColor =
+              active ? '#07132f' : '#ffffff';
+
+            const multiplierText =
+              multiplier
+                .toFixed(2)
+                .replace(/0+$/, '')
+                .replace(/\.$/, '');
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                gap:9px;
+                padding:8px;
+              ">
+
+                <img
+                  src="${path}/icono_bonus.png"
+                  style="
+                    width:43px;
+                    height:43px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                  "
+                >
+
+                <div style="text-align:left;">
+
+                  <div style="
+                    color:${secondary};
+                    font-size:9px;
+                    font-weight:900;
+                    letter-spacing:.4px;
+                    white-space:nowrap;
+                  ">
+                    BONUS RACHA
+                  </div>
+
+                  <div style="
+                    margin-top:3px;
+                    color:${mainColor};
+                    font-size:${active ? '20px' : '13px'};
+                    line-height:22px;
+                    font-weight:900;
+                    white-space:nowrap;
+                  ">
+                    ${
+                      active
+                        ? `×${multiplierText}`
+                        : 'PENDIENTE'
+                    }
+                  </div>
+
+                </div>
+              </div>
+            `;
+          ]]]
+  cards: []
+  icon: mdi:controller
+  show_icon_and_title: true
+  badges: []
+  theme: Catppuccin Mocha

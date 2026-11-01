@@ -1,0 +1,296 @@
+# ============================================================
+# LEVEL UP FAMILY - THEMES
+# Sistema visual centralizado de temporadas
+#
+# Este archivo es la única fuente de verdad para los colores
+# y estilos visuales de Level Up Family.
+#
+# El dashboard NO debe contener colores específicos de una
+# temporada.
+#
+# La temporada activa se obtiene de:
+#   input_number.champ_season_number
+#
+# Los recursos gráficos se obtienen de:
+#   sensor.champ_season_path
+#
+# Cuando una temporada todavía no tenga tema propio definido,
+# se utilizará temporalmente el tema de Season 1 - Zero Point.
+# ============================================================
+
+
+template:
+
+  # ==========================================================
+  # TEMA VISUAL ACTIVO
+  # ==========================================================
+
+  - sensor:
+
+      - name: "Level Up Family - Theme"
+        unique_id: champ_theme
+        default_entity_id: sensor.champ_theme
+        icon: mdi:palette
+
+        # El estado identifica la temporada activa.
+        state: >-
+          {% set season =
+            states('input_number.champ_season_number') | int(1)
+          %}
+          season_{{ '%02d' | format(season) }}
+
+        attributes:
+
+          # ====================================================
+          # INFORMACIÓN GENERAL
+          # ====================================================
+
+          season_number: >-
+            {{
+              states('input_number.champ_season_number')
+              | int(1)
+            }}
+
+          season_name: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+            {% set names = {
+              1: 'Zero Point',
+              2: 'The Convergence',
+              3: 'Chrome Storm',
+              4: 'Neon Bloom',
+              5: 'Solar Drift',
+              6: 'Fracture Point',
+              7: 'The Deep',
+              8: 'Static',
+              9: 'Hollow Earth',
+              10: 'Afterglow',
+              11: 'Override',
+              12: 'The Finale'
+            } %}
+            {{ names.get(season, 'Zero Point') }}
+
+          season_path: >-
+            {{
+              states('sensor.champ_season_path')
+            }}
+
+
+          # ====================================================
+          # COLOR PRIMARIO
+          #
+          # Color inicial de degradados.
+          # ====================================================
+
+          primary: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: '#7a28ff'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # COLOR SECUNDARIO
+          #
+          # Zona media de degradados.
+          # ====================================================
+
+          secondary: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: '#d66cff'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # HIGHLIGHT
+          #
+          # Extremo luminoso de barras y elementos destacados.
+          # ====================================================
+
+          highlight: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: '#ff9cff'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # ACCENT
+          #
+          # Texto destacado, porcentajes, XP, etc.
+          # ====================================================
+
+          accent: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: '#65ddff'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # GLOW
+          # ====================================================
+
+          glow: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: 'rgba(169, 62, 255, 0.85)'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # FONDO DE TARJETAS
+          # ====================================================
+
+          card_background: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: 'rgba(3, 12, 35, 0.92)'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # BORDE NORMAL
+          # ====================================================
+
+          border: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: 'rgba(90, 190, 255, 0.40)'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # BORDE DESTACADO
+          #
+          # Barras, tarjetas activas, etc.
+          # ====================================================
+
+          border_strong: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: 'rgba(93, 125, 255, 0.72)'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # TRACK
+          #
+          # Fondo de barras de progreso.
+          # ====================================================
+
+          track: >-
+            {% set season =
+              states('input_number.champ_season_number') | int(1)
+            %}
+
+            {% set themes = {
+              1: '#07132f'
+            } %}
+
+            {{ themes.get(season, themes[1]) }}
+
+
+          # ====================================================
+          # MISIONES COMPLETADAS
+          #
+          # Por ahora mantenemos un lenguaje común para todas
+          # las temporadas:
+          #
+          #   pendiente   -> tema de temporada
+          #   completada  -> verde/turquesa
+          #
+          # Si más adelante queremos que también cambie por
+          # temporada, solo habrá que modificar este archivo.
+          # ====================================================
+
+          completed_background: >-
+            rgba(17, 95, 95, 0.72)
+
+          completed_border: >-
+            rgba(80, 255, 205, 0.75)
+
+          completed_color: >-
+            #68ffd5
+
+
+          # ====================================================
+          # OBJETIVO CONSEGUIDO
+          #
+          # Este tema NO depende de la temporada.
+          #
+          # Cuando el sensor de objetivo del jugador indique
+          # que está conseguido, los elementos correspondientes
+          # utilizarán estos colores.
+          # ====================================================
+
+          success_primary: >-
+            #d99000
+
+          success_secondary: >-
+            #ffbd18
+
+          success_highlight: >-
+            #fff0a0
+
+          success_accent: >-
+            #ffd83d
+
+          success_border: >-
+            rgba(255, 200, 35, 0.92)
+
+          success_glow: >-
+            rgba(255, 183, 0, 0.95)
+
+
+          # ====================================================
+          # TEXTO
+          # ====================================================
+
+          text_primary: >-
+            #ffffff
+
+          text_secondary: >-
+            rgba(255, 255, 255, 0.72)

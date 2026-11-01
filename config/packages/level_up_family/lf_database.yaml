@@ -1,0 +1,38 @@
+# Level Up Family - Acceso a SQLite
+shell_command:
+  champ_db_add_penalty: >-
+    python3 /config/level_up_family/python/champion_db.py
+    add_penalty {{ player_key }} {{ amount }} "{{ reason }}"
+
+  champ_db_cancel_penalty: >-
+    python3 /config/level_up_family/python/champion_db.py
+    cancel_penalty {{ penalty_id }}
+
+  champ_db_close_week: >-
+    python3 /config/level_up_family/python/champion_db.py
+    close_week
+    {{ player_key }}
+    {{ year }}
+    {{ iso_week }}
+    {{ week_start }}
+    {{ week_end }}
+    {{ season_number }}
+    {{ tasks_due }}
+    {{ tasks_completed }}
+    {{ task_xp }}
+    {{ perfect_days }}
+    {{ bonus_xp }}
+    {{ penalty_xp }}
+    {{ effective_xp }}
+    {{ level_start }}
+    {{ level_end }}
+    {{ weekly_goal_achieved }}
+    {{ daily_streak_end }}
+    {{ weekly_streak_end }}
+
+  champ_db_close_day: >-
+    python3 /config/level_up_family/python/champion_db.py
+    close_day
+    {{ player_key }}
+    {{ day_date }}
+    {{ perfect }}

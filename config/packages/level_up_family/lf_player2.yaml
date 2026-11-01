@@ -1,0 +1,1414 @@
+# ============================================================
+# LEVEL UP FAMILY - player2
+# ============================================================
+
+# ============================================================
+# HELPERS NUMÉRICOS
+# ============================================================
+
+input_number:
+  # ----------------------------------------------------------
+  # Progreso general
+  # ----------------------------------------------------------
+
+  champ_player2_points_total:
+    name: player2 - XP total
+    min: 0
+    max: 1000000
+    step: 1
+    mode: box
+    icon: mdi:star-circle
+
+  champ_player2_points_this_week:
+    name: player2 - XP esta semana
+    min: 0
+    max: 10000
+    step: 1
+    mode: box
+    icon: mdi:star
+
+  champ_player2_streak_days:
+    name: player2 - Racha diaria
+    min: 0
+    max: 3650
+    step: 1
+    mode: box
+    icon: mdi:fire
+
+  champ_player2_streak_weeks:
+    name: player2 - Racha semanal
+    min: 0
+    max: 520
+    step: 1
+    mode: box
+    icon: mdi:calendar-check
+
+  # ----------------------------------------------------------
+  # Resumen semanal
+  # ----------------------------------------------------------
+
+  champ_player2_weekly_tasks_due:
+    name: player2 - Misiones previstas semana
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    icon: mdi:clipboard-list
+
+  champ_player2_weekly_tasks_completed:
+    name: player2 - Misiones completadas semana
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    icon: mdi:clipboard-check
+
+  champ_player2_penalties_this_week:
+    name: player2 - Penalizaciones esta semana
+    min: 0
+    max: 5000
+    step: 1
+    mode: box
+    unit_of_measurement: XP
+    icon: mdi:alert-octagon-outline
+
+  # ==========================================================
+  # MISIONES SEMANALES
+  #
+  # Bitmask:
+  # L = 1
+  # M = 2
+  # X = 4
+  # J = 8
+  # V = 16
+  # S = 32
+  # D = 64
+  # ==========================================================
+
+  champ_player2_task_higiene_personal_week:
+    name: player2 - Higiene personal
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:face-woman-shimmer
+
+  champ_player2_task_tareas_cole_week:
+    name: player2 - Hacer tareas del cole
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:book-open-variant
+
+  champ_player2_task_poner_mesa_week:
+    name: player2 - Poner la mesa
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:table-chair
+
+  champ_player2_task_quitar_mesa_week:
+    name: player2 - Quitar la mesa
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:table-chair
+
+  champ_player2_task_recoger_cosas_week:
+    name: player2 - Recoger sus cosas
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:basket
+
+  champ_player2_task_agenda_week:
+    name: player2 - Escribir en la agenda
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:notebook-edit
+
+  champ_player2_task_colocar_ropa_week:
+    name: player2 - Colocar la ropa
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:tshirt-crew
+
+  champ_player2_task_ducharse_week:
+    name: player2 - Ducharse
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:shower
+
+  champ_player2_task_tratar_bien_week:
+    name: player2 - Tratar bien a los demás
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:heart
+
+  champ_player2_task_mochila_week:
+    name: player2 - Ordenar mochila y estuche
+    min: 0
+    max: 127
+    step: 1
+    mode: box
+    icon: mdi:bag-personal
+
+# ============================================================
+# TEXTO
+# ============================================================
+
+input_text:
+  champ_player2_todays_tasks:
+    name: player2 - Misiones de hoy
+    max: 255
+    icon: mdi:format-list-checks
+
+  champ_player2_weekly_tip:
+    name: player2 - Consejo semanal
+    max: 255
+    icon: mdi:lightbulb-outline
+
+  champ_player2_last_applied_week:
+    name: "Level Up Family - player2 - Última semana aplicada"
+    max: 10
+
+  champ_player2_active_week:
+    name: "Level Up Family - player2 - Semana activa"
+    max: 10
+
+  champ_player2_last_daily_close:
+    name: "Level Up Family - player2 - Último cierre diario"
+    max: 10
+
+# ============================================================
+# FECHAS
+# ============================================================
+
+input_datetime:
+  champ_player2_last_task_completion:
+    name: player2 - Última misión completada
+    has_date: true
+    has_time: true
+    icon: mdi:clock-check-outline
+
+  champ_player2_task_date:
+    name: player2 - Fecha misión
+    has_date: true
+    has_time: false
+    icon: mdi:calendar-edit
+
+# ============================================================
+# SCRIPTS
+# ============================================================
+
+script:
+
+  # ==========================================================
+  # MARCAR / DESMARCAR MISIONES
+  #
+  # Estos wrappers protegen los bitmasks frente a un cambio
+  # de semana. Antes de tocar una misión, comprueban que
+  # active_week coincide con la semana ISO actual.
+  #
+  # Si active_week está vacío, se inicializa.
+  # Si pertenece a una semana distinta, se rechaza la acción:
+  # no se mezclan datos de dos semanas.
+  # ==========================================================
+
+  champ_player2_marcar_mision:
+    alias: "Level Up Family - player2 - Marcar misión"
+    icon: mdi:check-circle-outline
+    mode: queued
+    fields:
+      tarea:
+        name: Tarea semanal
+        required: true
+        selector:
+          entity:
+            domain: input_number
+      fecha:
+        name: Fecha
+        required: true
+        selector:
+          date:
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          semana_actual: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  now().strftime('%G') | int,
+                  now().strftime('%V') | int
+                )
+            }}
+          semana_fecha: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  strptime(fecha, '%Y-%m-%d').isocalendar().year | int,
+                  strptime(fecha, '%Y-%m-%d').isocalendar().week | int
+                )
+            }}
+          semana_activa: >-
+            {{
+              states(
+                'input_text.champ_player2_active_week'
+              )
+            }}
+
+      # Solo permitimos fechas de la semana ISO actual.
+      - condition: template
+        value_template: >-
+          {{ semana_fecha == semana_actual }}
+
+      # Si aún no existe semana activa, la inicializamos.
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    semana_activa
+                    in ['', 'unknown', 'unavailable']
+                  }}
+            sequence:
+              - action: input_text.set_value
+                target:
+                  entity_id: input_text.champ_player2_active_week
+                data:
+                  value: "{{ semana_actual }}"
+
+      # Nunca mezclamos datos de dos semanas.
+      - condition: template
+        value_template: >-
+          {{
+            states(
+              'input_text.champ_player2_active_week'
+            ) == semana_actual
+          }}
+
+      - variables:
+          nombre_mision: >-
+            {% set nombres = {
+              'input_number.champ_player2_task_higiene_personal_week': 'Higiene personal',
+              'input_number.champ_player2_task_tareas_cole_week': 'Tareas del cole',
+              'input_number.champ_player2_task_poner_mesa_week': 'Poner la mesa',
+              'input_number.champ_player2_task_quitar_mesa_week': 'Quitar la mesa',
+              'input_number.champ_player2_task_recoger_cosas_week': 'Recoger sus cosas',
+              'input_number.champ_player2_task_agenda_week': 'Escribir en la agenda',
+              'input_number.champ_player2_task_colocar_ropa_week': 'Colocar la ropa',
+              'input_number.champ_player2_task_ducharse_week': 'Ducharse',
+              'input_number.champ_player2_task_tratar_bien_week': 'Tratar bien a los demás',
+              'input_number.champ_player2_task_mochila_week': 'Ordenar mochila y estuche'
+            } %}
+            {{ nombres.get(tarea, 'Misión') }}
+          xp_mision: >-
+            {% set xp = {
+              'input_number.champ_player2_task_higiene_personal_week': 15,
+              'input_number.champ_player2_task_tareas_cole_week': 20,
+              'input_number.champ_player2_task_poner_mesa_week': 10,
+              'input_number.champ_player2_task_quitar_mesa_week': 10,
+              'input_number.champ_player2_task_recoger_cosas_week': 10,
+              'input_number.champ_player2_task_agenda_week': 15,
+              'input_number.champ_player2_task_colocar_ropa_week': 15,
+              'input_number.champ_player2_task_ducharse_week': 10,
+              'input_number.champ_player2_task_tratar_bien_week': 20,
+              'input_number.champ_player2_task_mochila_week': 15
+            } %}
+            {{ xp.get(tarea, 0) }}
+
+      - action: script.champ_marcar_mision
+        data:
+          tarea: "{{ tarea }}"
+          fecha: "{{ fecha }}"
+
+  champ_player2_desmarcar_mision:
+    alias: "Level Up Family - player2 - Desmarcar misión"
+    icon: mdi:checkbox-blank-circle-outline
+    mode: queued
+    fields:
+      tarea:
+        name: Tarea semanal
+        required: true
+        selector:
+          entity:
+            domain: input_number
+      fecha:
+        name: Fecha
+        required: true
+        selector:
+          date:
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          semana_actual: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  now().strftime('%G') | int,
+                  now().strftime('%V') | int
+                )
+            }}
+          semana_fecha: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  strptime(fecha, '%Y-%m-%d').isocalendar().year | int,
+                  strptime(fecha, '%Y-%m-%d').isocalendar().week | int
+                )
+            }}
+
+      - condition: template
+        value_template: >-
+          {{
+            semana_fecha == semana_actual
+            and
+            states(
+              'input_text.champ_player2_active_week'
+            ) == semana_actual
+          }}
+
+      - action: script.champ_desmarcar_mision
+        data:
+          tarea: "{{ tarea }}"
+          fecha: "{{ fecha }}"
+
+
+  champ_player2_toggle_mision:
+    alias: "Level Up Family - player2 - Alternar misión"
+    icon: mdi:checkbox-marked-circle-auto-outline
+    mode: queued
+    max: 10
+
+    fields:
+      tarea:
+        name: Tarea semanal
+        description: Entidad input_number que contiene el bitmask semanal
+        required: true
+        selector:
+          entity:
+            domain: input_number
+
+      fecha:
+        name: Fecha
+        description: Fecha de la misión en formato YYYY-MM-DD
+        required: true
+        selector:
+          date:
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          semana_actual: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  now().strftime('%G') | int,
+                  now().strftime('%V') | int
+                )
+            }}
+
+          semana_fecha: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  strptime(fecha, '%Y-%m-%d').isocalendar().year | int,
+                  strptime(fecha, '%Y-%m-%d').isocalendar().week | int
+                )
+            }}
+
+          dia_semana: >-
+            {{ strptime(fecha, '%Y-%m-%d').weekday() }}
+
+          bit: >-
+            {% set d = strptime(fecha, '%Y-%m-%d').weekday() %}
+            {{ [1, 2, 4, 8, 16, 32, 64][d] }}
+
+          mascara_actual: >-
+            {{ states(tarea) | int(0) }}
+
+          esta_marcada: >-
+            {% set d = strptime(fecha, '%Y-%m-%d').weekday() %}
+            {% set b = [1, 2, 4, 8, 16, 32, 64][d] %}
+            {% set mask = states(tarea) | int(0) %}
+            {{ ((mask // b) % 2) == 1 }}
+
+      - condition: template
+        value_template: >-
+          {{ semana_fecha == semana_actual }}
+
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: "{{ esta_marcada }}"
+            sequence:
+              - action: script.champ_player2_desmarcar_mision
+                data:
+                  tarea: "{{ tarea }}"
+                  fecha: "{{ fecha }}"
+
+        default:
+          - action: script.champ_player2_marcar_mision
+            data:
+              tarea: "{{ tarea }}"
+              fecha: "{{ fecha }}"
+
+
+  champ_player2_cerrar_dia:
+    alias: "Level Up Family - player2 - Cerrar día"
+    icon: mdi:calendar-check-outline
+    mode: queued
+    max: 10
+    fields:
+      fecha:
+        name: Fecha a cerrar
+        required: true
+        selector:
+          date:
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          fecha_cierre: "{{ fecha }}"
+          semana_fecha: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  strptime(fecha, '%Y-%m-%d').isocalendar().year | int,
+                  strptime(fecha, '%Y-%m-%d').isocalendar().week | int
+                )
+            }}
+          semana_activa: >-
+            {{ states('input_text.champ_player2_active_week') }}
+          indice_dia: >-
+            {{ strptime(fecha, '%Y-%m-%d').weekday() | int }}
+          bit: >-
+            {% set d = strptime(fecha, '%Y-%m-%d').weekday() %}
+            {{ [1, 2, 4, 8, 16, 32, 64][d] }}
+
+      # Solo evaluamos fechas cuyos bitmasks sigan perteneciendo
+      # a la semana activa.
+      - condition: template
+        value_template: >-
+          {{ semana_fecha == semana_activa }}
+
+      - variables:
+          dia_perfecto: >-
+            {% set b = bit | int %}
+            {% set d = indice_dia | int %}
+            {% set ns = namespace(ok=true) %}
+            {% set tareas_diarias = [
+              'input_number.champ_player2_task_higiene_personal_week',
+              'input_number.champ_player2_task_poner_mesa_week',
+              'input_number.champ_player2_task_quitar_mesa_week',
+              'input_number.champ_player2_task_recoger_cosas_week',
+              'input_number.champ_player2_task_colocar_ropa_week',
+              'input_number.champ_player2_task_ducharse_week',
+              'input_number.champ_player2_task_tratar_bien_week'
+            ] %}
+            {% for entidad in tareas_diarias %}
+              {% if (states(entidad) | int(0) | bitwise_and(b)) == 0 %}
+                {% set ns.ok = false %}
+              {% endif %}
+            {% endfor %}
+            {% if d <= 4 %}
+              {% if (
+                states('input_number.champ_player2_task_tareas_cole_week')
+                | int(0) | bitwise_and(b)
+              ) == 0 %}
+                {% set ns.ok = false %}
+              {% endif %}
+              {% if (
+                states('input_number.champ_player2_task_agenda_week')
+                | int(0) | bitwise_and(b)
+              ) == 0 %}
+                {% set ns.ok = false %}
+              {% endif %}
+            {% endif %}
+            {{ 1 if ns.ok else 0 }}
+
+      - condition: template
+        value_template: >-
+          {% set start = states('input_datetime.champ_season_start') %}
+          {{ start not in ['', 'unknown', 'unavailable']
+             and fecha_cierre | string >= start }}
+
+      - action: shell_command.champ_db_close_day
+        data:
+          player_key: player2
+          day_date: "{{ fecha_cierre }}"
+          perfect: "{{ dia_perfecto | int }}"
+        response_variable: resultado_dia
+
+      - condition: template
+        value_template: >-
+          {{ resultado_dia.returncode | int == 0 }}
+
+      - variables:
+          respuesta_dia: >-
+            {{ resultado_dia.stdout | from_json }}
+
+      - condition: template
+        value_template: >-
+          {{ respuesta_dia.ok | default(false) }}
+
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.champ_player2_streak_days
+        data:
+          value: "{{ respuesta_dia.current_streak | int(0) }}"
+
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.champ_player2_last_daily_close
+        data:
+          value: "{{ fecha_cierre }}"
+
+  champ_player2_cerrar_semana:
+    alias: "Level Up Family - player2 - Cerrar semana"
+    icon: mdi:calendar-check
+    mode: single
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      # ======================================================
+      # DATOS DE LA ÚLTIMA SEMANA COMPLETA
+      # ======================================================
+
+      - variables:
+          fin_semana: >-
+            {{
+              (
+                now()
+                - timedelta(days=now().isoweekday())
+              ).date()
+            }}
+          inicio_semana: >-
+            {{
+              (
+                now()
+                - timedelta(days=now().isoweekday() + 6)
+              ).date()
+            }}
+          ano_semana: >-
+            {{
+              (
+                now()
+                - timedelta(days=now().isoweekday())
+              ).strftime('%G') | int
+            }}
+          numero_semana: >-
+            {{
+              (
+                now()
+                - timedelta(days=now().isoweekday())
+              ).strftime('%V') | int
+            }}
+          clave_semana: >-
+            {{
+              '%04d-W%02d'
+              | format(ano_semana | int, numero_semana | int)
+            }}
+          clave_semana_actual: >-
+            {{
+              '%04d-W%02d'
+              | format(
+                  now().strftime('%G') | int,
+                  now().strftime('%V') | int
+                )
+            }}
+          temporada: >-
+            {{ states('input_number.champ_season_number') | int(1) }}
+          misiones_previstas: 60
+          misiones_completadas: >-
+            {{
+              states(
+                'sensor.player2_misiones_completadas_calculadas'
+              ) | int(0)
+            }}
+          xp_tareas: >-
+            {{
+              states(
+                'sensor.player2_xp_tareas_semana'
+              ) | int(0)
+            }}
+          penalizaciones: >-
+            {{
+              states(
+                'input_number.champ_player2_penalties_this_week'
+              ) | int(0)
+            }}
+
+      # ======================================================
+      # DÍAS PERFECTOS + RACHA DIARIA CONSOLIDADA
+      # ======================================================
+
+      - variables:
+          calculo_dias_semana: >-
+            {% set ns = namespace(perfectos=0) %}
+            {% set tareas_diarias = [
+              'input_number.champ_player2_task_higiene_personal_week',
+              'input_number.champ_player2_task_poner_mesa_week',
+              'input_number.champ_player2_task_quitar_mesa_week',
+              'input_number.champ_player2_task_recoger_cosas_week',
+              'input_number.champ_player2_task_colocar_ropa_week',
+              'input_number.champ_player2_task_ducharse_week',
+              'input_number.champ_player2_task_tratar_bien_week'
+            ] %}
+            {% for bit in [1,2,4,8,16,32,64] %}
+              {% set indice_dia = loop.index0 %}
+              {% set dia = namespace(ok=true) %}
+              {% for entidad in tareas_diarias %}
+                {% if (states(entidad) | int(0) | bitwise_and(bit)) == 0 %}
+                  {% set dia.ok = false %}
+                {% endif %}
+              {% endfor %}
+              {% if indice_dia <= 4 %}
+                {% if (
+                  states('input_number.champ_player2_task_tareas_cole_week')
+                  | int(0) | bitwise_and(bit)
+                ) == 0 %}
+                  {% set dia.ok = false %}
+                {% endif %}
+                {% if (
+                  states('input_number.champ_player2_task_agenda_week')
+                  | int(0) | bitwise_and(bit)
+                ) == 0 %}
+                  {% set dia.ok = false %}
+                {% endif %}
+              {% endif %}
+              {% if dia.ok %}
+                {% set ns.perfectos = ns.perfectos + 1 %}
+              {% endif %}
+            {% endfor %}
+            {{ ns.perfectos }}
+
+      - variables:
+          dias_perfectos_cierre: >-
+            {{ calculo_dias_semana | int(0) }}
+          racha_diaria_fin: >-
+            {{
+              states('input_number.champ_player2_streak_days')
+              | int(0)
+            }}
+
+      # ======================================================
+      # BONUS + OBJETIVO + RACHA + MULTIPLICADOR + XP EFECTIVO
+      #
+      # Primera buena semana: x1.
+      # Desde la segunda buena semana consecutiva: multiplicador
+      # parametrizado en el CORE.
+      # Las penalizaciones se restan después del multiplicador.
+      # ======================================================
+
+      - variables:
+          bonus_semana: >-
+            {{
+              (dias_perfectos_cierre | int)
+              *
+              (
+                states('input_number.champ_xp_daily_bonus')
+                | int(25)
+              )
+            }}
+          xp_bruto: >-
+            {{
+              (xp_tareas | int)
+              +
+              (bonus_semana | int)
+            }}
+          porcentaje_cumplimiento: >-
+            {{
+              (
+                (misiones_completadas | float(0))
+                /
+                (misiones_previstas | float(60))
+                *
+                100
+              ) | round(2)
+            }}
+          objetivo_semanal_pct: >-
+            {{
+              states('input_number.champ_weekly_goal_pct')
+              | float(75)
+            }}
+          objetivo_conseguido: >-
+            {{
+              1
+              if
+                (porcentaje_cumplimiento | float(0))
+                >=
+                (objetivo_semanal_pct | float(75))
+              else 0
+            }}
+          racha_semanal_inicio: >-
+            {{
+              states(
+                'input_number.champ_player2_streak_weeks'
+              ) | int(0)
+            }}
+
+      - variables:
+          racha_semanal_fin: >-
+            {% if objetivo_conseguido | int(0) == 1 %}
+              {{ (racha_semanal_inicio | int(0)) + 1 }}
+            {% else %}
+              0
+            {% endif %}
+          multiplicador_aplicado: >-
+            {% if
+              objetivo_conseguido | int(0) == 1
+              and
+              racha_semanal_inicio | int(0) >= 1
+            %}
+              {{
+                states(
+                  'input_number.champ_weekly_streak_multiplier'
+                ) | float(1.25)
+              }}
+            {% else %}
+              1
+            {% endif %}
+
+      - variables:
+          xp_con_racha: >-
+            {{
+              (
+                (xp_bruto | float(0))
+                *
+                (multiplicador_aplicado | float(1))
+              ) | round(0) | int
+            }}
+          xp_efectivo: >-
+            {{
+              [
+                (xp_con_racha | int)
+                -
+                (penalizaciones | int),
+                0
+              ] | max
+            }}
+
+      # ======================================================
+      # NIVEL AL PRINCIPIO Y AL FINAL
+      # ======================================================
+
+      - variables:
+          nivel_inicio: >-
+            {{
+              (
+                (
+                  states(
+                    'input_number.champ_player2_points_total'
+                  ) | int(0)
+                ) // 500
+              ) + 1
+            }}
+          nivel_fin: >-
+            {{
+              (
+                (
+                  (
+                    states(
+                      'input_number.champ_player2_points_total'
+                    ) | int(0)
+                  )
+                  +
+                  (xp_efectivo | int)
+                ) // 500
+              ) + 1
+            }}
+
+      # ======================================================
+      # GUARDAR / RECUPERAR CIERRE EN SQLITE
+      # ======================================================
+
+      - condition: template
+        value_template: >-
+          {% set start = states('input_datetime.champ_season_start') %}
+          {{ start not in ['', 'unknown', 'unavailable']
+             and inicio_semana | string >= start }}
+
+      - action: shell_command.champ_db_close_week
+        data:
+          player_key: player2
+          year: "{{ ano_semana | int }}"
+          iso_week: "{{ numero_semana | int }}"
+          week_start: "{{ inicio_semana }}"
+          week_end: "{{ fin_semana }}"
+          season_number: "{{ temporada | int }}"
+          tasks_due: "{{ misiones_previstas | int }}"
+          tasks_completed: "{{ misiones_completadas | int }}"
+          task_xp: "{{ xp_tareas | int }}"
+          perfect_days: "{{ dias_perfectos_cierre | int }}"
+          bonus_xp: "{{ bonus_semana | int }}"
+          penalty_xp: "{{ penalizaciones | int }}"
+          effective_xp: "{{ xp_efectivo | int }}"
+          level_start: "{{ nivel_inicio | int }}"
+          level_end: "{{ nivel_fin | int }}"
+          weekly_goal_achieved: "{{ objetivo_conseguido | int }}"
+          daily_streak_end: "{{ racha_diaria_fin | int }}"
+          weekly_streak_end: "{{ racha_semanal_fin | int }}"
+        response_variable: resultado
+
+      - condition: template
+        value_template: >-
+          {{ resultado.returncode | int == 0 }}
+
+      - variables:
+          respuesta_db: >-
+            {{ resultado.stdout | from_json }}
+
+      # Si HA ya terminó de aplicar esta semana, se detiene aquí.
+      - condition: template
+        value_template: >-
+          {{
+            respuesta_db.ok | default(false)
+            and
+            states(
+              'input_text.champ_player2_last_applied_week'
+            ) != clave_semana
+          }}
+
+      # ======================================================
+      # RECONCILIAR ESTADO VIVO DESDE SQLITE
+      # ======================================================
+
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.champ_player2_points_total
+        data:
+          value: >-
+            {{ respuesta_db.lifetime_xp | int(0) }}
+
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.champ_player2_streak_days
+        data:
+          value: >-
+            {{ respuesta_db.daily_streak_end | int(0) }}
+
+      - action: input_number.set_value
+        target:
+          entity_id: input_number.champ_player2_streak_weeks
+        data:
+          value: >-
+            {{ respuesta_db.weekly_streak_end | int(0) }}
+
+      # ======================================================
+      # RESETEAR SOLO LOS DATOS QUE AÚN PERTENEZCAN
+      # A LA SEMANA QUE SE ESTÁ CERRANDO
+      # ======================================================
+
+      - choose:
+          - conditions:
+              - condition: template
+                value_template: >-
+                  {{
+                    states(
+                      'input_text.champ_player2_active_week'
+                    ) in [
+                      '',
+                      'unknown',
+                      'unavailable',
+                      clave_semana
+                    ]
+                  }}
+            sequence:
+              - action: input_number.set_value
+                target:
+                  entity_id:
+                    - input_number.champ_player2_task_higiene_personal_week
+                    - input_number.champ_player2_task_tareas_cole_week
+                    - input_number.champ_player2_task_poner_mesa_week
+                    - input_number.champ_player2_task_quitar_mesa_week
+                    - input_number.champ_player2_task_recoger_cosas_week
+                    - input_number.champ_player2_task_agenda_week
+                    - input_number.champ_player2_task_colocar_ropa_week
+                    - input_number.champ_player2_task_ducharse_week
+                    - input_number.champ_player2_task_tratar_bien_week
+                    - input_number.champ_player2_task_mochila_week
+                data:
+                  value: 0
+
+              - action: input_number.set_value
+                target:
+                  entity_id: input_number.champ_player2_penalties_this_week
+                data:
+                  value: 0
+
+              - action: input_text.set_value
+                target:
+                  entity_id: input_text.champ_player2_active_week
+                data:
+                  value: "{{ clave_semana_actual }}"
+
+      # Debe ser la última acción del cierre.
+      - action: input_text.set_value
+        target:
+          entity_id: input_text.champ_player2_last_applied_week
+        data:
+          value: "{{ clave_semana }}"
+
+# ============================================================
+# SENSORES CALCULADOS
+# ============================================================
+
+template:
+  - sensor:
+      # ======================================================
+      # NIVEL
+      #
+      # 500 XP por nivel
+      # ======================================================
+
+      - name: "player2 - Nivel Level Up Family"
+        unique_id: player2_nivel_champion
+        default_entity_id: sensor.player2_nivel_champion
+        icon: mdi:shield-star
+        state: >-
+          {% set total = states('input_number.champ_player2_points_total') | int(0) %}
+          {{ (total // 500) + 1 }}
+
+      - name: "player2 - XP nivel actual"
+        unique_id: player2_xp_nivel_actual
+        unit_of_measurement: XP
+        icon: mdi:star-circle-outline
+        state: >-
+          {% set total = states('input_number.champ_player2_points_total') | int(0) %}
+          {{ total % 500 }}
+
+      - name: "player2 - XP siguiente nivel"
+        unique_id: player2_xp_siguiente_nivel
+        unit_of_measurement: XP
+        icon: mdi:star-circle
+        state: "500"
+
+      - name: "player2 - Progreso de nivel"
+        unique_id: player2_progreso_de_nivel
+        unit_of_measurement: "%"
+        icon: mdi:progress-star
+        state: >-
+          {% set total = states('input_number.champ_player2_points_total') | int(0) %}
+          {{ ((total % 500) / 500 * 100) | round(1) }}
+
+      # ======================================================
+      # MISIONES COMPLETADAS ESTA SEMANA
+      #
+      # L-D = 127
+      # L-V = 31
+      #
+      # Mochila cuenta UNA sola vez si está marcada
+      # sábado o domingo.
+      # ======================================================
+
+      - name: "player2 - Misiones completadas calculadas"
+        unique_id: player2_misiones_completadas_calculadas
+        unit_of_measurement: "misiones"
+        icon: mdi:clipboard-check
+        state: >-
+          {% set ns = namespace(total=0) %}
+
+          {% set tareas_ld = [
+            'input_number.champ_player2_task_higiene_personal_week',
+            'input_number.champ_player2_task_poner_mesa_week',
+            'input_number.champ_player2_task_quitar_mesa_week',
+            'input_number.champ_player2_task_recoger_cosas_week',
+            'input_number.champ_player2_task_colocar_ropa_week',
+            'input_number.champ_player2_task_ducharse_week',
+            'input_number.champ_player2_task_tratar_bien_week'
+          ] %}
+
+          {% set tareas_lv = [
+            'input_number.champ_player2_task_tareas_cole_week',
+            'input_number.champ_player2_task_agenda_week'
+          ] %}
+
+          {% for entidad in tareas_ld %}
+            {% set valor = states(entidad) | int(0) %}
+            {% for bit in [1,2,4,8,16,32,64] %}
+              {% if (valor | bitwise_and(bit)) > 0 %}
+                {% set ns.total = ns.total + 1 %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+
+          {% for entidad in tareas_lv %}
+            {% set valor = states(entidad) | int(0) %}
+            {% for bit in [1,2,4,8,16] %}
+              {% if (valor | bitwise_and(bit)) > 0 %}
+                {% set ns.total = ns.total + 1 %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+
+          {% set mochila =
+            states('input_number.champ_player2_task_mochila_week') | int(0)
+          %}
+
+          {% if (mochila | bitwise_and(96)) > 0 %}
+            {% set ns.total = ns.total + 1 %}
+          {% endif %}
+
+          {{ ns.total }}
+
+      # ======================================================
+      # XP DE MISIONES
+      # ======================================================
+
+      - name: "player2 - XP tareas semana"
+        unique_id: player2_xp_tareas_semana
+        unit_of_measurement: XP
+        icon: mdi:star
+        state: >-
+          {% set sencilla = states('input_number.champ_xp_minor') | int(10) %}
+          {% set estandar = states('input_number.champ_xp_standard') | int(15) %}
+          {% set importante = states('input_number.champ_xp_complex') | int(20) %}
+
+          {% set ns = namespace(total=0) %}
+
+          {% set tareas = [
+            ('input_number.champ_player2_task_higiene_personal_week', 127, estandar),
+            ('input_number.champ_player2_task_tareas_cole_week', 31, importante),
+            ('input_number.champ_player2_task_poner_mesa_week', 127, sencilla),
+            ('input_number.champ_player2_task_quitar_mesa_week', 127, sencilla),
+            ('input_number.champ_player2_task_recoger_cosas_week', 127, sencilla),
+            ('input_number.champ_player2_task_agenda_week', 31, estandar),
+            ('input_number.champ_player2_task_colocar_ropa_week', 127, estandar),
+            ('input_number.champ_player2_task_ducharse_week', 127, sencilla),
+            ('input_number.champ_player2_task_tratar_bien_week', 127, importante)
+          ] %}
+
+          {% for entidad, mascara, xp in tareas %}
+            {% set valor = states(entidad) | int(0) %}
+
+            {% for bit in [1,2,4,8,16,32,64] %}
+              {% if
+                (mascara | bitwise_and(bit)) > 0
+                and
+                (valor | bitwise_and(bit)) > 0
+              %}
+                {% set ns.total = ns.total + xp %}
+              {% endif %}
+            {% endfor %}
+          {% endfor %}
+
+          {% set mochila =
+            states('input_number.champ_player2_task_mochila_week') | int(0)
+          %}
+
+          {% if (mochila | bitwise_and(96)) > 0 %}
+            {% set ns.total = ns.total + estandar %}
+          {% endif %}
+
+          {{ ns.total }}
+
+      # ======================================================
+      # DÍAS PERFECTOS
+      #
+      # Solo se consolidan días anteriores a hoy.
+      #
+      # La misión mochila/estuche NO forma parte del
+      # día perfecto de sábado o domingo.
+      # ======================================================
+
+      - name: "player2 - Días perfectos semana"
+        unique_id: player2_dias_perfectos_semana
+        unit_of_measurement: "días"
+        icon: mdi:trophy-variant
+        state: >-
+          {% set hoy = now().weekday() %}
+          {% set ns = namespace(total=0) %}
+
+          {% set tareas_diarias = [
+            'input_number.champ_player2_task_higiene_personal_week',
+            'input_number.champ_player2_task_poner_mesa_week',
+            'input_number.champ_player2_task_quitar_mesa_week',
+            'input_number.champ_player2_task_recoger_cosas_week',
+            'input_number.champ_player2_task_colocar_ropa_week',
+            'input_number.champ_player2_task_ducharse_week',
+            'input_number.champ_player2_task_tratar_bien_week'
+          ] %}
+
+          {% for bit in [1,2,4,8,16,32,64] %}
+
+            {% set indice_dia = loop.index0 %}
+
+            {% if indice_dia < hoy %}
+
+              {% set dia = namespace(ok=true) %}
+
+              {% for entidad in tareas_diarias %}
+                {% if
+                  (states(entidad) | int(0) | bitwise_and(bit)) == 0
+                %}
+                  {% set dia.ok = false %}
+                {% endif %}
+              {% endfor %}
+
+              {% if indice_dia <= 4 %}
+
+                {% if
+                  (
+                    states(
+                      'input_number.champ_player2_task_tareas_cole_week'
+                    ) | int(0) | bitwise_and(bit)
+                  ) == 0
+                %}
+                  {% set dia.ok = false %}
+                {% endif %}
+
+                {% if
+                  (
+                    states(
+                      'input_number.champ_player2_task_agenda_week'
+                    ) | int(0) | bitwise_and(bit)
+                  ) == 0
+                %}
+                  {% set dia.ok = false %}
+                {% endif %}
+
+              {% endif %}
+
+              {% if dia.ok %}
+                {% set ns.total = ns.total + 1 %}
+              {% endif %}
+
+            {% endif %}
+
+          {% endfor %}
+
+          {{ ns.total }}
+
+      # ======================================================
+      # BONUS SEMANAL
+      # ======================================================
+
+      - name: "player2 - XP bonus semana"
+        unique_id: player2_xp_bonus_semana
+        unit_of_measurement: XP
+        icon: mdi:trophy-award
+        state: >-
+          {{
+            (
+              states('sensor.player2_dias_perfectos_semana') | int(0)
+            )
+            *
+            (
+              states('input_number.champ_xp_daily_bonus') | int(25)
+            )
+          }}
+
+      # ======================================================
+      # XP SEMANAL BRUTO
+      # ======================================================
+
+      - name: "player2 - XP semana bruto"
+        unique_id: player2_xp_semana_bruto
+        unit_of_measurement: XP
+        icon: mdi:star-box
+        state: >-
+          {{
+            (
+              states('sensor.player2_xp_tareas_semana') | int(0)
+            )
+            +
+            (
+              states('sensor.player2_xp_bonus_semana') | int(0)
+            )
+          }}
+
+      # ======================================================
+      # XP SEMANAL EFECTIVO
+      #
+      # XP bruto - penalizaciones
+      # Nunca puede quedar por debajo de 0.
+      # ======================================================
+
+      - name: "player2 - XP semana efectivo"
+        unique_id: player2_xp_semana_efectivo
+        unit_of_measurement: XP
+        icon: mdi:star-check
+        state: >-
+          {% set bruto =
+            states('sensor.player2_xp_semana_bruto') | int(0)
+          %}
+
+          {% set penalizaciones =
+            states(
+              'input_number.champ_player2_penalties_this_week'
+            ) | int(0)
+          %}
+
+          {{ [bruto - penalizaciones, 0] | max }}
+
+  # ==========================================================
+  # OBJETIVO SEMANAL EN TIEMPO REAL
+  #
+  # El umbral NO está definido aquí. Se toma siempre de:
+  #   input_number.champ_weekly_goal_pct
+  #
+  # De esta forma, si el objetivo cambia en el CORE (75, 60,
+  # 80...), este sensor y el dashboard se adaptan solos.
+  # ==========================================================
+
+  - binary_sensor:
+      - name: "player2 - Objetivo semanal conseguido"
+        unique_id: player2_objetivo_semanal_conseguido
+        icon: mdi:target-account
+
+        state: >-
+          {% set completadas =
+            states(
+              'sensor.player2_misiones_completadas_calculadas'
+            ) | float(0)
+          %}
+
+          {% set previstas_helper =
+            states(
+              'input_number.champ_player2_weekly_tasks_due'
+            ) | float(0)
+          %}
+
+          {% set previstas =
+            previstas_helper
+            if previstas_helper > 0
+            else 60
+          %}
+
+          {% set porcentaje =
+            (completadas / previstas * 100)
+            if previstas > 0
+            else 0
+          %}
+
+          {% set objetivo =
+            states('input_number.champ_weekly_goal_pct')
+            | float(75)
+          %}
+
+          {{ porcentaje >= objetivo }}
+
+        attributes:
+          misiones_completadas: >-
+            {{
+              states(
+                'sensor.player2_misiones_completadas_calculadas'
+              ) | int(0)
+            }}
+
+          misiones_previstas: >-
+            {% set previstas =
+              states(
+                'input_number.champ_player2_weekly_tasks_due'
+              ) | int(0)
+            %}
+            {{ previstas if previstas > 0 else 60 }}
+
+          porcentaje_actual: >-
+            {% set completadas =
+              states(
+                'sensor.player2_misiones_completadas_calculadas'
+              ) | float(0)
+            %}
+
+            {% set previstas_helper =
+              states(
+                'input_number.champ_player2_weekly_tasks_due'
+              ) | float(0)
+            %}
+
+            {% set previstas =
+              previstas_helper
+              if previstas_helper > 0
+              else 60
+            %}
+
+            {{
+              (completadas / previstas * 100)
+              | round(2)
+              if previstas > 0
+              else 0
+            }}
+
+          objetivo_pct: >-
+            {{
+              states('input_number.champ_weekly_goal_pct')
+              | float(75)
+            }}
+
+
+
+# ============================================================
+# AUTOMATIZACIONES - CIERRE DIARIO
+# ============================================================
+
+automation:
+  - id: champ_player2_cierre_diario_0005
+    alias: "Level Up Family - player2 - Cierre diario 00:05"
+    description: >-
+      Consolida a las 00:05 el resultado del día anterior en SQLite
+      y actualiza la racha diaria viva.
+    trigger:
+      - platform: time
+        at: "00:05:00"
+    condition: []
+    action:
+      - variables:
+          fecha_ayer: >-
+            {{ (now() - timedelta(days=1)).date().isoformat() }}
+      - action: script.champ_player2_cerrar_dia
+        data:
+          fecha: "{{ fecha_ayer }}"
+    mode: single
+
+  - id: champ_player2_recuperar_cierre_diario_arranque
+    alias: "Level Up Family - player2 - Recuperar cierre diario al arrancar"
+    description: >-
+      Si Home Assistant estaba apagado a las 00:05, intenta consolidar
+      el día anterior al arrancar, siempre que sus bitmasks sigan
+      perteneciendo a la semana activa.
+    trigger:
+      - platform: homeassistant
+        event: start
+    condition: []
+    action:
+      - delay: "00:00:20"
+      - variables:
+          fecha_ayer: >-
+            {{ (now() - timedelta(days=1)).date().isoformat() }}
+          ultimo_cierre: >-
+            {{ states('input_text.champ_player2_last_daily_close') }}
+      - condition: template
+        value_template: >-
+          {{ ultimo_cierre != fecha_ayer }}
+      - action: script.champ_player2_cerrar_dia
+        data:
+          fecha: "{{ fecha_ayer }}"
+    mode: single

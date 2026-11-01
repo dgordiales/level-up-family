@@ -1,0 +1,520 @@
+# ============================================================
+# LEVEL UP FAMILY - CORE
+# Configuración compartida por todos los jugadores
+# ============================================================
+
+# ============================================================
+# HELPERS GENERALES
+# ============================================================
+
+input_number:
+  # ----------------------------------------------------------
+  # Temporadas
+  # ----------------------------------------------------------
+
+  champ_season_number:
+    name: Level Up Family - Temporada actual
+    min: 1
+    max: 12
+    step: 1
+    mode: box
+    icon: mdi:shield-star
+
+  # ----------------------------------------------------------
+  # Valores XP
+  # ----------------------------------------------------------
+
+  champ_xp_minor:
+    name: Level Up Family - XP misión sencilla
+    min: 0
+    max: 100
+    step: 5
+    mode: box
+    initial: 10
+    icon: mdi:star-outline
+
+  champ_xp_standard:
+    name: Level Up Family - XP misión estándar
+    min: 0
+    max: 100
+    step: 5
+    mode: box
+    initial: 15
+    icon: mdi:star-half-full
+
+  champ_xp_complex:
+    name: Level Up Family - XP misión importante
+    min: 0
+    max: 100
+    step: 5
+    mode: box
+    initial: 20
+    icon: mdi:star
+
+  champ_xp_daily_bonus:
+    name: Level Up Family - Bonus diario
+    min: 0
+    max: 200
+    step: 5
+    mode: box
+    initial: 25
+    icon: mdi:trophy-award
+
+  # ----------------------------------------------------------
+  # Reglas semanales
+  # ----------------------------------------------------------
+
+  champ_weekly_goal_pct:
+    name: Level Up Family - Objetivo semanal
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    initial: 75
+    unit_of_measurement: "%"
+    icon: mdi:target
+
+  champ_weekly_streak_multiplier:
+    name: Level Up Family - Multiplicador racha semanal
+    min: 1
+    max: 3
+    step: 0.05
+    mode: box
+    initial: 1.25
+    icon: mdi:creation
+
+  # ----------------------------------------------------------
+  # Valores de penalización
+  # ----------------------------------------------------------
+
+  champ_penalty_minor:
+    name: Level Up Family - Penalización leve
+    min: 0
+    max: 200
+    step: 5
+    mode: box
+    icon: mdi:alert-outline
+
+  champ_penalty_medium:
+    name: Level Up Family - Penalización media
+    min: 0
+    max: 200
+    step: 5
+    mode: box
+    icon: mdi:alert
+
+  champ_penalty_major:
+    name: Level Up Family - Penalización grave
+    min: 0
+    max: 500
+    step: 5
+    mode: box
+    icon: mdi:alert-octagon
+
+# ============================================================
+# TEXTO
+# ============================================================
+
+input_text:
+  champ_current_season:
+    name: Level Up Family - Nombre temporada actual
+    max: 50
+    icon: mdi:shield-star
+
+# ============================================================
+# FECHAS
+# ============================================================
+
+input_datetime:
+  champ_season_start:
+    name: Level Up Family - Inicio de temporada
+    has_date: true
+    has_time: false
+    icon: mdi:calendar-start
+
+# ============================================================
+# SENSORES DERIVADOS
+# ============================================================
+
+template:
+  - sensor:
+      - name: "Level Up Family - Carpeta temporada"
+        unique_id: champ_season_folder
+        default_entity_id: sensor.champ_season_folder
+        icon: mdi:folder-image
+        state: >-
+          {% set temporada = states('input_number.champ_season_number') | int(1) %}
+          {% if temporada < 10 %}
+            season_0{{ temporada }}
+          {% else %}
+            season_{{ temporada }}
+          {% endif %}
+
+      - name: "Level Up Family - Ruta temporada"
+        unique_id: champ_season_path
+        default_entity_id: sensor.champ_season_path
+        icon: mdi:folder-multiple-image
+        state: >-
+          {% set temporada = states('input_number.champ_season_number') | int(1) %}
+          {% if temporada < 10 %}
+            /local/level_up_family/season_0{{ temporada }}
+          {% else %}
+            /local/level_up_family/season_{{ temporada }}
+          {% endif %}
+
+# ============================================================
+# SCRIPTS
+# ============================================================
+
+script:
+  # ==========================================================
+  # MARCAR MISIÓN
+  #
+  # Cada tarea semanal se almacena mediante bitmask:
+  #
+  # Lunes       1
+  # Martes      2
+  # Miércoles   4
+  # Jueves      8
+  # Viernes    16
+  # Sábado     32
+  # Domingo    64
+  #
+  # Ejemplos:
+  #
+  # Lunes                  = 1
+  # Lunes + martes         = 3
+  # Lunes a viernes       = 31
+  # Semana completa       = 127
+  # ==========================================================
+
+  champ_marcar_mision:
+    alias: "Level Up Family - Marcar misión"
+    icon: mdi:checkbox-marked-circle-outline
+
+    fields:
+      tarea:
+        name: Tarea semanal
+        required: true
+        selector:
+          entity:
+            domain: input_number
+
+      fecha:
+        name: Fecha
+        required: true
+        selector:
+          date:
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          semana_actual: "{{ now().isocalendar().week }}"
+          ano_actual: "{{ now().isocalendar().year }}"
+
+          semana_fecha: >-
+            {{ strptime(fecha, '%Y-%m-%d').isocalendar().week }}
+          ano_fecha: >-
+            {{ strptime(fecha, '%Y-%m-%d').isocalendar().year }}
+          dia_semana: >-
+            {{ strptime(fecha, '%Y-%m-%d').weekday() }}
+
+          bit: "{{ 2 ** dia_semana }}"
+
+          valor_actual: "{{ states(tarea) | int(0) }}"
+
+      # Solo se permite modificar la semana ISO actual
+      - condition: template
+        value_template: >-
+          {{
+            semana_fecha | int == semana_actual | int
+            and
+            ano_fecha | int == ano_actual | int
+          }}
+
+      - action: input_number.set_value
+        target:
+          entity_id: "{{ tarea }}"
+        data:
+          value: >-
+            {{
+              valor_actual | int
+              | bitwise_or(bit | int)
+            }}
+
+  # ==========================================================
+  # DESMARCAR MISIÓN
+  # ==========================================================
+
+  champ_desmarcar_mision:
+    alias: "Level Up Family - Desmarcar misión"
+    icon: mdi:checkbox-blank-circle-outline
+
+    fields:
+      tarea:
+        name: Tarea semanal
+        required: true
+        selector:
+          entity:
+            domain: input_number
+
+      fecha:
+        name: Fecha
+        required: true
+        selector:
+          date:
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      - variables:
+          semana_actual: "{{ now().isocalendar().week }}"
+          ano_actual: "{{ now().isocalendar().year }}"
+
+          semana_fecha: >-
+            {{ strptime(fecha, '%Y-%m-%d').isocalendar().week }}
+          ano_fecha: >-
+            {{ strptime(fecha, '%Y-%m-%d').isocalendar().year }}
+          dia_semana: >-
+            {{ strptime(fecha, '%Y-%m-%d').weekday() }}
+
+          bit: "{{ 2 ** dia_semana }}"
+
+          valor_actual: "{{ states(tarea) | int(0) }}"
+
+      # Solo se permite modificar la semana ISO actual
+      - condition: template
+        value_template: >-
+          {{
+            semana_fecha | int == semana_actual | int
+            and
+            ano_fecha | int == ano_actual | int
+          }}
+
+      - action: input_number.set_value
+        target:
+          entity_id: "{{ tarea }}"
+        data:
+          value: >-
+            {{
+              (valor_actual | int)
+              -
+              (
+                (valor_actual | int)
+                | bitwise_and(bit | int)
+              )
+            }}
+
+  # ==========================================================
+  # APLICAR PENALIZACIÓN
+  #
+  # 1. Registra la penalización individual en champion.db.
+  # 2. Comprueba que SQLite respondió correctamente.
+  # 3. Incrementa el acumulador semanal de HA.
+  #
+  # SQLite es la fuente de verdad del histórico.
+  # ==========================================================
+
+  champ_aplicar_penalizacion:
+    alias: "Level Up Family - Aplicar penalización"
+    icon: mdi:alert-octagon-outline
+
+    fields:
+      player_key:
+        name: Clave del jugador
+        description: "player1 = player1 / player2 = player2"
+        required: true
+        selector:
+          text:
+
+      penalizaciones:
+        name: Penalizaciones semanales
+        description: Contador semanal de penalizaciones del jugador
+        required: true
+        selector:
+          entity:
+            domain: input_number
+
+      motivo:
+        name: Motivo
+        required: true
+        selector:
+          text:
+
+      cantidad:
+        name: XP de penalización
+        required: true
+        selector:
+          number:
+            min: 1
+            max: 500
+            step: 1
+            unit_of_measurement: XP
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      # -------------------------------------------------------
+      # 1. Registrar primero en SQLite
+      # -------------------------------------------------------
+
+      - action: shell_command.champ_db_add_penalty
+        data:
+          player_key: "{{ player_key }}"
+          amount: "{{ cantidad | int }}"
+          reason: "{{ motivo }}"
+        response_variable: resultado
+
+      # -------------------------------------------------------
+      # 2. Solo continuar si SQLite escribió correctamente
+      # -------------------------------------------------------
+
+      - condition: template
+        value_template: "{{ resultado.returncode | int == 0 }}"
+
+      # -------------------------------------------------------
+      # 3. Obtener el valor actual
+      # -------------------------------------------------------
+
+      - variables:
+          actual: "{{ states(penalizaciones) | int(0) }}"
+
+      # -------------------------------------------------------
+      # 4. Incrementar penalizaciones semanales
+      # -------------------------------------------------------
+
+      - action: input_number.set_value
+        target:
+          entity_id: "{{ penalizaciones }}"
+        data:
+          value: >-
+            {{
+              (actual | int)
+              +
+              (cantidad | int)
+            }}
+
+  # ==========================================================
+  # ANULAR PENALIZACIÓN
+  #
+  # Recibe el ID único almacenado en champion.db.
+  #
+  # SQLite:
+  #   ACTIVE -> CANCELLED
+  #
+  # Python devuelve:
+  #
+  # {
+  #   "penalty_id": 7,
+  #   "player_key": "player1",
+  #   "amount": 10
+  # }
+  #
+  # Home Assistant utiliza esa respuesta para restar
+  # exactamente el importe al jugador correspondiente.
+  # ==========================================================
+
+  champ_anular_penalizacion:
+    alias: "Level Up Family - Anular penalización"
+    icon: mdi:undo-variant
+
+    fields:
+      penalty_id:
+        name: ID de penalización
+        required: true
+        selector:
+          number:
+            min: 1
+            max: 999999
+            step: 1
+            mode: box
+
+    sequence:
+      # Impide escrituras durante la migración o el reinicio manual.
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: "off"
+      # -------------------------------------------------------
+      # 1. Anular la penalización en SQLite
+      # -------------------------------------------------------
+
+      - action: shell_command.champ_db_cancel_penalty
+        data:
+          penalty_id: "{{ penalty_id | int }}"
+        response_variable: resultado
+
+      # -------------------------------------------------------
+      # 2. Continuar solo si Python terminó correctamente
+      # -------------------------------------------------------
+
+      - condition: template
+        value_template: "{{ resultado.returncode | int == 0 }}"
+
+      # -------------------------------------------------------
+      # 3. Convertir la respuesta JSON
+      # -------------------------------------------------------
+
+      - variables:
+          penalizacion: "{{ resultado.stdout | from_json }}"
+
+      # -------------------------------------------------------
+      # 4. Extraer jugador e importe
+      # -------------------------------------------------------
+
+      - variables:
+          jugador: "{{ penalizacion.player_key }}"
+          importe: "{{ penalizacion.amount | int }}"
+
+      # -------------------------------------------------------
+      # 5. Determinar el acumulador semanal
+      # -------------------------------------------------------
+
+      - variables:
+          entidad_penalizaciones: >-
+            {% if jugador == 'player1' %}
+              input_number.champ_player1_penalties_this_week
+            {% elif jugador == 'player2' %}
+              input_number.champ_player2_penalties_this_week
+            {% else %}
+              unknown
+            {% endif %}
+
+      # -------------------------------------------------------
+      # 6. Protección frente a jugador desconocido
+      # -------------------------------------------------------
+
+      - condition: template
+        value_template: "{{ entidad_penalizaciones != 'unknown' }}"
+
+      # -------------------------------------------------------
+      # 7. Restar la penalización del acumulador semanal
+      #
+      # Nunca permitimos valores negativos.
+      # -------------------------------------------------------
+
+      - action: input_number.set_value
+        target:
+          entity_id: "{{ entidad_penalizaciones }}"
+        data:
+          value: >-
+            {{
+              [
+                (states(entidad_penalizaciones) | int(0))
+                -
+                (importe | int),
+                0
+              ] | max
+            }}
+
+# Activar antes de migrar o reiniciar. Nunca se ejecuta un reset al arrancar.
+input_boolean:
+  champ_maintenance:
+    name: Level Up Family - Mantenimiento
+    icon: mdi:tools

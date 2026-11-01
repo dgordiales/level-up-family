@@ -1,0 +1,28 @@
+# ============================================================
+# LEVEL UP FAMILY - HISTÓRICO
+# Fuente de verdad: /config/level_up_family/data/champion.db
+# Lector: /config/level_up_family/python/champion_history.py
+# ============================================================
+
+command_line:
+
+  - sensor:
+      name: "Champion - Histórico"
+      unique_id: champion_historico
+
+      command: >-
+        python3 /config/level_up_family/python/champion_history.py
+
+      scan_interval: 60
+
+      value_template: >-
+        {{ value_json.weeks_count | int(0) }}
+
+      json_attributes:
+        - weeks_count
+        - years_count
+        - weeks
+        - years
+        - error
+
+      icon: mdi:history

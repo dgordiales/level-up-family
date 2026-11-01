@@ -1,0 +1,67 @@
+# Level Up Family - Calendario de temporada (28 días naturales de HA).
+# Inicio = día 1; inicio + 27 = día 28; inicio + 28 = finalizada.
+# Solo informa: no reinicia contadores ni cambia automáticamente de temporada.
+template:
+  - sensor:
+      - name: "Level Up Family - Día de temporada"
+        unique_id: champ_season_day
+        default_entity_id: sensor.champ_season_day
+        icon: mdi:calendar-today
+        availability: >-
+          {{ strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) is not none }}
+        state: >-
+          {% set start = strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) %}
+          {% if start is not none %}
+            {% set elapsed = (now().date() - start.date()).days %}
+            {{ [[elapsed + 1, 0] | max, 28] | min }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+
+      - name: "Level Up Family - Días restantes de temporada"
+        unique_id: champ_season_days_remaining
+        default_entity_id: sensor.champ_season_days_remaining
+        icon: mdi:calendar-clock
+        unit_of_measurement: d
+        availability: >-
+          {{ strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) is not none }}
+        state: >-
+          {% set start = strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) %}
+          {% if start is not none %}
+            {% set elapsed = (now().date() - start.date()).days %}
+            {{ [[28 - elapsed, 0] | max, 28] | min }}
+          {% else %}
+            {{ none }}
+          {% endif %}
+        attributes:
+          incluye_hoy: true
+          duracion_dias: 28
+
+      - name: "Level Up Family - Último día de temporada"
+        unique_id: champ_season_end
+        default_entity_id: sensor.champ_season_end
+        icon: mdi:calendar-end
+        device_class: date
+        availability: >-
+          {{ strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) is not none }}
+        state: >-
+          {% set start = strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) %}
+          {{ (start.date() + timedelta(days=27)).isoformat() if start is not none else none }}
+
+      - name: "Level Up Family - Estado de temporada"
+        unique_id: champ_season_status
+        default_entity_id: sensor.champ_season_status
+        icon: mdi:flag-checkered
+        availability: >-
+          {{ strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) is not none }}
+        state: >-
+          {% set start = strptime(states('input_datetime.champ_season_start'), '%Y-%m-%d', none) %}
+          {% if start is none %}
+            {{ none }}
+          {% elif now().date() < start.date() %}
+            pendiente
+          {% elif now().date() < start.date() + timedelta(days=28) %}
+            activa
+          {% else %}
+            finalizada
+          {% endif %}

@@ -1,0 +1,29 @@
+# Combinar estas secciones con las existentes; no duplicar claves principales.
+homeassistant:
+  packages: !include_dir_named packages
+
+lovelace:
+  dashboards:
+    level-up-family-player1:
+      mode: yaml
+      title: Level Up Family - player1
+      icon: mdi:gamepad-variant
+      show_in_sidebar: true
+      filename: panel/level_up_family/player1.yaml
+    level-up-family-player2:
+      mode: yaml
+      title: Level Up Family - player2
+      icon: mdi:gamepad-variant
+      show_in_sidebar: true
+      filename: panel/level_up_family/player2.yaml
+    level-up-family-parents:
+      mode: yaml
+      title: Level Up Family - Padres
+      icon: mdi:shield-account
+      show_in_sidebar: true
+      require_admin: true
+      filename: panel/level_up_family/parents.yaml
+
+# Instalar button-card y registrar su recurso JavaScript en Home Assistant.
+# Si ya gestionas recursos desde la interfaz, conserva esa configuración.
+# Ejemplo de recurso: /hacsfiles/button-card/button-card.js, tipo module.
