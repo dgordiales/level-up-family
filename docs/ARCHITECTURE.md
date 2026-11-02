@@ -2,7 +2,11 @@
 
 ## Estado de juego
 
-Home Assistant mantiene las misiones semanales en helpers numéricos: cada bit representa un día, del lunes (`1`) al domingo (`64`). Marcar o desmarcar una misión actualiza ese bitmask. Los sensores derivan XP, progreso, objetivos y nivel. Las tareas y sus calendarios todavía están definidos en YAML.
+Home Assistant mantiene las misiones semanales en helpers numéricos: cada bit representa un día, del lunes (`1`) al domingo (`64`). Los sensores derivan XP, progreso, objetivos y nivel. `task_defaults.json` aporta los valores iniciales y `lf_tasks.yaml` los combina con los metadatos editables persistidos en helpers de texto para publicar `sensor.champ_task_catalog`.
+
+Los paneles, cálculos y cierres consumen ese catálogo. Los cambios de configuración y las acciones de marcar, desmarcar o alternar se serializan en `script.champ_task_mutate`. Antes de escribir se comprueban la revisión del formulario, tipos, límites, semana activa, jugador y día. Cambiar reglas de una tarea con progreso se rechaza; su nombre sigue siendo editable.
+
+La reasignación mantiene el helper físico de la misión. Cada cierre semanal reinicia únicamente las tareas asignadas al jugador que está cerrando, aunque sus entidades conservaran un nombre anterior. Así se evita borrar misiones del otro jugador. Los helpers antiguos de XP por dificultad se conservan por compatibilidad; los XP de cada tarea proceden ahora del catálogo.
 
 `lf_core.yaml` contiene reglas compartidas y scripts de acceso. `lf_player1.yaml` y `lf_player2.yaml` reúnen los helpers, sensores, acciones y cierres diarios de cada jugador. `lf_weekly.yaml` inicializa la semana y programa su cierre, incluyendo recuperación al arrancar. `lf_season.yaml` calcula el estado y las fechas de una temporada de 28 días. `lf_themes.yaml` define la presentación de la temporada.
 
@@ -16,7 +20,7 @@ Los scripts que escriben comprueban el helper de mantenimiento. El cierre diario
 
 ## Paneles
 
-Los paneles de jugador incluyen únicamente su pestaña Level Up Family. El panel de padres contiene control e histórico. No hay pestañas de domótica general ni referencias a dispositivos de la casa.
+Los paneles de jugador incluyen únicamente su pestaña Level Up Family. El panel de padres contiene control, histórico y Tareas y premios. El módulo local `level-up-family-cards.js` registra las tarjetas de administración, misiones y premio, usando el objeto `hass` de Home Assistant y nodos de texto para los nombres y recompensas. No hay pestañas de domótica general ni referencias a dispositivos de la casa.
 
 ## Compatibilidad
 

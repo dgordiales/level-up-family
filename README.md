@@ -8,6 +8,8 @@ Esta primera versión reúne el motor SQLite, los paquetes de Home Assistant, lo
 
 - Panel de `player1` y panel de `player2`, cada uno con una única pestaña del juego.
 - Panel de padres con control e histórico de Level Up Family.
+- Pestaña de padres **Tareas y premios** para editar las 20 tareas actuales: nombre, XP, jugador y calendario.
+- Un premio semanal distinto para cada jugador, visible en su propio panel con el estilo de temporada.
 - Misiones, XP, bonus, rachas, niveles, penalizaciones y cierres diarios/semanales.
 - Temporada de 28 días, con fecha de inicio configurable y estados pendiente, activa y finalizada.
 - Histórico en SQLite y utilidad de limpieza con copia de seguridad.
@@ -25,7 +27,7 @@ tests/                         Pruebas sin acceso a datos reales
 tools/                         Validadores de configuración y paneles
 ```
 
-Consulta la [instalación](docs/INSTALLATION.md), la [arquitectura](docs/ARCHITECTURE.md) y la [hoja de ruta](docs/ROADMAP.md).
+Consulta la [instalación](docs/INSTALLATION.md), [Tareas y premios](docs/TASKS_AND_REWARDS.md), la [arquitectura](docs/ARCHITECTURE.md) y la [hoja de ruta](docs/ROADMAP.md).
 
 ## Desarrollo
 
