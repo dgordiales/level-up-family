@@ -73,11 +73,59 @@ views:
       grid_options:
         columns: 24
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
   - type: grid
     cards:
     - type: heading
       heading: player1
       icon: mdi:account
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: grid
       columns: 3
       square: false
@@ -96,6 +144,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player1_points_total
@@ -110,6 +179,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: sensor.player1_xp_semana_efectivo
@@ -124,6 +214,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
     - type: custom:button-card
       template: champ_metric
       entity: sensor.player1_misiones_completadas_calculadas
@@ -131,6 +242,28 @@ views:
       show_label: true
       label: '[[[ return `de ${states[''sensor.player1_misiones_previstas_calculadas'']?.state || 0} misiones`;
         ]]]'
+      styles:
+        card:
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
+      triggers_update:
+      - sensor.champ_theme
     - type: grid
       columns: 3
       square: false
@@ -149,6 +282,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player1_streak_days
@@ -163,6 +317,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player1_streak_weeks
@@ -177,6 +352,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
     - type: markdown
       content: "### Estado semanal\n**Objetivo:** {% if is_state('binary_sensor.player1_objetivo_semanal_conseguido','on')\
         \ %}✅ Conseguido{% else %}⏳ Pendiente{% endif %}\n\n**Multas:** {{ states('input_number.champ_player1_penalties_this_week')\
@@ -185,11 +381,59 @@ views:
         \nℹ️ **Objetivo semanal:** se consigue al alcanzar el porcentaje configurado de misiones.  \nℹ️ **Multas:**\
         \ XP descontado esta semana; no reduce el XP histórico.  \nℹ️ **Bonus de racha:** se activa desde la segunda\
         \ semana buena consecutiva.\n"
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
   - type: grid
     cards:
     - type: heading
       heading: player2
       icon: mdi:account
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: grid
       columns: 3
       square: false
@@ -208,6 +452,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player2_points_total
@@ -222,6 +487,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: sensor.player2_xp_semana_efectivo
@@ -236,6 +522,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
     - type: custom:button-card
       template: champ_metric
       entity: sensor.player2_misiones_completadas_calculadas
@@ -243,6 +550,28 @@ views:
       show_label: true
       label: '[[[ return `de ${states[''sensor.player2_misiones_previstas_calculadas'']?.state || 0} misiones`;
         ]]]'
+      styles:
+        card:
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
+      triggers_update:
+      - sensor.champ_theme
     - type: grid
       columns: 3
       square: false
@@ -261,6 +590,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player2_streak_days
@@ -275,6 +625,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
       - type: custom:button-card
         template: champ_metric
         entity: input_number.champ_player2_streak_weeks
@@ -289,6 +660,27 @@ views:
             - position: absolute
             - inset: 0
             - pointer-events: none
+          card:
+          - background: rgba(4,14,38,.94)
+          - border: 1px solid rgba(101,221,255,.35)
+          - border-radius: 20px
+          - box-shadow: none
+          - color: '#ffffff'
+          - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+              || '''') ? accent : ''#65ddff''; ]]]'
+          - --lf-panel-border: rgba(101,221,255,.35)
+          - --lf-panel-divider: rgba(101,221,255,.18)
+          - --lf-panel-inset: rgba(101,221,255,.06)
+          icon:
+          - color: var(--lf-accent)
+          name:
+          - color: '#ffffff'
+          state:
+          - color: var(--lf-accent)
+          label:
+          - color: rgba(255,255,255,.72)
+        triggers_update:
+        - sensor.champ_theme
     - type: markdown
       content: "### Estado semanal\n**Objetivo:** {% set c = states('sensor.player2_misiones_completadas_calculadas')\
         \ | float(0) %}{% set g = states('input_number.champ_weekly_goal_pct') | float(75) %}{% if is_state('binary_sensor.player2_objetivo_semanal_conseguido',\
@@ -298,6 +690,30 @@ views:
         \nℹ️ **Objetivo semanal:** se consigue al alcanzar el porcentaje configurado de misiones.  \nℹ️ **Multas:**\
         \ XP descontado esta semana; no reduce el XP histórico.  \nℹ️ **Bonus de racha:** se activa desde la segunda\
         \ semana buena consecutiva.\n"
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
   - type: grid
     column_span: 2
     cards:
@@ -314,6 +730,30 @@ views:
           - **Leve · −10 XP:** incidencia menor.
           - **Media · −20 XP:** incumplimiento relevante.
           - **Grave · −40 XP:** conducta o incumplimiento importante.
+        card_mod:
+          style: |
+            :host {
+              --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+              --primary-text-color: #ffffff;
+              --secondary-text-color: rgba(255,255,255,.72);
+              --primary-color: var(--lf-accent);
+              --state-icon-color: var(--lf-accent);
+              --state-icon-active-color: var(--lf-accent);
+              --card-mod-icon-color: var(--lf-accent);
+              --ha-card-header-color: #ffffff;
+              --ha-card-background: rgba(4,14,38,.94);
+              --ha-card-border-color: rgba(101,221,255,.35);
+              --ha-card-border-radius: 20px;
+              --ha-card-box-shadow: none;
+              color: #ffffff;
+            }
+            ha-card {
+              background: rgba(4,14,38,.94);
+              border: 1px solid rgba(101,221,255,.35);
+              border-radius: 20px;
+              box-shadow: none;
+              color: #ffffff;
+            }
       - type: grid
         columns: 2
         square: false
@@ -323,6 +763,30 @@ views:
           - type: markdown
             content: |
               ### player1
+            card_mod:
+              style: |
+                :host {
+                  --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                  --primary-text-color: #ffffff;
+                  --secondary-text-color: rgba(255,255,255,.72);
+                  --primary-color: var(--lf-accent);
+                  --state-icon-color: var(--lf-accent);
+                  --state-icon-active-color: var(--lf-accent);
+                  --card-mod-icon-color: var(--lf-accent);
+                  --ha-card-header-color: #ffffff;
+                  --ha-card-background: rgba(4,14,38,.94);
+                  --ha-card-border-color: rgba(101,221,255,.35);
+                  --ha-card-border-radius: 20px;
+                  --ha-card-box-shadow: none;
+                  color: #ffffff;
+                }
+                ha-card {
+                  background: rgba(4,14,38,.94);
+                  border: 1px solid rgba(101,221,255,.35);
+                  border-radius: 20px;
+                  box-shadow: none;
+                  color: #ffffff;
+                }
           - type: horizontal-stack
             cards:
             - type: button
@@ -341,6 +805,30 @@ views:
                   text: ¿Aplicar una multa leve de 10 XP a player1?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
             - type: button
               name: Media · −20 XP
               icon: mdi:alert
@@ -357,6 +845,30 @@ views:
                   text: ¿Aplicar una multa media de 20 XP a player1?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
             - type: button
               name: Grave · −40 XP
               icon: mdi:alert-octagon
@@ -373,11 +885,59 @@ views:
                   text: ¿Aplicar una multa grave de 40 XP a player1?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
         - type: vertical-stack
           cards:
           - type: markdown
             content: |
               ### player2
+            card_mod:
+              style: |
+                :host {
+                  --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                  --primary-text-color: #ffffff;
+                  --secondary-text-color: rgba(255,255,255,.72);
+                  --primary-color: var(--lf-accent);
+                  --state-icon-color: var(--lf-accent);
+                  --state-icon-active-color: var(--lf-accent);
+                  --card-mod-icon-color: var(--lf-accent);
+                  --ha-card-header-color: #ffffff;
+                  --ha-card-background: rgba(4,14,38,.94);
+                  --ha-card-border-color: rgba(101,221,255,.35);
+                  --ha-card-border-radius: 20px;
+                  --ha-card-box-shadow: none;
+                  color: #ffffff;
+                }
+                ha-card {
+                  background: rgba(4,14,38,.94);
+                  border: 1px solid rgba(101,221,255,.35);
+                  border-radius: 20px;
+                  box-shadow: none;
+                  color: #ffffff;
+                }
           - type: horizontal-stack
             cards:
             - type: button
@@ -396,6 +956,30 @@ views:
                   text: ¿Aplicar una multa leve de 10 XP a player2?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
             - type: button
               name: Media · −20 XP
               icon: mdi:alert
@@ -412,6 +996,30 @@ views:
                   text: ¿Aplicar una multa media de 20 XP a player2?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
             - type: button
               name: Grave · −40 XP
               icon: mdi:alert-octagon
@@ -428,6 +1036,30 @@ views:
                   text: ¿Aplicar una multa grave de 40 XP a player2?
               hold_action:
                 action: none
+              card_mod:
+                style: |
+                  :host {
+                    --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                    --primary-text-color: #ffffff;
+                    --secondary-text-color: rgba(255,255,255,.72);
+                    --primary-color: var(--lf-accent);
+                    --state-icon-color: var(--lf-accent);
+                    --state-icon-active-color: var(--lf-accent);
+                    --card-mod-icon-color: var(--lf-accent);
+                    --ha-card-header-color: #ffffff;
+                    --ha-card-background: rgba(4,14,38,.94);
+                    --ha-card-border-color: rgba(101,221,255,.35);
+                    --ha-card-border-radius: 20px;
+                    --ha-card-box-shadow: none;
+                    color: #ffffff;
+                  }
+                  ha-card {
+                    background: rgba(4,14,38,.94);
+                    border: 1px solid rgba(101,221,255,.35);
+                    border-radius: 20px;
+                    box-shadow: none;
+                    color: #ffffff;
+                  }
   - type: grid
     column_span: 2
     cards:
@@ -444,6 +1076,30 @@ views:
       grid_options:
         columns: 24
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
   - type: grid
     column_span: 2
     columns: 2
@@ -466,6 +1122,30 @@ views:
         Aquí aparecen las **multas activas registradas en SQLite**. Cada multa conserva su ID único, el niño, el importe y el motivo.
 
         Para anular una multa concreta, copia su **ID** en el selector inferior y pulsa **ANULAR MULTA**. La multa no se borra del histórico: pasa a estado cancelado y se devuelve su XP al acumulado semanal del niño.
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_multas_activas
       show_icon: false
@@ -473,13 +1153,31 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_multas_activas
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -536,6 +1234,55 @@ views:
         entities:
         - entity: input_number.champ_penalty_id_to_cancel
           name: ID de multa a anular
+        card_mod:
+          style:
+            .: |
+              :host {
+                --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+                --primary-text-color: #ffffff;
+                --secondary-text-color: rgba(255,255,255,.72);
+                --primary-color: var(--lf-accent);
+                --state-icon-color: var(--lf-accent);
+                --state-icon-active-color: var(--lf-accent);
+                --card-mod-icon-color: var(--lf-accent);
+                --ha-card-header-color: #ffffff;
+                --ha-card-background: rgba(4,14,38,.94);
+                --ha-card-border-color: rgba(101,221,255,.35);
+                --ha-card-border-radius: 20px;
+                --ha-card-box-shadow: none;
+                color: #ffffff;
+              }
+              ha-card {
+                background: rgba(4,14,38,.94);
+                border: 1px solid rgba(101,221,255,.35);
+                border-radius: 20px;
+                box-shadow: none;
+                color: #ffffff;
+              }
+
+              :host {
+                --input-fill-color: #0b1c37;
+                --input-ink-color: #ffffff;
+                --input-label-ink-color: rgba(255,255,255,.72);
+                --input-idle-line-color: rgba(101,221,255,.35);
+                --input-hover-line-color: var(--lf-accent);
+                --mdc-text-field-fill-color: #0b1c37;
+                --ha-color-fill-neutral-quiet-resting: #0b1c37;
+                --ha-color-fill-neutral-normal-resting: #0b1c37;
+                --wa-color-neutral-fill-quiet: #0b1c37;
+                --wa-color-neutral-fill-normal: #0b1c37;
+                --wa-color-neutral-on-loud: #ffffff;
+                --wa-color-brand-fill-loud: var(--lf-accent);
+              }
+            hui-input-number-entity-row$: |
+              ha-input::part(wa-base) {
+                background: #0b1c37;
+                border: 1px solid rgba(101,221,255,.35);
+                border-radius: 10px;
+              }
+              ha-input::part(wa-input) {
+                color: #ffffff;
+              }
       - type: button
         name: ANULAR MULTA
         icon: mdi:undo-variant
@@ -548,6 +1295,30 @@ views:
               como cancelada.
         hold_action:
           action: none
+        card_mod:
+          style: |
+            :host {
+              --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+              --primary-text-color: #ffffff;
+              --secondary-text-color: rgba(255,255,255,.72);
+              --primary-color: var(--lf-accent);
+              --state-icon-color: var(--lf-accent);
+              --state-icon-active-color: var(--lf-accent);
+              --card-mod-icon-color: var(--lf-accent);
+              --ha-card-header-color: #ffffff;
+              --ha-card-background: rgba(4,14,38,.94);
+              --ha-card-border-color: rgba(101,221,255,.35);
+              --ha-card-border-radius: 20px;
+              --ha-card-box-shadow: none;
+              color: #ffffff;
+            }
+            ha-card {
+              background: rgba(4,14,38,.94);
+              border: 1px solid rgba(101,221,255,.35);
+              border-radius: 20px;
+              box-shadow: none;
+              color: #ffffff;
+            }
   theme: Catppuccin Mocha
   cards: []
 - title: Histórico Level Up Family
@@ -568,6 +1339,30 @@ views:
       grid_options:
         columns: 24
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
   - type: grid
     column_span: 2
     cards:
@@ -578,10 +1373,20 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
@@ -592,6 +1397,14 @@ views:
         - grid-template-areas: '"content"'
         - grid-template-columns: 1fr
         - grid-template-rows: auto
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -630,7 +1443,7 @@ views:
                   <div style="font-size:11px;opacity:.65;font-weight:800;">
                     SEMANAS REALES
                   </div>
-                  <div style="font-size:26px;font-weight:900;">
+                  <div style="font-size:26px;font-weight:900;color:var(--lf-accent);">
                     ${realWeeks.length}
                   </div>
                 </div>
@@ -638,7 +1451,7 @@ views:
                   <div style="font-size:11px;opacity:.65;font-weight:800;">
                     RESÚMENES ANUALES
                   </div>
-                  <div style="font-size:26px;font-weight:900;">
+                  <div style="font-size:26px;font-weight:900;color:var(--lf-accent);">
                     ${years.filter(x => Number(x.year) !== 2099).length}
                   </div>
                 </div>
@@ -646,7 +1459,7 @@ views:
                   <div style="font-size:11px;opacity:.65;font-weight:800;">
                     DATOS DE PRUEBA
                   </div>
-                  <div style="font-size:26px;font-weight:900;">
+                  <div style="font-size:26px;font-weight:900;color:var(--lf-accent);">
                     ${testWeeks.length}
                   </div>
                 </div>
@@ -661,6 +1474,30 @@ views:
     - type: heading
       heading: player1
       icon: mdi:account
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_historico
       show_icon: false
@@ -668,13 +1505,31 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -726,6 +1581,30 @@ views:
     - type: heading
       heading: player2
       icon: mdi:account
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_historico
       show_icon: false
@@ -733,13 +1612,31 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -795,6 +1692,30 @@ views:
       grid_options:
         columns: full
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_historico
       show_icon: false
@@ -802,11 +1723,21 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
         - text-align: left
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
@@ -817,6 +1748,14 @@ views:
         - grid-template-areas: '"content"'
         - grid-template-columns: 1fr
         - grid-template-rows: auto
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -856,7 +1795,7 @@ views:
                   gap:8px;
                   align-items:center;
                   padding:9px 0;
-                  border-top:1px solid rgba(255,255,255,.08);
+                  border-top:1px solid var(--lf-panel-divider);
                   ${test ? 'opacity:.68;' : ''}
                 ">
                   <div style="font-weight:800;">${player(x.player_key)}</div>
@@ -909,6 +1848,30 @@ views:
       grid_options:
         columns: full
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_historico
       show_icon: false
@@ -916,11 +1879,21 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
         - text-align: left
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
@@ -931,6 +1904,14 @@ views:
         - grid-template-areas: '"content"'
         - grid-template-columns: 1fr
         - grid-template-rows: auto
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -962,9 +1943,9 @@ views:
                 ${weeks.map(x => `
                   <div style="
                     padding:13px;
-                    border:1px solid rgba(255,255,255,.10);
+                    border:1px solid var(--lf-panel-border);
                     border-radius:12px;
-                    background:rgba(0,0,0,.10);
+                    background:var(--lf-panel-inset);
                     ${Number(x.year) === 2099 ? 'opacity:.72;' : ''}
                   ">
                     <div style="display:flex;justify-content:space-between;gap:10px;">
@@ -1006,6 +1987,30 @@ views:
       grid_options:
         columns: full
         rows: auto
+      card_mod:
+        style: |
+          :host {
+            --lf-accent: {{ state_attr('sensor.champ_theme', 'accent') or '#65ddff' }};
+            --primary-text-color: #ffffff;
+            --secondary-text-color: rgba(255,255,255,.72);
+            --primary-color: var(--lf-accent);
+            --state-icon-color: var(--lf-accent);
+            --state-icon-active-color: var(--lf-accent);
+            --card-mod-icon-color: var(--lf-accent);
+            --ha-card-header-color: #ffffff;
+            --ha-card-background: rgba(4,14,38,.94);
+            --ha-card-border-color: rgba(101,221,255,.35);
+            --ha-card-border-radius: 20px;
+            --ha-card-box-shadow: none;
+            color: #ffffff;
+          }
+          ha-card {
+            background: rgba(4,14,38,.94);
+            border: 1px solid rgba(101,221,255,.35);
+            border-radius: 20px;
+            box-shadow: none;
+            color: #ffffff;
+          }
     - type: custom:button-card
       entity: sensor.champion_historico
       show_icon: false
@@ -1013,11 +2018,21 @@ views:
       show_state: false
       triggers_update:
       - sensor.champion_historico
+      - sensor.champ_theme
       styles:
         card:
         - padding: 14px
-        - border-radius: 14px
         - text-align: left
+        - background: rgba(4,14,38,.94)
+        - border: 1px solid rgba(101,221,255,.35)
+        - border-radius: 20px
+        - box-shadow: none
+        - color: '#ffffff'
+        - --lf-accent: '[[[ const accent = states[''sensor.champ_theme'']?.attributes?.accent; return /^#[a-fA-F0-9]{3,8}$/.test(accent
+            || '''') ? accent : ''#65ddff''; ]]]'
+        - --lf-panel-border: rgba(101,221,255,.35)
+        - --lf-panel-divider: rgba(101,221,255,.18)
+        - --lf-panel-inset: rgba(101,221,255,.06)
         custom_fields:
           content:
           - width: 100%
@@ -1028,6 +2043,14 @@ views:
         - grid-template-areas: '"content"'
         - grid-template-columns: 1fr
         - grid-template-rows: auto
+        icon:
+        - color: var(--lf-accent)
+        name:
+        - color: '#ffffff'
+        state:
+        - color: var(--lf-accent)
+        label:
+        - color: rgba(255,255,255,.72)
       custom_fields:
         content: |
           [[[
@@ -1063,9 +2086,9 @@ views:
                 ${years.map(y => `
                   <div style="
                     padding:14px;
-                    border:1px solid rgba(255,255,255,.10);
+                    border:1px solid var(--lf-panel-border);
                     border-radius:12px;
-                    background:rgba(0,0,0,.10);
+                    background:var(--lf-panel-inset);
                     ${Number(y.year) === 2099 ? 'opacity:.72;' : ''}
                   ">
                     <div style="display:flex;justify-content:space-between;">

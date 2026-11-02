@@ -36,4 +36,6 @@ Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas 
 
 El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.2` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
 
+Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
+
 La administración se muestra en el panel de padres y el formulario solo aparece para administradores. Se mantienen los permisos existentes de Home Assistant sobre scripts y helpers.
