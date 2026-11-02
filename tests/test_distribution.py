@@ -19,12 +19,16 @@ class DistributionTests(unittest.TestCase):
                 panel = yaml.safe_load(text)
                 self.assertEqual([v['path'] for v in panel['views']], [player + '-champion'])
                 self.assertNotIn('champ_' + other, text)
-                self.assertIn('script.champ_' + player + '_toggle_mision', text)
+                mission_cards = [card for section in panel['views'][0]['sections']
+                                 for card in section.get('cards', [])
+                                 if card.get('type') == 'custom:level-up-family-missions']
+                self.assertEqual(len(mission_cards), 2)
+                self.assertTrue(all(card['player'] == player for card in mission_cards))
 
     def test_parents_panel_contains_control_and_history_only(self):
         data = yaml.safe_load((PANELS / 'parents.yaml').read_text(encoding='utf-8'))
         self.assertEqual([v['path'] for v in data['views']],
-                         ['control-champion', 'historico-champion'])
+                         ['control-champion', 'historico-champion', 'tasks-rewards'])
 
     def test_no_household_devices_or_notification_destinations_in_panels(self):
         for path in PANELS.glob('*.yaml'):
@@ -36,7 +40,7 @@ class DistributionTests(unittest.TestCase):
         names = set()
         for path in PANELS.glob('*.yaml'):
             names.update(re.findall(r'([a-z_]+\.png)', path.read_text(encoding='utf-8')))
-        self.assertGreaterEqual(len(names), 10)
+        self.assertTrue({'banner.png', 'fondo_vertical.png', 'icono_nivel.png'} <= names)
         for name in names:
             path = ROOT / 'config/www/level_up_family/season_01' / name
             self.assertTrue(path.is_file(), name)

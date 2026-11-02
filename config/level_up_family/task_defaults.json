@@ -1,0 +1,205 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "task01",
+      "entity": "input_number.champ_player1_task_dormir_solo_week",
+      "player": "player1",
+      "name": "Dormir solo",
+      "xp": 15,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:bed"
+    },
+    {
+      "id": "task02",
+      "entity": "input_number.champ_player1_task_tareas_cole_week",
+      "player": "player1",
+      "name": "Hacer tareas del cole",
+      "xp": 20,
+      "days": 31,
+      "once": false,
+      "icon": "mdi:book-open-variant"
+    },
+    {
+      "id": "task03",
+      "entity": "input_number.champ_player1_task_poner_mesa_week",
+      "player": "player1",
+      "name": "Poner la mesa",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:table-chair"
+    },
+    {
+      "id": "task04",
+      "entity": "input_number.champ_player1_task_quitar_mesa_week",
+      "player": "player1",
+      "name": "Quitar la mesa",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:table-chair"
+    },
+    {
+      "id": "task05",
+      "entity": "input_number.champ_player1_task_recoger_cosas_week",
+      "player": "player1",
+      "name": "Recoger sus cosas",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:basket"
+    },
+    {
+      "id": "task06",
+      "entity": "input_number.champ_player1_task_agenda_week",
+      "player": "player1",
+      "name": "Escribir en la agenda",
+      "xp": 15,
+      "days": 31,
+      "once": false,
+      "icon": "mdi:notebook-edit"
+    },
+    {
+      "id": "task07",
+      "entity": "input_number.champ_player1_task_colocar_ropa_week",
+      "player": "player1",
+      "name": "Colocar la ropa",
+      "xp": 15,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:tshirt-crew"
+    },
+    {
+      "id": "task08",
+      "entity": "input_number.champ_player1_task_ducharse_week",
+      "player": "player1",
+      "name": "Ducharse",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:shower"
+    },
+    {
+      "id": "task09",
+      "entity": "input_number.champ_player1_task_tratar_bien_week",
+      "player": "player1",
+      "name": "Tratar bien a los demás",
+      "xp": 20,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:heart"
+    },
+    {
+      "id": "task10",
+      "entity": "input_number.champ_player1_task_mochila_week",
+      "player": "player1",
+      "name": "Ordenar mochila y estuche",
+      "xp": 15,
+      "days": 96,
+      "once": true,
+      "icon": "mdi:bag-personal"
+    },
+    {
+      "id": "task11",
+      "entity": "input_number.champ_player2_task_higiene_personal_week",
+      "player": "player2",
+      "name": "Higiene personal",
+      "xp": 15,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:face-woman-shimmer"
+    },
+    {
+      "id": "task12",
+      "entity": "input_number.champ_player2_task_tareas_cole_week",
+      "player": "player2",
+      "name": "Hacer tareas del cole",
+      "xp": 20,
+      "days": 31,
+      "once": false,
+      "icon": "mdi:book-open-variant"
+    },
+    {
+      "id": "task13",
+      "entity": "input_number.champ_player2_task_poner_mesa_week",
+      "player": "player2",
+      "name": "Poner la mesa",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:table-chair"
+    },
+    {
+      "id": "task14",
+      "entity": "input_number.champ_player2_task_quitar_mesa_week",
+      "player": "player2",
+      "name": "Quitar la mesa",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:table-chair"
+    },
+    {
+      "id": "task15",
+      "entity": "input_number.champ_player2_task_recoger_cosas_week",
+      "player": "player2",
+      "name": "Recoger sus cosas",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:basket"
+    },
+    {
+      "id": "task16",
+      "entity": "input_number.champ_player2_task_agenda_week",
+      "player": "player2",
+      "name": "Escribir en la agenda",
+      "xp": 15,
+      "days": 31,
+      "once": false,
+      "icon": "mdi:notebook-edit"
+    },
+    {
+      "id": "task17",
+      "entity": "input_number.champ_player2_task_colocar_ropa_week",
+      "player": "player2",
+      "name": "Colocar la ropa",
+      "xp": 15,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:tshirt-crew"
+    },
+    {
+      "id": "task18",
+      "entity": "input_number.champ_player2_task_ducharse_week",
+      "player": "player2",
+      "name": "Ducharse",
+      "xp": 10,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:shower"
+    },
+    {
+      "id": "task19",
+      "entity": "input_number.champ_player2_task_tratar_bien_week",
+      "player": "player2",
+      "name": "Tratar bien a los demás",
+      "xp": 20,
+      "days": 127,
+      "once": false,
+      "icon": "mdi:heart"
+    },
+    {
+      "id": "task20",
+      "entity": "input_number.champ_player2_task_mochila_week",
+      "player": "player2",
+      "name": "Ordenar mochila y estuche",
+      "xp": 15,
+      "days": 96,
+      "once": true,
+      "icon": "mdi:bag-personal"
+    }
+  ]
+}

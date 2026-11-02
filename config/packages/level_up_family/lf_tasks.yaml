@@ -1,0 +1,417 @@
+input_text:
+  champ_task_config_task01:
+    name: Level Up Family - Configuración tarea task01
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task02:
+    name: Level Up Family - Configuración tarea task02
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task03:
+    name: Level Up Family - Configuración tarea task03
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task04:
+    name: Level Up Family - Configuración tarea task04
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task05:
+    name: Level Up Family - Configuración tarea task05
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task06:
+    name: Level Up Family - Configuración tarea task06
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task07:
+    name: Level Up Family - Configuración tarea task07
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task08:
+    name: Level Up Family - Configuración tarea task08
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task09:
+    name: Level Up Family - Configuración tarea task09
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task10:
+    name: Level Up Family - Configuración tarea task10
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task11:
+    name: Level Up Family - Configuración tarea task11
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task12:
+    name: Level Up Family - Configuración tarea task12
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task13:
+    name: Level Up Family - Configuración tarea task13
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task14:
+    name: Level Up Family - Configuración tarea task14
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task15:
+    name: Level Up Family - Configuración tarea task15
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task16:
+    name: Level Up Family - Configuración tarea task16
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task17:
+    name: Level Up Family - Configuración tarea task17
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task18:
+    name: Level Up Family - Configuración tarea task18
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task19:
+    name: Level Up Family - Configuración tarea task19
+    max: 255
+    icon: mdi:clipboard-edit-outline
+  champ_task_config_task20:
+    name: Level Up Family - Configuración tarea task20
+    max: 255
+    icon: mdi:clipboard-edit-outline
+command_line:
+- sensor:
+    name: Champ task defaults
+    unique_id: champ_task_defaults
+    command: cat /config/level_up_family/task_defaults.json
+    scan_interval: 86400
+    value_template: '{{ value_json.tasks | length }}'
+    json_attributes:
+    - tasks
+template:
+- sensor:
+  - name: Champ task catalog
+    unique_id: champ_task_catalog
+    default_entity_id: sensor.champ_task_catalog
+    availability: |-
+      {% set defaults = state_attr('sensor.champ_task_defaults', 'tasks') %} {% set ns = namespace(ok=defaults is not none and defaults | length > 0) %} {% for task in defaults | default([], true) %}
+        {% if not has_value(task.entity) %}{% set ns.ok = false %}{% endif %}
+      {% endfor %} {{ ns.ok }}
+    state: '{{ state_attr(''sensor.champ_task_defaults'', ''tasks'') | default([], true) | length }}'
+    attributes:
+      tasks: |-
+        {% set ns = namespace(tasks=[]) %} {% for base in state_attr('sensor.champ_task_defaults', 'tasks') | default([], true) %}
+          {% set config_entity = 'input_text.champ_task_config_' ~ base.id %}
+          {% set raw = states(config_entity) %}
+          {% set raw = '' if raw in ['unknown','unavailable',''] else raw %}
+          {% set config = raw | from_json({}) %}
+          {% set config = config if config is mapping else {} %}
+          {% set task = dict(base,
+              name=config.get('name',base.name), player=config.get('player',base.player),
+              xp=config.get('xp',base.xp) | int, days=config.get('days',base.days) | int,
+              once=config.get('once',base.once), progress=states(base.entity) | int(-1),
+              config_entity=config_entity, revision=raw) %}
+          {% set ns.tasks = ns.tasks + [task] %}
+        {% endfor %} {{ ns.tasks }}
+script:
+  champ_task_mutate:
+    alias: Level Up Family - Actualizar tarea
+    mode: queued
+    max: 50
+    fields:
+      operation:
+        required: true
+      entity: {}
+      task_id: {}
+      player: {}
+      fecha: {}
+      name: {}
+      xp: {}
+      days: {}
+      once: {}
+      expected: {}
+      reward: {}
+    sequence:
+    - if:
+      - condition: state
+        entity_id: input_boolean.champ_maintenance
+        state: 'on'
+      then:
+      - variables:
+          reply:
+            ok: false
+            error: Level Up Family está en mantenimiento.
+      - stop: Level Up Family está en mantenimiento.
+        response_variable: reply
+    - if:
+      - condition: template
+        value_template: '{{ not has_value(''sensor.champ_task_catalog'') }}'
+      then:
+      - variables:
+          reply:
+            ok: false
+            error: El catálogo de tareas todavía no está disponible. Inténtalo de nuevo.
+      - stop: El catálogo de tareas todavía no está disponible. Inténtalo de nuevo.
+        response_variable: reply
+    - variables:
+        operation: '{{ operation | default('''') }}'
+        entity: '{{ entity | default('''') }}'
+        task_id: '{{ task_id | default('''') }}'
+        player: '{{ player | default('''') }}'
+        fecha: '{{ fecha | default('''') }}'
+        expected: '{{ expected | default(''__missing__'') }}'
+        candidates: |-
+          {% set tasks = state_attr('sensor.champ_task_catalog','tasks') | default([], true) %} {{ tasks | selectattr('id','eq',task_id) | list if operation == 'edit'
+             else tasks | selectattr('entity','eq',entity) | list }}
+        task: '{{ candidates | first if candidates | length == 1 else {} }}'
+    - choose:
+      - conditions: '{{ operation == "reward" }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{{ player not in [''player1'',''player2''] or reward is not defined or reward is not
+              string or reward | length > 255 }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: Elige un jugador y un premio de hasta 255 caracteres.
+          - stop: Elige un jugador y un premio de hasta 255 caracteres.
+            response_variable: reply
+        - variables:
+            reward_entity: '{{ ''input_text.champ_player1_weekly_reward'' if player == ''player1'' else ''input_text.champ_player2_weekly_reward''
+              }}'
+            old_reward: '{{ states(reward_entity) if states(reward_entity) not in [''unknown'',''unavailable'']
+              else '''' }}'
+        - if:
+          - condition: template
+            value_template: '{{ expected != old_reward }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: El premio ha cambiado en otra sesión. Recarga el formulario antes de guardarlo.
+          - stop: El premio ha cambiado en otra sesión. Recarga el formulario antes de guardarlo.
+            response_variable: reply
+        - action: input_text.set_value
+          target:
+            entity_id: '{{ reward_entity }}'
+          data:
+            value: '{{ reward | trim }}'
+      - conditions: '{{ operation == "edit" }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: '{{ not task or not (states(''input_text.champ_player1_active_week'') == now().strftime(''%G-W%V'')
+              and states(''input_text.champ_player2_active_week'') == now().strftime(''%G-W%V'')) }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: No se puede editar hasta que termine el cambio de semana de los dos jugadores.
+          - stop: No se puede editar hasta que termine el cambio de semana de los dos jugadores.
+            response_variable: reply
+        - if:
+          - condition: template
+            value_template: |-
+              {{ name is not defined or name is not string or name | trim | length < 1 or name | trim | length > 80
+                 or player not in ['player1','player2']
+                 or xp is not defined or xp is not number or xp is boolean or xp != xp | int or not 0 <= xp <= 100
+                 or days is not defined or days is not number or days is boolean or days != days | int or not 0 <= days <= 127
+                 or once is not defined or once is not boolean }}
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: Revisa el nombre, jugador, XP (0–100) y los días seleccionados.
+          - stop: Revisa el nombre, jugador, XP (0–100) y los días seleccionados.
+            response_variable: reply
+        - variables:
+            raw: '{{ states(task.config_entity) }}'
+            revision: '{{ '''' if raw in [''unknown'',''unavailable'',''''] else raw }}'
+            rules_changed: '{{ player != task.player or xp != task.xp or days != task.days or once != task.once
+              }}'
+            config: '{{ dict(name=name | trim, player=player, xp=xp | int, days=days | int, once=once) | to_json(ensure_ascii=False)
+              }}'
+        - if:
+          - condition: template
+            value_template: '{{ expected != revision }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: Esta tarea ha cambiado en otra sesión. Vuelve a seleccionarla antes de guardarla.
+          - stop: Esta tarea ha cambiado en otra sesión. Vuelve a seleccionarla antes de guardarla.
+            response_variable: reply
+        - if:
+          - condition: template
+            value_template: '{{ not has_value(task.entity) or (rules_changed and states(task.entity) | int(-1) !=
+              0) }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: La tarea ya tiene progreso esta semana. Puedes cambiar su nombre, pero no sus XP, días o
+                  jugador.
+          - stop: La tarea ya tiene progreso esta semana. Puedes cambiar su nombre, pero no sus XP, días o jugador.
+            response_variable: reply
+        - if:
+          - condition: template
+            value_template: '{{ config | length > 255 }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: El nombre ocupa demasiado espacio. Usa un nombre más corto.
+          - stop: El nombre ocupa demasiado espacio. Usa un nombre más corto.
+            response_variable: reply
+        - action: input_text.set_value
+          target:
+            entity_id: '{{ task.config_entity }}'
+          data:
+            value: '{{ config }}'
+        - wait_template: |-
+            {{ (state_attr('sensor.champ_task_catalog','tasks') | default([], true)
+                 | selectattr('id','eq',task_id) | list | first).revision == config }}
+          timeout: 00:00:10
+          continue_on_timeout: false
+        - if:
+          - condition: template
+            value_template: '{{ rules_changed }}'
+          then:
+          - repeat:
+              count: '{{ now().weekday() }}'
+              sequence:
+              - variables:
+                  recheck_date: '{{ (now() - timedelta(days=now().weekday() - repeat.index + 1)).date().isoformat()
+                    }}'
+              - action: script.champ_player1_cerrar_dia
+                data:
+                  fecha: '{{ recheck_date }}'
+              - action: script.champ_player2_cerrar_dia
+                data:
+                  fecha: '{{ recheck_date }}'
+      - conditions: '{{ operation in [''mark'',''unmark'',''toggle''] }}'
+        sequence:
+        - if:
+          - condition: template
+            value_template: |-
+              {{ not task or (player != '' and player != task.player)
+                 or not (states('input_text.champ_player1_active_week') == now().strftime('%G-W%V') and states('input_text.champ_player2_active_week') == now().strftime('%G-W%V')) }}
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: La tarea no está asignada a este jugador o está pendiente el cambio de semana.
+          - stop: La tarea no está asignada a este jugador o está pendiente el cambio de semana.
+            response_variable: reply
+        - variables:
+            valid_date: '{{ strptime(fecha, ''%Y-%m-%d'', none) is not none }}'
+            start: '{{ states(''input_datetime.champ_season_start'') }}'
+        - if:
+          - condition: template
+            value_template: |-
+              {{ not valid_date or fecha != strptime(fecha, '%Y-%m-%d').date().isoformat()
+                 or strptime(fecha, '%Y-%m-%d').strftime('%G-W%V') != now().strftime('%G-W%V')
+                 or fecha > now().date().isoformat()
+                 or start in ['unknown','unavailable',''] or fecha < start }}
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: Solo se pueden cambiar misiones desde el inicio de temporada hasta hoy, dentro de la semana
+                  activa.
+          - stop: Solo se pueden cambiar misiones desde el inicio de temporada hasta hoy, dentro de la semana activa.
+            response_variable: reply
+        - variables:
+            bit: '{{ 2 ** strptime(fecha, ''%Y-%m-%d'').weekday() }}'
+            raw: '{{ states(task.entity) | int(-1) }}'
+        - if:
+          - condition: template
+            value_template: '{{ raw < 0 or not (task.days | bitwise_and(bit)) }}'
+          then:
+          - variables:
+              reply:
+                ok: false
+                error: La tarea no se aplica en ese día o su progreso no está disponible.
+          - stop: La tarea no se aplica en ese día o su progreso no está disponible.
+            response_variable: reply
+        - variables:
+            done: '{{ (raw | bitwise_and(task.days if task.once else bit)) > 0 }}'
+            remove: '{{ operation == ''unmark'' or (operation == ''toggle'' and done) }}'
+            new_mask: '{% if remove %}{{ raw - (raw | bitwise_and(task.days if task.once else bit)) }} {% elif task.once
+              and done %}{{ raw }} {% else %}{{ raw | bitwise_or(bit) }}{% endif %}'
+        - action: input_number.set_value
+          target:
+            entity_id: '{{ task.entity }}'
+          data:
+            value: '{{ new_mask | int }}'
+        - wait_template: |-
+            {{ (state_attr('sensor.champ_task_catalog','tasks') | default([], true)
+                 | selectattr('entity','eq',entity) | list | first).progress == new_mask | int }}
+          timeout: 00:00:10
+          continue_on_timeout: false
+      default:
+      - variables:
+          reply:
+            ok: false
+            error: Operación no válida.
+      - stop: Operación no válida.
+        response_variable: reply
+    - variables:
+        reply:
+          ok: true
+    - stop: Actualización completada
+      response_variable: reply
+  champ_configurar_tarea:
+    alias: Level Up Family - Guardar tarea
+    mode: queued
+    fields:
+      task_id:
+        required: true
+      name:
+        required: true
+      player:
+        required: true
+      xp:
+        required: true
+      days:
+        required: true
+      once:
+        required: true
+      expected:
+        required: true
+    sequence:
+    - action: script.champ_task_mutate
+      data:
+        operation: edit
+        task_id: '{{ task_id }}'
+        name: '{{ name }}'
+        player: '{{ player }}'
+        xp: '{{ xp }}'
+        days: '{{ days }}'
+        once: '{{ once }}'
+        expected: '{{ expected }}'
+      response_variable: reply
+    - stop: Resultado de la actualización
+      response_variable: reply
+  champ_configurar_recompensa:
+    alias: Level Up Family - Guardar recompensa semanal
+    mode: queued
+    fields:
+      player:
+        required: true
+      reward:
+        required: true
+      expected:
+        required: true
+    sequence:
+    - action: script.champ_task_mutate
+      data:
+        operation: reward
+        player: '{{ player }}'
+        reward: '{{ reward }}'
+        expected: '{{ expected }}'
+      response_variable: reply
+    - stop: Resultado de la actualización
+      response_variable: reply

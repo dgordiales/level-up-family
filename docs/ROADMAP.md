@@ -1,6 +1,6 @@
 # Próximos cambios
 
-Esta primera subida fija una base para trabajar mediante ramas y pull requests. Los cambios siguientes están pendientes; no forman parte de la funcionalidad actual.
+El proyecto se desarrolla mediante ramas y pull requests. Las ampliaciones siguientes están pendientes.
 
 ## Temporadas nuevas
 
@@ -8,9 +8,9 @@ Preparar cada temporada en una rama, con sus recursos en `season_XX`, textos y c
 
 ## Administración de misiones desde padres
 
-Extraer las tareas del código hacia un catálogo persistente editable desde el panel de padres. Definir identificador estable de misión, jugador, nombre, XP, días previstos y estado activo. Permitir crear, editar, desactivar y ordenar tareas sin editar YAML ni perder el histórico. Validar los cambios y ofrecer una vista previa antes de aplicarlos.
+Ya se pueden editar las 20 tareas actuales (nombre, XP, jugador, días y frecuencia), desactivarlas y definir un premio por jugador desde **Tareas y premios**. Los cambios de reglas se aplican esta semana si la tarea todavía no tiene progreso; los formularios antiguos y los cambios de reglas con progreso se rechazan.
 
-La migración deberá convertir los bitmasks actuales sin perder las misiones completadas; definir qué ocurre si se cambia una tarea a mitad de semana; y separar permisos de administración y acciones de jugador. El motor y los paneles deben consumir el mismo catálogo para evitar referencias duplicadas.
+Queda ampliar el catálogo para crear espacios adicionales, ordenar tareas desde la interfaz y retirar espacios sin tocar YAML. También quedan el historial de premios entregados y los iconos de recompensa específicos de cada temporada. La ampliación deberá mantener identificadores estables e incluir una migración del progreso existente.
 
 ## Criterios para cada PR
 

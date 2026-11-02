@@ -99,7 +99,7 @@ def validate(root):
     env = jinja2.Environment(extensions=["jinja2.ext.loopcontrols", "jinja2.ext.do"])
     env.filters.update(bitwise_and=lambda a, b: int(a) & int(b),
                        bitwise_or=lambda a, b: int(a) | int(b),
-                       from_json=json.loads, as_datetime=lambda value: value,
+                       from_json=json.loads, to_json=json.dumps, as_datetime=lambda value: value,
                        as_timestamp=lambda value: value, timestamp_custom=lambda value, *args: value)
     if not root.is_dir():
         result["errors"].append(f"Missing config directory: {root}")
