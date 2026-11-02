@@ -16,9 +16,18 @@
     button:hover:not(:disabled) { background:rgba(101,221,255,.25); } button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:2px solid var(--lf-accent); outline-offset:3px; }
     button:disabled { opacity:.45; cursor:default; } .secondary { background:transparent; }
     .row { display:flex; align-items:center; gap:12px; } .grow { flex:1; min-width:0; } .small { font-size:12px; color:rgba(255,255,255,.70); }
-    .task { width:100%; display:flex; align-items:center; gap:12px; text-align:left; margin:8px 0; min-height:52px; padding:12px; }
-    .task.done { background:rgba(25,149,113,.25); border-color:rgba(103,239,196,.6); } .task .name { overflow-wrap:anywhere; }
-    .task .xp { color:var(--lf-accent); font-size:13px; white-space:nowrap; } ha-icon { --mdc-icon-size:25px; color:var(--lf-accent); flex-shrink:0; }
+    ha-card.mission-list { background:transparent; border:0; border-radius:0; box-shadow:none; overflow:visible; }
+    .mission-body { padding:0; }
+    .task { width:100%; height:48px; display:flex; align-items:center; text-align:left; margin:0 0 8px; padding:0 10px; border-radius:14px; box-shadow:none; background:var(--lf-track); border:1px solid var(--lf-task-border); }
+    .task:last-of-type { margin-bottom:0; }
+    .task:hover:not(:disabled) { background:var(--lf-track); filter:brightness(1.12); }
+    .task.done,.task.done:hover:not(:disabled) { background:var(--lf-completed-background); border-color:var(--lf-completed-border); }
+    .task .mark { width:22px; flex:0 0 22px; text-align:center; font-size:20px; font-weight:900; color:var(--lf-accent); }
+    .task .name { padding-left:3px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:12px; font-weight:800; color:#fff; }
+    .task .xp { color:var(--lf-accent); font-size:11px; font-weight:900; white-space:nowrap; margin-left:10px; }
+    .task.done .mark,.task.done .xp { color:var(--lf-completed-color); }
+    .mission-body .message:empty { display:none; }
+    ha-icon { --mdc-icon-size:25px; color:var(--lf-accent); flex-shrink:0; }
     label { display:block; font-size:13px; font-weight:600; } input:not([type=checkbox]),select,textarea { display:block; width:100%; margin-top:7px; padding:11px; border:1px solid rgba(255,255,255,.26); border-radius:10px; background:#0b1c37; color:#fff; }
     textarea { resize:vertical; min-height:86px; } select option { background:#0b1c37; } input:disabled,select:disabled { opacity:.55; }
     .form { display:grid; gap:15px; grid-template-columns:repeat(2,minmax(0,1fr)); } .wide { grid-column:1/-1; }
@@ -110,10 +119,22 @@
     render() {
       const today=new Intl.DateTimeFormat('sv-SE',{timeZone:this._hass.config?.time_zone}).format(new Date());
       const all=tasks(this._hass), now=new Date(today+'T12:00:00');
-      const signature=JSON.stringify([all,today,this._busy,cleanState(this._hass,'input_boolean.champ_maintenance')]);
+      const theme=this._hass.states['sensor.champ_theme']?.attributes || {};
+      const start=cleanState(this._hass,'input_datetime.champ_season_start');
+      const signature=JSON.stringify([all,today,this._busy,this._error,this.config,theme,start,cleanState(this._hass,'input_boolean.champ_maintenance')]);
       if(signature===this.signature)return;
       this.signature=signature;
-      const card=this.shell(), body=node('div',undefined,'body');card.append(body);
+      const card=this.shell(), body=node('div',undefined,this.config.week?'body':'mission-body');card.append(body);
+      if(!this.config.week){
+        card.className='mission-list';
+        for(const [name,value] of Object.entries({
+          '--lf-track':theme.track || '#07132f',
+          '--lf-task-border':theme.border_strong || 'rgba(93,125,255,.72)',
+          '--lf-completed-background':theme.completed_background || 'rgba(17,95,95,.72)',
+          '--lf-completed-border':theme.completed_border || 'rgba(80,255,205,.75)',
+          '--lf-completed-color':theme.completed_color || '#68ffd5'
+        }))card.style.setProperty(name,value);
+      }
       const list=(all||[]).filter(t=>t.player===this.config.player && t.days>0);
       const bit=1<<((now.getDay()+6)%7);
       const visible=this.config.week?list:list.filter(t=>t.days&bit);
@@ -122,16 +143,15 @@
         const details=node('details');details.open=Boolean(this._expanded);
         details.addEventListener('toggle',()=>{this._expanded=details.open;});
         details.append(node('summary',this.config.title || 'Ver y corregir esta semana'));body.append(details);content=details;
-      }else body.append(node('h2',`${this.config.title || 'Misiones de hoy'} · ${visible.length}`));
+      }
       if(all===null)content.append(node('p','Las misiones todavía no están disponibles.','empty'));
       else if(!visible.length)content.append(node('p',this.config.week?'No tienes tareas asignadas esta semana.':'Hoy no hay misiones programadas.','empty'));
-      const start=cleanState(this._hass,'input_datetime.champ_season_start');
       for(const task of visible){
         if(!this.config.week){
           const done=completed(task,bit),button=node('button',undefined,'task'+(done?' done':''));
           button.type='button';button.setAttribute('aria-pressed',String(done));
-          const icon=node('ha-icon');icon.setAttribute('icon',done?'mdi:check-circle-outline':task.icon || 'mdi:checkbox-blank-circle-outline');
-          button.append(icon,node('span',task.name,'grow name'),node('span',`+${task.xp} XP`,'xp'));
+          button.title=task.name;
+          button.append(node('span',done?'✓':'○','mark'),node('span',task.name,'grow name'),node('span',`+${task.xp} XP`,'xp'));
           button.disabled=Boolean(this._busy)||!start||today<start||cleanState(this._hass,'input_boolean.champ_maintenance')==='on';
           button.addEventListener('click',()=>this.toggle(task,today));content.append(button);
         }else{
@@ -242,10 +262,12 @@
       finally{this._busy=false;this.render();}
     }
   }
-  customElements.define('level-up-family-reward',FamilyReward);
-  customElements.define('level-up-family-missions',FamilyMissions);
-  customElements.define('level-up-family-admin',FamilyAdmin);
+  for(const [type,element] of [['level-up-family-reward',FamilyReward],['level-up-family-missions',FamilyMissions],['level-up-family-admin',FamilyAdmin]]){
+    if(!customElements.get(type))customElements.define(type,element);
+  }
   window.customCards=window.customCards||[];
-  for(const [type,name] of [['level-up-family-admin','Level Up Family · Administración'],['level-up-family-missions','Level Up Family · Misiones'],['level-up-family-reward','Level Up Family · Recompensa']])window.customCards.push({type,name,preview:false,description:'Level Up Family'});
+  for(const [type,name] of [['level-up-family-admin','Level Up Family · Administración'],['level-up-family-missions','Level Up Family · Misiones'],['level-up-family-reward','Level Up Family · Recompensa']]){
+    if(!window.customCards.some(card=>card.type===type))window.customCards.push({type,name,preview:false,description:'Level Up Family'});
+  }
   if(typeof module!=='undefined')module.exports={isoDate,monday,completed,difficulty};
 })();

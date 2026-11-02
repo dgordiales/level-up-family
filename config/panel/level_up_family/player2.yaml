@@ -1405,6 +1405,112 @@ views:
             `;
           ]]]
     - type: custom:button-card
+      show_name: false
+      show_icon: false
+      show_state: false
+      triggers_update:
+      - sensor.champ_theme
+      - sensor.champ_task_catalog
+      - sensor.date
+      styles:
+        card:
+        - height: 52px
+        - padding: 0 12px
+        - border-radius: 14px
+        - background: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return t.card_background || 'rgba(3,12,35,0.92)';
+            ]]]
+        - border: |
+            [[[
+              const t = states['sensor.champ_theme']?.attributes || {};
+              return `1px solid ${t.border || 'rgba(90,190,255,0.40)'}`;
+            ]]]
+        - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: 1fr
+        custom_fields:
+          content:
+          - width: 100%
+      custom_fields:
+        content: |
+          [[[
+            const t = states['sensor.champ_theme']?.attributes || {};
+
+            const path =
+              t.season_path ||
+              '/local/level_up_family/season_01';
+
+            const accent =
+              t.accent ||
+              '#65ddff';
+
+            const glow =
+              t.glow ||
+              'rgba(169,62,255,.85)';
+
+            const text =
+              t.text_primary ||
+              '#ffffff';
+
+            const today = new Intl.DateTimeFormat('sv-SE', {timeZone: hass.config?.time_zone}).format(new Date());
+            const day = (new Date(today + 'T12:00:00').getDay() + 6) % 7;
+            const catalog = states['sensor.champ_task_catalog'];
+            const available = catalog && !['unknown', 'unavailable'].includes(catalog.state);
+            const tasks = available && Array.isArray(catalog.attributes.tasks) ? catalog.attributes.tasks : null;
+            const count = tasks ? tasks.filter(t => t.player === 'player2' && (t.days & (1 << day))).length : '—';
+
+            return `
+              <div style="
+                box-sizing:border-box;
+                width:100%;
+                height:100%;
+                display:flex;
+                align-items:center;
+                gap:11px;
+              ">
+
+                <img
+                  src="${path}/icono_mision.png"
+                  style="
+                    width:42px;
+                    height:42px;
+                    object-fit:contain;
+                    flex:0 0 auto;
+                    filter:drop-shadow(0 0 6px ${glow});
+                  "
+                >
+
+                <div style="
+                  color:${text};
+                  font-size:18px;
+                  font-weight:900;
+                  letter-spacing:.4px;
+                  white-space:nowrap;
+                ">
+                  MISIONES DE HOY
+                </div>
+
+                <div style="
+                  margin-left:auto;
+                  color:${accent};
+                  font-size:11px;
+                  font-weight:800;
+                  opacity:.85;
+                  white-space:nowrap;
+                ">
+                  ${count} MISIONES
+                </div>
+
+              </div>
+            `;
+          ]]]
+    - type: custom:level-up-family-missions
+      player: player2
+      title: Misiones de hoy
+    - type: custom:button-card
       section_mode: true
       grid_options:
         rows: 1
@@ -1813,13 +1919,6 @@ views:
       player: player2
       reward_entity: input_text.champ_player2_weekly_reward
       goal_entity: binary_sensor.player2_objetivo_semanal_conseguido
-    - type: custom:level-up-family-missions
-      player: player2
-      title: Misiones de hoy
-    - type: custom:level-up-family-missions
-      player: player2
-      title: Ver y corregir esta semana
-      week: true
   cards: []
   icon: mdi:controller
   show_icon_and_title: true

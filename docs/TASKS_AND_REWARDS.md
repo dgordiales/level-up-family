@@ -26,10 +26,14 @@ Escribe el premio de cada jugador y pulsa su botón **Guardar premio**. Cada pan
 
 La tarjeta usa por ahora `mdi:gift-outline`, con los colores de la temporada. Cuando se cree el icono específico de cada temporada, el sensor de tema podrá exponer `reward_image` con una ruta bajo `/local/level_up_family/`. La tarjeta usará esa imagen y conservará el icono provisional si no puede cargarla.
 
+## Panel infantil
+
+Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas de XP, racha diaria y multas. Después aparecen la cabecera de misiones y las filas de tareas, con el diseño original y el catálogo editable. Bajo las tareas se muestran el nivel, la racha semanal, el bonus y la recompensa. Las filas usan solo círculos de estado, sin pictogramas ni fondo común. La corrección de otros días de la semana se ofrece únicamente en el panel de padres.
+
 ## Persistencia e instalación
 
 `task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.champ_task_config_*`; los premios, en `input_text.champ_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
 
-El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.1` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
+El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.2` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
 
 La administración se muestra en el panel de padres y el formulario solo aparece para administradores. Se mantienen los permisos existentes de Home Assistant sobre scripts y helpers.
