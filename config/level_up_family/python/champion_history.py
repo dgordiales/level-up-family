@@ -26,6 +26,7 @@ def main():
                     w.id AS week_id,
                     pl.player_key,
                     pl.display_name AS player_name,
+                    pl.active AS player_active,
                     w.year,
                     w.iso_week,
                     w.week_start,
@@ -47,7 +48,6 @@ def main():
                     w.closed_at
                 FROM weeks w
                 JOIN players pl ON pl.id = w.player_id
-                WHERE pl.active = 1
                 ORDER BY w.year DESC, w.iso_week DESC, pl.id
                 """
             ).fetchall()
@@ -58,6 +58,7 @@ def main():
                     y.id AS year_id,
                     pl.player_key,
                     pl.display_name AS player_name,
+                    pl.active AS player_active,
                     y.year,
                     y.weeks_played,
                     y.tasks_due,
@@ -78,7 +79,6 @@ def main():
                     y.closed_at
                 FROM years y
                 JOIN players pl ON pl.id = y.player_id
-                WHERE pl.active = 1
                 ORDER BY y.year DESC, pl.id
                 """
             ).fetchall()

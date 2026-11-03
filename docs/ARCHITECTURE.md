@@ -20,8 +20,19 @@ Los scripts que escriben comprueban el helper de mantenimiento. El cierre diario
 
 ## Paneles
 
-Los paneles de jugador incluyen únicamente su pestaña Level Up Family. El panel de padres contiene control, histórico y Tareas y premios. El módulo local `level-up-family-cards.js` registra las tarjetas de administración, misiones y premio, usando el objeto `hass` de Home Assistant y nodos de texto para los nombres y recompensas. No hay pestañas de domótica general ni referencias a dispositivos de la casa.
+Los paneles de jugador incluyen únicamente su pestaña Level Up Family. El panel de padres contiene Control, Histórico, Tareas y premios y Familia. El módulo local `level-up-family-cards.js` registra las tarjetas de administración, misiones, premio y familia, usando el objeto `hass` de Home Assistant y nodos de texto para los nombres y recompensas. No hay pestañas de domótica general ni referencias a dispositivos de la casa. Los nuevos jugadores aparecen como vistas del panel compartido de hijos.
+
+## Gestión de familia
+
+`custom_components/level_up_family` carga `family.json` de versión 2, publica `sensor.champ_family` y registra la acción `level_up_family.manage_family` con autorización de administrador en el servidor. Su registro mantiene separados el identificador público, el nombre visible, el prefijo de entidades, la clave SQLite y la ruta de panel. Los comandos del motor aceptan también el formato inicial de versión 1; la interfaz requiere la versión 2.
+
+Las operaciones se serializan mediante un bloqueo y validan la revisión del registro. Cambiar nombre o retirar actualiza metadatos, conserva las identidades numéricas de SQLite y mantiene las tablas de actividad. Los hijos retirados quedan fuera del catálogo y los cierres activos, pero siguen en el histórico y sus multas pendientes continúan consultables. Al actualizar paneles se sustituyen las vistas del juego por sus plantillas; las otras vistas y los ajustes generales se conservan.
+
+Una alta se prepara con un token que caduca a los diez minutos. Aplicarla pone el juego en mantenimiento, espera a que terminen los scripts, copia SQLite y los helpers, genera el paquete del nuevo jugador y amplía tareas y automatizaciones. Después valida la configuración de HA y guarda `family_pending.json` antes del reinicio. Al arrancar restaura helpers, comprueba las entidades del nuevo jugador, sincroniza SQLite y actualiza paneles antes de recuperar el estado previo de mantenimiento. Una recuperación incompleta mantiene el juego en mantenimiento y publica el error.
+
+`templates.json` contiene las plantillas genéricas utilizadas para generar paneles y altas. Se reconstruye con `python tools/build_family_templates.py`; una prueba verifica que coincide con los YAML y valores iniciales de origen. El cambio de estilo de las vistas administradas debe actualizar también este archivo generado.
 
 ## Compatibilidad
 
-Se conservan prefijos internos históricos (`champ_`, `champion_`) para mantener las referencias entre módulos. Las claves públicas de jugador de esta distribución son `player1` y `player2`. Renombrar una instalación existente requiere una migración de estado, no solamente copiar archivos.
+Se conservan prefijos internos históricos (`champ_`, `champion_`) para mantener las referencias entre módulos. Las claves públicas son identificadores estables como `player1`, `player2` y `player3`; el nombre visible y estado activo se describen en `family.json`. El generador `tools/configure_family.py` prepara la configuración completa desde un archivo privado, usando los dos jugadores incluidos como plantillas. Cambiar un nombre visible conserva la identidad; cambiar una clave interna de una instalación existente requiere migrar el estado.
+

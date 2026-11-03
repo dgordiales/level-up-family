@@ -1,0 +1,10 @@
+{
+  "domain": "level_up_family",
+  "name": "Level Up Family",
+  "version": "0.4.1",
+  "documentation": "https://github.com/dgordiales/level-up-family",
+  "codeowners": [],
+  "dependencies": ["lovelace"],
+  "iot_class": "local_push",
+  "requirements": []
+}

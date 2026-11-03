@@ -34,7 +34,7 @@ const context = vm.createContext({
 });
 const source = fs.readFileSync(process.argv[1], 'utf8');
 vm.runInContext(source, context);
-const expected = ['level-up-family-admin', 'level-up-family-missions', 'level-up-family-reward'];
+const expected = ['level-up-family-admin', 'level-up-family-missions', 'level-up-family-reward', 'level-up-family-roster'];
 assert.equal(registry.size, expected.length);
 const firstConstructors = new Map(registry);
 vm.runInContext(source, context);

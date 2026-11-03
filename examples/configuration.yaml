@@ -23,10 +23,19 @@ lovelace:
       show_in_sidebar: true
       require_admin: true
       filename: panel/level_up_family/parents.yaml
+    level-up-family-children:
+      mode: yaml
+      title: Level Up Family - Hijos
+      icon: mdi:account-group
+      show_in_sidebar: true
+      filename: panel/level_up_family/children.yaml
 
 # Instalar button-card y registrar su recurso JavaScript en Home Assistant.
 # Si ya gestionas recursos desde la interfaz, conserva esa configuración.
-# Añade /local/level_up_family/level-up-family-cards.js?v=2.1 como módulo.
+# Añade /local/level_up_family/level-up-family-cards.js?v=2.5.1 como módulo.
+# Instala también card-mod para el estilo de las tarjetas nativas de padres.
 # Si eliges gestionar TODOS los recursos en YAML, configura resource_mode: yaml
 # y una lista resources que incluya este módulo, button-card y tus demás recursos.
 # Ejemplo de recurso: /hacsfiles/button-card/button-card.js, tipo module.
+
+

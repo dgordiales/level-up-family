@@ -93,22 +93,15 @@ template:
     unique_id: champ_season_folder
     default_entity_id: sensor.champ_season_folder
     icon: mdi:folder-image
-    state: |-
-      {% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}
-        season_0{{ temporada }}
-      {% else %}
-        season_{{ temporada }}
-      {% endif %}
+    state: "{% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}\n\
+      \  season_0{{ temporada }}\n{% else %}\n  season_{{ temporada }}\n{% endif %}"
   - name: Level Up Family - Ruta temporada
     unique_id: champ_season_path
     default_entity_id: sensor.champ_season_path
     icon: mdi:folder-multiple-image
-    state: |-
-      {% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}
-        /local/level_up_family/season_0{{ temporada }}
-      {% else %}
-        /local/level_up_family/season_{{ temporada }}
-      {% endif %}
+    state: "{% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}\n\
+      \  /local/level_up_family/season_0{{ temporada }}\n{% else %}\n  /local/level_up_family/season_{{ temporada\
+      \ }}\n{% endif %}"
 script:
   champ_marcar_mision:
     alias: Level Up Family - Marcar misión
@@ -207,12 +200,7 @@ script:
       target:
         entity_id: '{{ penalizaciones }}'
       data:
-        value: |-
-          {{
-            (actual | int)
-            +
-            (cantidad | int)
-          }}
+        value: "{{\n  (actual | int)\n  +\n  (cantidad | int)\n}}"
   champ_anular_penalizacion:
     alias: Level Up Family - Anular penalización
     icon: mdi:undo-variant
@@ -242,29 +230,16 @@ script:
         jugador: '{{ penalizacion.player_key }}'
         importe: '{{ penalizacion.amount | int }}'
     - variables:
-        entidad_penalizaciones: |-
-          {% if jugador == 'player1' %}
-            input_number.champ_player1_penalties_this_week
-          {% elif jugador == 'player2' %}
-            input_number.champ_player2_penalties_this_week
-          {% else %}
-            unknown
-          {% endif %}
+        entidad_penalizaciones: '{{ (state_attr(''sensor.champ_family'',''players'') | default([], true) | selectattr(''db_key'',''eq'',jugador)
+          | map(attribute=''penalty_entity'') | list | first) | default(''unknown'') }}'
     - condition: template
       value_template: '{{ entidad_penalizaciones != ''unknown'' }}'
     - action: input_number.set_value
       target:
         entity_id: '{{ entidad_penalizaciones }}'
       data:
-        value: |-
-          {{
-            [
-              (states(entidad_penalizaciones) | int(0))
-              -
-              (importe | int),
-              0
-            ] | max
-          }}
+        value: "{{\n  [\n    (states(entidad_penalizaciones) | int(0))\n    -\n    (importe | int),\n    0\n  ]\
+          \ | max\n}}"
 input_boolean:
   champ_maintenance:
     name: Level Up Family - Mantenimiento

@@ -22,6 +22,10 @@ class TaskCatalogTests(unittest.TestCase):
                             'input_text.champ_player1_active_week':'2026-W45',
                             'input_text.champ_player2_active_week':'2026-W45'})
         self.attributes={('sensor.champ_task_defaults','tasks'):self.defaults}
+        registry=json.loads((CONFIG/'level_up_family/family.json').read_text(encoding='utf-8'))
+        players=[dict(p,week_entity='input_text.champ_'+p['id']+'_active_week',daily_script='script.champ_'+p['id']+'_cerrar_dia',reward_entity='input_text.champ_'+p['id']+'_weekly_reward') for p in registry['players']]
+        self.attributes[('sensor.champ_family','active_ids')]=[p['id'] for p in players if p['active']]
+        self.attributes[('sensor.champ_family','players')]=players
         self.now=datetime(2026,11,4,12)
         self.env=jinja2.Environment(undefined=jinja2.StrictUndefined)
         def from_json(value,default=None):

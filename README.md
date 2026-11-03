@@ -2,12 +2,13 @@
 
 Juego familiar de misiones domésticas para Home Assistant. Cada jugador completa misiones, gana XP, sube de nivel y sigue su progreso en temporadas de 28 días.
 
-Esta primera versión reúne el motor SQLite, los paquetes de Home Assistant, los paneles del juego y los recursos gráficos de la temporada 1. Los dos jugadores usan los identificadores genéricos `player1` y `player2` en todo el código.
+Esta versión reúne el motor SQLite, los paquetes de Home Assistant, los paneles del juego y los recursos gráficos de la temporada 1. Incluye dos jugadores como ejemplo y un generador para configurar uno, dos o más hijos con nombres propios e identificadores estables `player1`, `player2`, `player3`…
 
 ## Qué incluye
 
 - Panel de `player1` y panel de `player2`, cada uno con una única pestaña del juego.
-- Panel de padres con control e histórico de Level Up Family.
+- Configuración familiar central para añadir, renombrar o retirar hijos sin borrar su histórico.
+- Panel de padres con Control, Histórico, Tareas y premios y Familia.
 - Pestaña de padres **Tareas y premios** para editar las 20 tareas actuales: nombre, XP, jugador y calendario.
 - Un premio semanal distinto para cada jugador, visible en su propio panel con el estilo de temporada.
 - Misiones, XP, bonus, rachas, niveles, penalizaciones y cierres diarios/semanales.
@@ -17,6 +18,8 @@ Esta primera versión reúne el motor SQLite, los paquetes de Home Assistant, lo
 
 ```text
 config/
+  custom_components/level_up_family/ Gestión de familia y plantillas de aprovisionamiento
+  level_up_family/family.json   Registro familiar de ejecución (versión 2)
   level_up_family/python/       Motor y utilidades de datos
   packages/level_up_family/     Helpers, reglas y automatizaciones
   panel/level_up_family/        player1.yaml, player2.yaml y parents.yaml
@@ -28,6 +31,10 @@ tools/                         Validadores de configuración y paneles
 ```
 
 Consulta la [instalación](docs/INSTALLATION.md), [Tareas y premios](docs/TASKS_AND_REWARDS.md), la [arquitectura](docs/ARCHITECTURE.md) y la [hoja de ruta](docs/ROADMAP.md).
+
+Los [cambios acumulados y su validación](docs/CHANGES.md) explican el alcance de esta actualización y sus límites.
+
+En **Familia**, dentro del panel de padres, puedes añadir hijos, retirarlos conservando su progreso e histórico y cambiar sus nombres. Las altas requieren un reinicio comprobado de HA; nombres y retiradas se aplican al guardar. Consulta [Configurar la familia](docs/FAMILY_CONFIGURATION.md) para instalar esta función o preparar una familia inicial con el generador.
 
 ## Desarrollo
 
@@ -49,3 +56,4 @@ El repositorio contiene una distribución anonimizada para una instalación nuev
 No incluye bases de datos, actividad de jugadores, credenciales, copias de seguridad, dispositivos personales ni otras pestañas de los paneles de la casa. La configuración de ejemplo debe combinarse con la configuración propia de Home Assistant.
 
 La instalación que originó esta copia utiliza otros identificadores de jugador. Sustituirla directamente por estos archivos crearía entidades nuevas: una migración de esa instalación requiere mapear por separado entidades, referencias y claves SQLite. Publicar este repositorio no cambia la instalación en uso.
+

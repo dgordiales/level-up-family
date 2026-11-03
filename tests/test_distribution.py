@@ -68,7 +68,7 @@ class DistributionTests(unittest.TestCase):
     def test_parents_panel_contains_control_and_history_only(self):
         data = yaml.safe_load((PANELS / 'parents.yaml').read_text(encoding='utf-8'))
         self.assertEqual([v['path'] for v in data['views']],
-                         ['control-champion', 'historico-champion', 'tasks-rewards'])
+                         ['control-champion', 'historico-champion', 'tasks-rewards', 'family'])
 
     def test_no_household_devices_or_notification_destinations_in_panels(self):
         for path in PANELS.glob('*.yaml'):
