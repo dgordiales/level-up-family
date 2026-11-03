@@ -9,7 +9,7 @@ from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent / "data"
-DB_PATH = BASE_DIR / "champion.db"
+DB_PATH = BASE_DIR / "luf.db"
 FAMILY_PATH = Path(__file__).resolve().parent.parent / "family.json"
 
 
@@ -1049,18 +1049,18 @@ def delete_test_weeks():
 def main():
     if len(sys.argv) < 2:
         print("Usage:")
-        print("  champion_db.py init")
-        print("  champion_db.py players")
-        print("  champion_db.py sync_family")
-        print("  champion_db.py add_penalty <player_key> <amount> <reason>")
-        print("  champion_db.py penalties")
-        print("  champion_db.py cancel_penalty <penalty_id>")
-        print("  champion_db.py close_week <player_key> <year> <iso_week> <week_start> <week_end> <season_number> <tasks_due> <tasks_completed> <task_xp> <perfect_days> <bonus_xp> <penalty_xp> <effective_xp> <level_start> <level_end> <weekly_goal_achieved> <daily_streak_end> <weekly_streak_end>")
-        print("  champion_db.py close_day <player_key> <YYYY-MM-DD> <perfect:0|1>")
-        print("  champion_db.py days [player_key]")
-        print("  champion_db.py weeks")
-        print("  champion_db.py years")
-        print("  champion_db.py delete_test_weeks")
+        print("  luf_db.py init")
+        print("  luf_db.py players")
+        print("  luf_db.py sync_family")
+        print("  luf_db.py add_penalty <player_key> <amount> <reason>")
+        print("  luf_db.py penalties")
+        print("  luf_db.py cancel_penalty <penalty_id>")
+        print("  luf_db.py close_week <player_key> <year> <iso_week> <week_start> <week_end> <season_number> <tasks_due> <tasks_completed> <task_xp> <perfect_days> <bonus_xp> <penalty_xp> <effective_xp> <level_start> <level_end> <weekly_goal_achieved> <daily_streak_end> <weekly_streak_end>")
+        print("  luf_db.py close_day <player_key> <YYYY-MM-DD> <perfect:0|1>")
+        print("  luf_db.py days [player_key]")
+        print("  luf_db.py weeks")
+        print("  luf_db.py years")
+        print("  luf_db.py delete_test_weeks")
         sys.exit(1)
 
     command = sys.argv[1].lower()
@@ -1073,13 +1073,13 @@ def main():
 
     elif command == "sync_family":
         if len(sys.argv) != 2:
-            raise ValueError("Uso: champion_db.py sync_family (lee family.json junto al código del juego).")
+            raise ValueError("Uso: luf_db.py sync_family (lee family.json junto al código del juego).")
         sync_family()
 
     elif command == "add_penalty":
         if len(sys.argv) < 5:
             print(
-                "Usage: champion_db.py add_penalty "
+                "Usage: luf_db.py add_penalty "
                 "<player_key> <amount> <reason>"
             )
             sys.exit(1)
@@ -1113,7 +1113,7 @@ def main():
 
     elif command == "cancel_penalty":
         if len(sys.argv) != 3:
-            print("Usage: champion_db.py cancel_penalty <penalty_id>")
+            print("Usage: luf_db.py cancel_penalty <penalty_id>")
             sys.exit(1)
 
         try:
@@ -1127,7 +1127,7 @@ def main():
     elif command == "close_week":
         if len(sys.argv) != 20:
             print(
-                "Usage: champion_db.py close_week "
+                "Usage: luf_db.py close_week "
                 "<player_key> "
                 "<year> "
                 "<iso_week> "
@@ -1172,13 +1172,13 @@ def main():
 
     elif command == "close_day":
         if len(sys.argv) != 5:
-            print("Usage: champion_db.py close_day <player_key> <YYYY-MM-DD> <perfect:0|1>")
+            print("Usage: luf_db.py close_day <player_key> <YYYY-MM-DD> <perfect:0|1>")
             raise SystemExit(1)
         close_day(sys.argv[2], sys.argv[3], sys.argv[4])
 
     elif command == "days":
         if len(sys.argv) > 3:
-            print("Usage: champion_db.py days [player_key]")
+            print("Usage: luf_db.py days [player_key]")
             raise SystemExit(1)
         show_days(sys.argv[2] if len(sys.argv) == 3 else None)
 

@@ -73,7 +73,7 @@ def change(data, operation, revision, player_id=None, name=None):
         key = f'player{number}'
         data['players'].append({'id': key, 'name': (name or '').strip(), 'active': True,
             'entity_prefix': key, 'db_key': key, 'dashboard_url': 'level-up-family-children',
-            'dashboard_path': key + '-champion'})
+            'dashboard_path': key + '-luf'})
     else:
         player = next((p for p in data['players'] if p['id'] == player_id), None)
         if player is None:
@@ -131,10 +131,10 @@ def sync_db(path, registry):
 
 
 def public_players(registry):
-    return [dict(p, reward_entity=f"input_text.champ_{p['entity_prefix']}_weekly_reward",
-                 week_entity=f"input_text.champ_{p['entity_prefix']}_active_week",
-                 daily_script=f"script.champ_{p['entity_prefix']}_cerrar_dia",
-                 penalty_entity=f"input_number.champ_{p['entity_prefix']}_penalties_this_week")
+    return [dict(p, reward_entity=f"input_text.luf_{p['entity_prefix']}_weekly_reward",
+                 week_entity=f"input_text.luf_{p['entity_prefix']}_active_week",
+                 daily_script=f"script.luf_{p['entity_prefix']}_cerrar_dia",
+                 penalty_entity=f"input_number.luf_{p['entity_prefix']}_penalties_this_week")
             for p in registry['players']]
 
 
@@ -161,7 +161,7 @@ def label(value, key, name):
 def bind(value, players):
     for p in players:
         key, prefix, db_key = p['id'], p['entity_prefix'], p['db_key']
-        value = transform(value, lambda s: s.replace('champ_' + key + '_', 'champ_' + prefix + '_')
+        value = transform(value, lambda s: s.replace('luf_' + key + '_', 'luf_' + prefix + '_')
                           .replace('sensor.' + key + '_', 'sensor.' + prefix + '_'))
         value = transform(value, lambda s: s.replace('binary_sensor.' + key + '_', 'binary_sensor.' + prefix + '_')
                           .replace("x.player_key === '" + key + "'", "x.player_key === '" + db_key + "'"))
@@ -210,7 +210,7 @@ def parents_views(templates, registry):
     history['sections'] = [*sections[:2], *years, *sections[4:]]
     admin = editor['sections'][0]['cards'][0]
     admin['players'] = {p['id']: p['name'] for p in active}
-    admin['rewards'] = {p['id']: f"input_text.champ_{p['entity_prefix']}_weekly_reward" for p in active}
+    admin['rewards'] = {p['id']: f"input_text.luf_{p['entity_prefix']}_weekly_reward" for p in active}
     names = json.dumps({p['db_key']: escaped(p['name']) for p in players})
     pattern = r"p === 'player1' \? 'player1' :\s*p === 'player2' \? 'player2' : p"
     views = transform(views, lambda s: re.sub(pattern, lambda _: '(' + names + ')[p] || p', s))
@@ -237,7 +237,7 @@ def new_player_files(templates, player, defaults, weekly):
         for domain in ('sensor', 'binary_sensor'):
             for sensor in block.get(domain, []):
                 sensor.setdefault('default_entity_id', domain + '.' + sensor['unique_id'])
-    guard = {'condition': 'template', 'value_template': "{{ '" + key + "' in (state_attr('sensor.champ_family','active_ids') | default([], true)) }}"}
+    guard = {'condition': 'template', 'value_template': "{{ '" + key + "' in (state_attr('sensor.luf_family','active_ids') | default([], true)) }}"}
     for script in package.get('script', {}).values():
         script['sequence'].insert(0, deepcopy(guard))
     package = label(package, key, player['name'])
@@ -258,7 +258,7 @@ def new_player_files(templates, player, defaults, weekly):
     for automation in extra:
         automation.setdefault('conditions', []).insert(0, deepcopy(guard))
     weekly['automation'].extend(label(extra, key, player['name']))
-    helpers = {f"champ_task_config_{t['id']}": {'name': 'Level Up Family - Configuración ' + t['id'], 'max': 255}
+    helpers = {f"luf_task_config_{t['id']}": {'name': 'Level Up Family - Configuración ' + t['id'], 'max': 255}
                for t in added}
     package.setdefault('input_text', {}).update(helpers)
     return package, defaults, weekly
@@ -267,14 +267,14 @@ def new_player_files(templates, player, defaults, weekly):
 def runtime_tasks(package):
     """Replace pair-specific routing with the authoritative registry sensor."""
     package = deepcopy(package)
-    active = "(state_attr('sensor.champ_family','active_ids') | default([], true))"
-    members = "state_attr('sensor.champ_family','players') | default([], true)"
+    active = "(state_attr('sensor.luf_family','active_ids') | default([], true))"
+    members = "state_attr('sensor.luf_family','players') | default([], true)"
     sensor = package['template'][0]['sensor'][0]
     catalog = sensor['attributes']['tasks']
     needle = '{% set ns.tasks = ns.tasks + [task] %}'
-    if "task.player in (state_attr('sensor.champ_family'" not in catalog:
+    if "task.player in (state_attr('sensor.luf_family'" not in catalog:
         sensor['attributes']['tasks'] = catalog.replace(needle, '{% if task.player in ' + active + ' %}' + needle + '{% endif %}')
-    sequence = package['script']['champ_task_mutate']['sequence']
+    sequence = package['script']['luf_task_mutate']['sequence']
     choices = next(s['choose'] for s in sequence if 'choose' in s)
     readiness = ("{% set ns = namespace(ready=true) %}{% for p in " + members + " %}"
                  "{% if p.active and states(p.week_entity) != now().strftime('%G-W%V') %}"
@@ -303,7 +303,7 @@ def runtime_tasks(package):
 
 def protect_player(package, key):
     package = deepcopy(package)
-    guard = {'condition': 'template', 'value_template': "{{ '" + key + "' in (state_attr('sensor.champ_family','active_ids') | default([], true)) }}"}
+    guard = {'condition': 'template', 'value_template': "{{ '" + key + "' in (state_attr('sensor.luf_family','active_ids') | default([], true)) }}"}
     for script in package.get('script', {}).values():
         if guard not in script['sequence']:
             script['sequence'].insert(0, deepcopy(guard))

@@ -101,7 +101,7 @@ def child_panel(source, player, base):
     panel = label(panel, player)
     if not player['active']:
         # A stale HA sidebar registration cannot expose retired mission buttons.
-        panel['views'] = [{'title': player['name'], 'path': key + '-champion',
+        panel['views'] = [{'title': player['name'], 'path': key + '-luf',
                            'cards': [{'type': 'markdown', 'content': 'Este jugador está retirado. Su histórico se conserva en el panel de padres.'}]}]
         return panel
     profile = panel['views'][0]['sections'][0]['cards'][1]['custom_fields']
@@ -139,7 +139,7 @@ def parents_panel(panel, players):
     history['sections'] = [*sections[:2], *years, *sections[4:]]
     admin = editor['sections'][0]['cards'][0]
     admin['players'] = {p['id']: p['name'] for p in active}
-    admin['rewards'] = {p['id']: f"input_text.champ_{p['id']}_weekly_reward" for p in active}
+    admin['rewards'] = {p['id']: f"input_text.luf_{p['id']}_weekly_reward" for p in active}
     names = json.dumps({p['id']: markup_name(p['name']) for p in players})
     pattern = r"p === 'player1' \? 'player1' :\s*p === 'player2' \? 'player2' : p"
     return transform(panel, lambda s: re.sub(pattern, lambda _: '(' + names + ')[p] || p', s))
@@ -147,7 +147,7 @@ def parents_panel(panel, players):
 
 def task_package(package, players, defaults):
     package = deepcopy(package)
-    package['input_text'] = {f"champ_task_config_{t['id']}": {
+    package['input_text'] = {f"luf_task_config_{t['id']}": {
         'name': 'Level Up Family - Configuración tarea ' + t['id'], 'max': 255,
         'icon': 'mdi:clipboard-edit-outline'} for t in defaults}
     return package
@@ -155,7 +155,7 @@ def task_package(package, players, defaults):
 
 def core_package(package, players):
     package = deepcopy(package)
-    fields = package['script']['champ_aplicar_penalizacion']['fields']
+    fields = package['script']['luf_aplicar_penalizacion']['fields']
     fields['player_key']['description'] = 'Identificador estable del jugador configurado en family.json.'
     return package
 
@@ -164,7 +164,7 @@ def generate(family_path, output, source=ROOT):
     source, output = Path(source).resolve(), Path(output).resolve()
     if output.exists() or output == source or output.is_relative_to(source / 'config'):
         raise ValueError('Elige una carpeta de salida nueva, fuera de config. Nunca uses /config de HA como salida.')
-    spec = importlib.util.spec_from_file_location('family_schema', source / 'config/level_up_family/python/champion_db.py')
+    spec = importlib.util.spec_from_file_location('family_schema', source / 'config/level_up_family/python/luf_db.py')
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     players = module.validate_family(load(family_path))
@@ -209,7 +209,7 @@ def generate(family_path, output, source=ROOT):
     save(panels / 'parents.yaml', parents_panel(load(source / 'config/panel/level_up_family/parents.yaml'), players))
     (cfg / 'level_up_family/task_defaults.json').write_text(json.dumps({'version': 1, 'tasks': defaults}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     registry = {'version': 2, 'revision': 0, 'players': [dict(p, entity_prefix=p['id'], db_key=p['id'],
-                dashboard_url='level-up-family-' + p['id'], dashboard_path=p['id'] + '-champion') for p in players]}
+                dashboard_url='level-up-family-' + p['id'], dashboard_path=p['id'] + '-luf') for p in players]}
     (cfg / 'level_up_family/family.json').write_text(json.dumps(registry, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (cfg / 'panel/level_up_family/children.yaml').write_text('title: Level Up Family\nviews: []\n', encoding='utf-8')
     dashboards['level-up-family-parents'] = {'mode': 'yaml', 'title': 'Level Up Family - Padres',

@@ -14,13 +14,13 @@ Las altas nuevas aparecen en el panel **Level Up Family · Hijos**. Los paneles 
 
 La acción `level_up_family.manage_family` comprueba en el servidor que quien la invoca es administrador. Los formularios rechazan revisiones antiguas si dos sesiones cambian la familia a la vez. Cada operación crea una copia en `/config/level_up_family/backups/family_*`; retirar nunca ejecuta un borrado de datos.
 
-El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.5.1`. Es necesario instalar también `config/custom_components/level_up_family`, `lf_family.yaml`, el registro familiar de versión 2 y el panel compartido de hijos. La integración se carga al reiniciar HA. No basta con cambiar la tarjeta JavaScript.
+El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.6.0`. Es necesario instalar también `config/custom_components/level_up_family`, `lf_family.yaml`, el registro familiar de versión 2 y el panel compartido de hijos. La integración se carga al reiniciar HA. No basta con cambiar la tarjeta JavaScript.
 
 ## Actualizar una instalación anterior
 
 Antes de sustituir archivos, realiza una copia completa. No reemplaces `data/`, los valores de los helpers ni `task_defaults.json` con el ejemplo del repositorio. Tampoco sustituyas el registro familiar existente por el ejemplo.
 
-Una instalación antigua necesita vincular una sola vez `id`, `entity_prefix`, `db_key`, `dashboard_url` y `dashboard_path` en su registro de versión 2. Por ejemplo, el identificador público `player1` puede apuntar a entidades `champ_legacy_one_*` y a la clave SQLite `player_1`. Cambiar el nombre visible no cambia esas vinculaciones. Configura `parents_dashboard` en `lf_family.yaml` si difiere del ejemplo. Mantén el panel compartido en `level-up-family-children`: las altas generan esa ruta. Todos los paneles vinculados, incluidos los de jugadores retirados, deben seguir registrados para que la gestión pueda cargar sus vistas.
+Una instalación antigua necesita vincular una sola vez `id`, `entity_prefix`, `db_key`, `dashboard_url` y `dashboard_path` en su registro de versión 2. Por ejemplo, el identificador público `player1` puede apuntar a entidades `luf_legacy_one_*` y a la clave SQLite `player_1`. Cambiar el nombre visible no cambia esas vinculaciones. Configura `parents_dashboard` en `lf_family.yaml` si difiere del ejemplo. Mantén el panel compartido en `level-up-family-children`: las altas generan esa ruta. Todos los paneles vinculados, incluidos los de jugadores retirados, deben seguir registrados para que la gestión pueda cargar sus vistas.
 
 Las vistas del juego se reconstruyen desde las plantillas distribuidas al cambiar la familia. Conserva una copia de cualquier personalización dentro de esas vistas antes de migrar; las pestañas ajenas al juego y los ajustes generales del panel se mantienen.
 
@@ -77,8 +77,8 @@ Sigue [Instalación](INSTALLATION.md) usando la carpeta `config/` y el fragmento
 En el entorno donde se ejecuta el juego:
 
 ```sh
-python3 /config/level_up_family/python/champion_db.py init
-python3 /config/level_up_family/python/champion_db.py players
+python3 /config/level_up_family/python/luf_db.py init
+python3 /config/level_up_family/python/luf_db.py players
 ```
 
 `init` lee `/config/level_up_family/family.json`. Cada hijo activo tendrá su panel, premio y diez espacios iniciales de tareas. `player1` conserva la plantilla de dormir solo; los demás parten de la de higiene personal. Se pueden editar o desactivar desde **Tareas y premios**.
@@ -97,8 +97,8 @@ Para el uso habitual utiliza la pestaña **Familia**. El flujo siguiente queda c
 6. Sin escritores en ejecución, sincroniza la familia con la base existente:
 
    ```sh
-   python3 /config/level_up_family/python/champion_db.py sync_family
-   python3 /config/level_up_family/python/champion_db.py players
+   python3 /config/level_up_family/python/luf_db.py sync_family
+   python3 /config/level_up_family/python/luf_db.py players
    ```
 
 7. Comprueba la configuración, inicia HA y revisa nombres, misiones, premios e histórico. Un jugador nuevo empieza sin actividad; los demás mantienen entidades y contadores.
@@ -135,5 +135,4 @@ Este procedimiento corresponde a instalaciones de **la distribución genérica d
 
 Para volver atrás, restaura conjuntamente configuración, SQLite y estado de helpers desde la copia anterior. Restaurar solo los YAML no revierte una sincronización de nombres o retiradas en la base.
 
-Para una recuperación manual, detén primero los escritores del juego y conserva la carpeta de copia completa. `helpers.json` contiene los valores anteriores, `family.json` el registro anterior y `champion.db` la copia SQLite; las vistas que se modifican se guardan como `dashboard_*.json`. En un alta, `files.json` conserva el contenido anterior de los archivos aprovisionados y señala los que antes no existían. Restaura el conjunto compatible o una copia completa de HA, comprueba la configuración y revisa contadores y paneles antes de reanudar. No borres `family_pending.json` ni apagues mantenimiento para ocultar una recuperación fallida: primero resuelve la causa o restaura la copia.
-
+Para una recuperación manual, detén primero los escritores del juego y conserva la carpeta de copia completa. `helpers.json` contiene los valores anteriores, `family.json` el registro anterior y `luf.db` la copia SQLite; las vistas que se modifican se guardan como `dashboard_*.json`. En un alta, `files.json` conserva el contenido anterior de los archivos aprovisionados y señala los que antes no existían. Restaura el conjunto compatible o una copia completa de HA, comprueba la configuración y revisa contadores y paneles antes de reanudar. No borres `family_pending.json` ni apagues mantenimiento para ocultar una recuperación fallida: primero resuelve la causa o restaura la copia.

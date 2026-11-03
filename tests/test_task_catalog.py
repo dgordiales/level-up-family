@@ -18,14 +18,14 @@ class TaskCatalogTests(unittest.TestCase):
         self.defaults=json.loads((CONFIG/'level_up_family/task_defaults.json').read_text(encoding='utf-8'))['tasks']
         self.package=yaml.safe_load((CONFIG/'packages/level_up_family/lf_tasks.yaml').read_text(encoding='utf-8'))
         self.values={t['entity']:'0' for t in self.defaults}
-        self.values.update({'input_datetime.champ_season_start':'2026-11-02',
-                            'input_text.champ_player1_active_week':'2026-W45',
-                            'input_text.champ_player2_active_week':'2026-W45'})
-        self.attributes={('sensor.champ_task_defaults','tasks'):self.defaults}
+        self.values.update({'input_datetime.luf_season_start':'2026-11-02',
+                            'input_text.luf_player1_active_week':'2026-W45',
+                            'input_text.luf_player2_active_week':'2026-W45'})
+        self.attributes={('sensor.luf_task_defaults','tasks'):self.defaults}
         registry=json.loads((CONFIG/'level_up_family/family.json').read_text(encoding='utf-8'))
-        players=[dict(p,week_entity='input_text.champ_'+p['id']+'_active_week',daily_script='script.champ_'+p['id']+'_cerrar_dia',reward_entity='input_text.champ_'+p['id']+'_weekly_reward') for p in registry['players']]
-        self.attributes[('sensor.champ_family','active_ids')]=[p['id'] for p in players if p['active']]
-        self.attributes[('sensor.champ_family','players')]=players
+        players=[dict(p,week_entity='input_text.luf_'+p['id']+'_active_week',daily_script='script.luf_'+p['id']+'_cerrar_dia',reward_entity='input_text.luf_'+p['id']+'_weekly_reward') for p in registry['players']]
+        self.attributes[('sensor.luf_family','active_ids')]=[p['id'] for p in players if p['active']]
+        self.attributes[('sensor.luf_family','players')]=players
         self.now=datetime(2026,11,4,12)
         self.env=jinja2.Environment(undefined=jinja2.StrictUndefined)
         def from_json(value,default=None):
@@ -51,8 +51,8 @@ class TaskCatalogTests(unittest.TestCase):
     def refresh(self):
         sensor=self.package['template'][0]['sensor'][0]
         self.catalog=ast.literal_eval(self.render(sensor['attributes']['tasks']))
-        self.attributes[('sensor.champ_task_catalog','tasks')]=self.catalog
-        self.values['sensor.champ_task_catalog']=str(len(self.catalog))
+        self.attributes[('sensor.luf_task_catalog','tasks')]=self.catalog
+        self.values['sensor.luf_task_catalog']=str(len(self.catalog))
 
     def sensor(self,player,suffix):
         data=yaml.safe_load((CONFIG/'packages/level_up_family'/('lf_'+player+'.yaml')).read_text(encoding='utf-8'))
@@ -62,7 +62,7 @@ class TaskCatalogTests(unittest.TestCase):
         return int(self.render(self.sensor(player,suffix)['state']))
 
     def edit_steps(self):
-        return next(c for step in self.package['script']['champ_task_mutate']['sequence'] for c in step.get('choose',[])
+        return next(c for step in self.package['script']['luf_task_mutate']['sequence'] for c in step.get('choose',[])
                     if c['conditions']=='{{ operation == "edit" }}')['sequence']
 
     def rejects(self,message,**variables):
@@ -150,20 +150,20 @@ class TaskCatalogTests(unittest.TestCase):
     def test_weekly_reset_uses_assignment_not_the_entity_name(self):
         for p in ('player1','player2'):
             package=yaml.safe_load((CONFIG/'packages/level_up_family'/('lf_'+p+'.yaml')).read_text(encoding='utf-8'))
-            steps=package['script']['champ_'+p+'_cerrar_semana']['sequence']
+            steps=package['script']['luf_'+p+'_cerrar_semana']['sequence']
             expression=next(s['variables']['task_entities'] for s in steps if 'task_entities' in s.get('variables',{}))
             moved=self.catalog[0];moved['player']='player2'
             entities=ast.literal_eval(self.render(expression))
             self.assertEqual(moved['entity'] in entities,p=='player2')
 
     def test_toggle_and_edit_share_one_serial_queue(self):
-        self.assertEqual(self.package['script']['champ_task_mutate']['mode'],'queued')
+        self.assertEqual(self.package['script']['luf_task_mutate']['mode'],'queued')
         core=yaml.safe_load((CONFIG/'packages/level_up_family/lf_core.yaml').read_text(encoding='utf-8'))
-        for name in ('champ_marcar_mision','champ_desmarcar_mision'):
-            self.assertEqual(core['script'][name]['sequence'][0]['action'],'script.champ_task_mutate')
+        for name in ('luf_marcar_mision','luf_desmarcar_mision'):
+            self.assertEqual(core['script'][name]['sequence'][0]['action'],'script.luf_task_mutate')
 
     def test_date_guard_rejects_invalid_future_and_other_week(self):
-        steps=next(c for step in self.package['script']['champ_task_mutate']['sequence']
+        steps=next(c for step in self.package['script']['luf_task_mutate']['sequence']
                    for c in step.get('choose',[]) if 'mark' in c['conditions'])['sequence']
         date_guard=next(step['if'][0]['value_template'] for step in steps
                         if any('Solo se pueden cambiar' in s.get('stop','') for s in step.get('then',[])))
@@ -173,7 +173,7 @@ class TaskCatalogTests(unittest.TestCase):
                 self.assertEqual(self.render(date_guard,fecha=day,valid_date=valid,start='2026-11-02')=='True',rejected)
 
     def test_once_toggle_unmarks_the_recorded_day_instead_of_creating_another(self):
-        steps=next(c for step in self.package['script']['champ_task_mutate']['sequence']
+        steps=next(c for step in self.package['script']['luf_task_mutate']['sequence']
                    for c in step.get('choose',[]) if 'mark' in c['conditions'])['sequence']
         expression=next(step['variables']['new_mask'] for step in steps if 'new_mask' in step.get('variables',{}))
         task=next(t for t in self.catalog if t['once'])

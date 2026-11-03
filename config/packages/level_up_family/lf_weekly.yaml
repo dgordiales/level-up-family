@@ -1,5 +1,5 @@
 automation:
-- id: champ_player1_week_initialization
+- id: luf_player1_week_initialization
   alias: Level Up Family - player1 - Inicializar semana activa
   description: Inicializa la semana activa si todavía no existe, sin cerrar semanas anteriores.
   triggers:
@@ -8,12 +8,12 @@ automation:
   conditions:
   - condition: template
     value_template: |-
-      {{ states('input_text.champ_player1_active_week')
+      {{ states('input_text.luf_player1_active_week')
          in ['', 'unknown', 'unavailable'] }}
   actions:
   - action: input_text.set_value
     target:
-      entity_id: input_text.champ_player1_active_week
+      entity_id: input_text.luf_player1_active_week
     data:
       value: |-
         {{
@@ -24,7 +24,7 @@ automation:
             )
         }}
   mode: single
-- id: champ_player1_weekly_close
+- id: luf_player1_weekly_close
   alias: Level Up Family - player1 - Cierre semanal
   description: Cierra la última semana completa cada lunes y recupera cierres pendientes tras reinicios.
   triggers:
@@ -51,16 +51,16 @@ automation:
         or
         (
           trigger.id == 'arranque'
-          and states('input_text.champ_player1_last_applied_week')
+          and states('input_text.luf_player1_last_applied_week')
               not in ['', 'unknown', 'unavailable']
-          and states('input_text.champ_player1_last_applied_week')
+          and states('input_text.luf_player1_last_applied_week')
               != clave_cierre
         )
       }}
   actions:
-  - action: script.champ_player1_cerrar_semana
+  - action: script.luf_player1_cerrar_semana
   mode: single
-- id: champ_player2_week_initialization
+- id: luf_player2_week_initialization
   alias: Level Up Family - player2 - Inicializar semana activa
   description: Inicializa la semana activa si todavía no existe, sin cerrar semanas anteriores.
   triggers:
@@ -69,12 +69,12 @@ automation:
   conditions:
   - condition: template
     value_template: |-
-      {{ states('input_text.champ_player2_active_week')
+      {{ states('input_text.luf_player2_active_week')
          in ['', 'unknown', 'unavailable'] }}
   actions:
   - action: input_text.set_value
     target:
-      entity_id: input_text.champ_player2_active_week
+      entity_id: input_text.luf_player2_active_week
     data:
       value: |-
         {{
@@ -85,7 +85,7 @@ automation:
             )
         }}
   mode: single
-- id: champ_player2_weekly_close
+- id: luf_player2_weekly_close
   alias: Level Up Family - player2 - Cierre semanal
   description: Cierra la última semana completa cada lunes y recupera cierres pendientes tras reinicios.
   triggers:
@@ -112,12 +112,12 @@ automation:
         or
         (
           trigger.id == 'arranque'
-          and states('input_text.champ_player2_last_applied_week')
+          and states('input_text.luf_player2_last_applied_week')
               not in ['', 'unknown', 'unavailable']
-          and states('input_text.champ_player2_last_applied_week')
+          and states('input_text.luf_player2_last_applied_week')
               != clave_cierre
         )
       }}
   actions:
-  - action: script.champ_player2_cerrar_semana
+  - action: script.luf_player2_cerrar_semana
   mode: single

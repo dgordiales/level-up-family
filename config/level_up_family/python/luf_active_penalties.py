@@ -6,7 +6,7 @@ import sqlite3
 from pathlib import Path
 from contextlib import closing
 
-DB_PATH = Path(__file__).resolve().parent.parent / "data" / "champion.db"
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "luf.db"
 
 
 def main():

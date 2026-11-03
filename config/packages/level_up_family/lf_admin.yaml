@@ -4,7 +4,7 @@
 
 input_number:
 
-  champ_penalty_id_to_cancel:
+  luf_penalty_id_to_cancel:
     name: Level Up Family - ID multa a anular
     icon: mdi:numeric
     min: 1
@@ -20,11 +20,11 @@ input_number:
 command_line:
 
   - sensor:
-      name: "Champion - Multas activas"
-      unique_id: champion_multas_activas
+      name: "Luf - Multas activas"
+      unique_id: luf_multas_activas
 
       command: >-
-        python3 /config/level_up_family/python/champion_active_penalties.py
+        python3 /config/level_up_family/python/luf_active_penalties.py
 
       scan_interval: 15
 
@@ -42,7 +42,7 @@ command_line:
 # SCRIPT - ANULAR MULTA SELECCIONADA
 #
 # El dashboard solo tiene que establecer el ID en:
-# input_number.champ_penalty_id_to_cancel
+# input_number.luf_penalty_id_to_cancel
 #
 # Este script lee el ID desde HA y llama al script central.
 # Así evitamos Jinja dentro del dashboard Lovelace.
@@ -50,7 +50,7 @@ command_line:
 
 script:
 
-  champ_anular_penalizacion_seleccionada:
+  luf_anular_penalizacion_seleccionada:
     alias: "Level Up Family - Anular multa seleccionada"
     icon: mdi:undo-variant
     mode: single
@@ -58,14 +58,14 @@ script:
     sequence:
       # Impide escrituras durante la migración o el reinicio manual.
       - condition: state
-        entity_id: input_boolean.champ_maintenance
+        entity_id: input_boolean.luf_maintenance
         state: "off"
 
       - variables:
           penalty_id: >-
             {{
               states(
-                'input_number.champ_penalty_id_to_cancel'
+                'input_number.luf_penalty_id_to_cancel'
               ) | int(0)
             }}
 
@@ -73,13 +73,13 @@ script:
         value_template: >-
           {{ penalty_id | int > 0 }}
 
-      - action: script.champ_anular_penalizacion
+      - action: script.luf_anular_penalizacion
         data:
           penalty_id: "{{ penalty_id | int }}"
 # Los IDs se conservan para que los paneles existentes sigan funcionando.
 homeassistant:
   customize:
-    sensor.champion_multas_activas:
+    sensor.luf_multas_activas:
       friendly_name: Level Up Family - Multas activas
-    sensor.champion_historico:
+    sensor.luf_historico:
       friendly_name: Level Up Family - Histórico

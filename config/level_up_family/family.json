@@ -9,7 +9,7 @@
       "entity_prefix": "player1",
       "db_key": "player1",
       "dashboard_url": "level-up-family-player1",
-      "dashboard_path": "player1-champion"
+      "dashboard_path": "player1-luf"
     },
     {
       "id": "player2",
@@ -18,7 +18,7 @@
       "entity_prefix": "player2",
       "db_key": "player2",
       "dashboard_url": "level-up-family-player2",
-      "dashboard_path": "player2-champion"
+      "dashboard_path": "player2-luf"
     }
   ]
 }

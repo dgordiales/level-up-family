@@ -31,10 +31,10 @@ class SeasonTimerTests(unittest.TestCase):
         return env.from_string(self.sensors[sensor][key]).render().strip()
 
     def check_date(self, today, day, remaining, status):
-        self.assertEqual(self.render('champ_season_day', 'state', today), str(day))
-        self.assertEqual(self.render('champ_season_days_remaining', 'state', today), str(remaining))
-        self.assertEqual(self.render('champ_season_status', 'state', today), status)
-        self.assertEqual(self.render('champ_season_end', 'state', today), '2026-11-29')
+        self.assertEqual(self.render('luf_season_day', 'state', today), str(day))
+        self.assertEqual(self.render('luf_season_days_remaining', 'state', today), str(remaining))
+        self.assertEqual(self.render('luf_season_status', 'state', today), status)
+        self.assertEqual(self.render('luf_season_end', 'state', today), '2026-11-29')
         for sensor in self.sensors:
             self.assertEqual(self.render(sensor, 'availability', today), 'True')
 
@@ -62,8 +62,8 @@ class SeasonTimerTests(unittest.TestCase):
                     self.assertEqual(self.render(sensor, 'state', '2026-11-02', start), 'None')
 
     def test_calendar_crosses_year(self):
-        self.assertEqual(self.render('champ_season_end', 'state', '2026-12-20', '2026-12-20'), '2027-01-16')
-        self.assertEqual(self.render('champ_season_status', 'state', '2027-01-17', '2026-12-20'), 'finalizada')
+        self.assertEqual(self.render('luf_season_end', 'state', '2026-12-20', '2026-12-20'), '2027-01-16')
+        self.assertEqual(self.render('luf_season_status', 'state', '2027-01-17', '2026-12-20'), 'finalizada')
 
     def test_entity_ids_are_explicit(self):
         for key, sensor in self.sensors.items():

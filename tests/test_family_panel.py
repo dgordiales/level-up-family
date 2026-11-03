@@ -75,7 +75,7 @@ class FamilyPanelTests(unittest.TestCase):
                                   dashboard_url='dashboard-one', dashboard_path='one-game')
         view = model.child_view(self.templates, data['players'][0])
         text = json.dumps(view)
-        self.assertIn('champ_legacy_one_', text)
+        self.assertIn('luf_legacy_one_', text)
         self.assertIn('sensor.legacy_one_', text)
         self.assertEqual(view['path'], 'one-game')
         views = model.parents_views(self.templates, data)
@@ -133,7 +133,7 @@ class FamilyPanelTests(unittest.TestCase):
     def test_dashboard_update_preserves_unrelated_views_and_settings(self):
         original = {'title': 'Casa', 'background': 'keep', 'views': [
             {'path': 'home', 'cards': [{'type': 'light', 'entity': 'light.private'}]},
-            {'path': 'player1-champion', 'title': 'old'}]}
+            {'path': 'player1-luf', 'title': 'old'}]}
         before = deepcopy(original)
         merged = model.merge_views(original, [model.child_view(self.templates, self.registry['players'][0])])
         self.assertEqual(original, before)

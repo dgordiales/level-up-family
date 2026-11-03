@@ -1,6 +1,6 @@
 title: Level Up Family - player1
 button_card_templates:
-  champ_mission:
+  luf_mission:
     show_icon: true
     show_name: true
     show_state: false
@@ -74,8 +74,8 @@ button_card_templates:
           const bit = 1 << index;
 
           return (Number(entity.state) & bit) !== 0
-            ? 'script.champ_player1_desmarcar_mision'
-            : 'script.champ_player1_marcar_mision';
+            ? 'script.luf_player1_desmarcar_mision'
+            : 'script.luf_player1_marcar_mision';
         ]]]
       service_data:
         tarea: |
@@ -96,7 +96,7 @@ views:
 - type: sections
   max_columns: 4
   title: player1 Level Up Family
-  path: player1-champion
+  path: player1-luf
   background:
     opacity: 55
     alignment: center
@@ -116,10 +116,10 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_season_path
-      - input_number.champ_season_number
-      - sensor.champ_season_days_remaining
-      - sensor.champ_season_status
+      - sensor.luf_season_path
+      - input_number.luf_season_number
+      - sensor.luf_season_days_remaining
+      - sensor.luf_season_status
       styles:
         card:
         - padding: 0
@@ -139,12 +139,12 @@ views:
         content: |
           [[[
             const path =
-              states['sensor.champ_season_path']?.state ||
+              states['sensor.luf_season_path']?.state ||
               '/local/level_up_family/season_01';
 
             const season =
               Number(
-                states['input_number.champ_season_number']?.state || 1
+                states['input_number.luf_season_number']?.state || 1
               );
 
             const names = {
@@ -162,9 +162,9 @@ views:
               12: 'THE FINALE'
             };
 
-            const remainingRaw = states['sensor.champ_season_days_remaining']?.state;
+            const remainingRaw = states['sensor.luf_season_days_remaining']?.state;
             const remaining = Number(remainingRaw);
-            const seasonStatus = states['sensor.champ_season_status']?.state;
+            const seasonStatus = states['sensor.luf_season_status']?.state;
             const validRemaining = typeof remainingRaw === 'string'
               && remainingRaw.trim() !== '' && Number.isFinite(remaining)
               && remaining >= 0 && remaining <= 28;
@@ -249,10 +249,10 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - sensor.champ_season_path
+      - sensor.luf_theme
+      - sensor.luf_season_path
       - binary_sensor.player1_objetivo_semanal_conseguido
-      - input_number.champ_player1_points_total
+      - input_number.luf_player1_points_total
       styles:
         card:
         - padding: 0
@@ -261,7 +261,7 @@ views:
         - background: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               return (
                 theme.card_background ||
@@ -271,7 +271,7 @@ views:
         - border: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               const border =
                 theme.border ||
@@ -295,7 +295,7 @@ views:
             // ========================================================
 
             const themeEntity =
-              states['sensor.champ_theme'];
+              states['sensor.luf_theme'];
 
             const theme =
               themeEntity?.attributes || {};
@@ -351,7 +351,7 @@ views:
             const totalXP =
               Number(
                 states[
-                  'input_number.champ_player1_points_total'
+                  'input_number.luf_player1_points_total'
                 ]?.state || 0
               );
 
@@ -365,7 +365,7 @@ views:
 
             const path =
               theme.season_path ||
-              states['sensor.champ_season_path']?.state ||
+              states['sensor.luf_season_path']?.state ||
               '/local/level_up_family/season_01';
 
 
@@ -881,7 +881,7 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
+      - sensor.luf_theme
       - sensor.player1_xp_semana_efectivo
       styles:
         card:
@@ -889,12 +889,12 @@ views:
         - border-radius: 18px
         - background: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return t.card_background || 'rgba(3,12,35,0.92)';
             ]]]
         - border: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return `1px solid ${t.border || 'rgba(90,190,255,0.40)'}`;
             ]]]
         - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
@@ -908,7 +908,7 @@ views:
       custom_fields:
         content: |
           [[[
-            const t = states['sensor.champ_theme']?.attributes || {};
+            const t = states['sensor.luf_theme']?.attributes || {};
 
             const path =
               t.season_path ||
@@ -992,8 +992,8 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - input_number.champ_player1_streak_days
+      - sensor.luf_theme
+      - input_number.luf_player1_streak_days
       styles:
         card:
         - padding: 0
@@ -1001,7 +1001,7 @@ views:
         - background: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               return (
                 theme.card_background ||
@@ -1011,7 +1011,7 @@ views:
         - border: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               const border =
                 theme.border ||
@@ -1035,7 +1035,7 @@ views:
             // ========================================================
 
             const theme =
-              states['sensor.champ_theme']?.attributes || {};
+              states['sensor.luf_theme']?.attributes || {};
 
             const path =
               theme.season_path ||
@@ -1058,7 +1058,7 @@ views:
               Math.round(
                 Number(
                   states[
-                    'input_number.champ_player1_streak_days'
+                    'input_number.luf_player1_streak_days'
                   ]?.state || 0
                 )
               );
@@ -1175,8 +1175,8 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - input_number.champ_player1_penalties_this_week
+      - sensor.luf_theme
+      - input_number.luf_player1_penalties_this_week
       styles:
         card:
         - padding: 0
@@ -1184,7 +1184,7 @@ views:
         - background: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               return (
                 theme.card_background ||
@@ -1194,12 +1194,12 @@ views:
         - border: |
             [[[
               const theme =
-                states['sensor.champ_theme']?.attributes || {};
+                states['sensor.luf_theme']?.attributes || {};
 
               const penalties =
                 Number(
                   states[
-                    'input_number.champ_player1_penalties_this_week'
+                    'input_number.luf_player1_penalties_this_week'
                   ]?.state || 0
                 );
 
@@ -1218,7 +1218,7 @@ views:
               const penalties =
                 Number(
                   states[
-                    'input_number.champ_player1_penalties_this_week'
+                    'input_number.luf_player1_penalties_this_week'
                   ]?.state || 0
                 );
 
@@ -1246,7 +1246,7 @@ views:
             // ========================================================
 
             const theme =
-              states['sensor.champ_theme']?.attributes || {};
+              states['sensor.luf_theme']?.attributes || {};
 
             const path =
               theme.season_path ||
@@ -1269,7 +1269,7 @@ views:
               Math.round(
                 Number(
                   states[
-                    'input_number.champ_player1_penalties_this_week'
+                    'input_number.luf_player1_penalties_this_week'
                   ]?.state || 0
                 )
               );
@@ -1409,8 +1409,8 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - sensor.champ_task_catalog
+      - sensor.luf_theme
+      - sensor.luf_task_catalog
       - sensor.date
       styles:
         card:
@@ -1419,12 +1419,12 @@ views:
         - border-radius: 14px
         - background: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return t.card_background || 'rgba(3,12,35,0.92)';
             ]]]
         - border: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return `1px solid ${t.border || 'rgba(90,190,255,0.40)'}`;
             ]]]
         - box-shadow: 0 7px 22px rgba(0, 0, 0, 0.32)
@@ -1437,7 +1437,7 @@ views:
       custom_fields:
         content: |
           [[[
-            const t = states['sensor.champ_theme']?.attributes || {};
+            const t = states['sensor.luf_theme']?.attributes || {};
 
             const path =
               t.season_path ||
@@ -1457,7 +1457,7 @@ views:
 
             const today = new Intl.DateTimeFormat('sv-SE', {timeZone: hass.config?.time_zone}).format(new Date());
             const day = (new Date(today + 'T12:00:00').getDay() + 6) % 7;
-            const catalog = states['sensor.champ_task_catalog'];
+            const catalog = states['sensor.luf_task_catalog'];
             const available = catalog && !['unknown', 'unavailable'].includes(catalog.state);
             const tasks = available && Array.isArray(catalog.attributes.tasks) ? catalog.attributes.tasks : null;
             const count = tasks ? tasks.filter(t => t.player === 'player1' && (t.days & (1 << day))).length : '—';
@@ -1519,8 +1519,8 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - sensor.player1_nivel_champion
+      - sensor.luf_theme
+      - sensor.player1_nivel_luf
       - sensor.player1_xp_nivel_actual
       - sensor.player1_xp_siguiente_nivel
       - sensor.player1_progreso_de_nivel
@@ -1530,12 +1530,12 @@ views:
         - border-radius: 18px
         - background: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return t.card_background || 'rgba(3,12,35,.92)';
             ]]]
         - border: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return `1px solid ${t.border || 'rgba(90,190,255,.40)'}`;
             ]]]
         - box-shadow: 0 7px 22px rgba(0,0,0,.32)
@@ -1549,7 +1549,7 @@ views:
       custom_fields:
         content: |
           [[[
-            const t = states['sensor.champ_theme']?.attributes || {};
+            const t = states['sensor.luf_theme']?.attributes || {};
 
             const path =
               t.season_path ||
@@ -1564,7 +1564,7 @@ views:
               'rgba(255,255,255,.72)';
 
             const level = Math.round(
-              Number(states['sensor.player1_nivel_champion']?.state || 1)
+              Number(states['sensor.player1_nivel_luf']?.state || 1)
             );
 
             const xp = Math.round(
@@ -1669,20 +1669,20 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - input_number.champ_player1_streak_weeks
+      - sensor.luf_theme
+      - input_number.luf_player1_streak_weeks
       styles:
         card:
         - padding: 0
         - border-radius: 18px
         - background: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return t.card_background || 'rgba(3,12,35,.92)';
             ]]]
         - border: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               return `1px solid ${t.border || 'rgba(90,190,255,.40)'}`;
             ]]]
         - box-shadow: 0 7px 22px rgba(0,0,0,.32)
@@ -1696,7 +1696,7 @@ views:
       custom_fields:
         content: |
           [[[
-            const t = states['sensor.champ_theme']?.attributes || {};
+            const t = states['sensor.luf_theme']?.attributes || {};
 
             const path =
               t.season_path ||
@@ -1708,7 +1708,7 @@ views:
 
             const streak = Math.round(
               Number(
-                states['input_number.champ_player1_streak_weeks']?.state || 0
+                states['input_number.luf_player1_streak_weeks']?.state || 0
               )
             );
 
@@ -1775,18 +1775,18 @@ views:
       show_icon: false
       show_state: false
       triggers_update:
-      - sensor.champ_theme
-      - input_number.champ_player1_streak_weeks
-      - input_number.champ_weekly_streak_multiplier
+      - sensor.luf_theme
+      - input_number.luf_player1_streak_weeks
+      - input_number.luf_weekly_streak_multiplier
       styles:
         card:
         - padding: 0
         - border-radius: 18px
         - background: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               const streak = Number(
-                states['input_number.champ_player1_streak_weeks']?.state || 0
+                states['input_number.luf_player1_streak_weeks']?.state || 0
               );
 
               return streak >= 2
@@ -1799,9 +1799,9 @@ views:
             ]]]
         - border: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               const streak = Number(
-                states['input_number.champ_player1_streak_weeks']?.state || 0
+                states['input_number.luf_player1_streak_weeks']?.state || 0
               );
 
               return `1px solid ${
@@ -1812,9 +1812,9 @@ views:
             ]]]
         - box-shadow: |
             [[[
-              const t = states['sensor.champ_theme']?.attributes || {};
+              const t = states['sensor.luf_theme']?.attributes || {};
               const streak = Number(
-                states['input_number.champ_player1_streak_weeks']?.state || 0
+                states['input_number.luf_player1_streak_weeks']?.state || 0
               );
 
               return streak >= 2
@@ -1831,7 +1831,7 @@ views:
       custom_fields:
         content: |
           [[[
-            const t = states['sensor.champ_theme']?.attributes || {};
+            const t = states['sensor.luf_theme']?.attributes || {};
 
             const path =
               t.season_path ||
@@ -1839,12 +1839,12 @@ views:
 
             const streak = Math.round(
               Number(
-                states['input_number.champ_player1_streak_weeks']?.state || 0
+                states['input_number.luf_player1_streak_weeks']?.state || 0
               )
             );
 
             const multiplier = Number(
-              states['input_number.champ_weekly_streak_multiplier']?.state || 1
+              states['input_number.luf_weekly_streak_multiplier']?.state || 1
             );
 
             const active = streak >= 2;
@@ -1917,7 +1917,7 @@ views:
           ]]]
     - type: custom:level-up-family-reward
       player: player1
-      reward_entity: input_text.champ_player1_weekly_reward
+      reward_entity: input_text.luf_player1_weekly_reward
       goal_entity: binary_sensor.player1_objetivo_semanal_conseguido
   cards: []
   icon: mdi:controller

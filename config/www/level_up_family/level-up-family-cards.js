@@ -1,7 +1,7 @@
 /* Level Up Family cards. No external runtime or HTML from task/reward text. */
 (() => {
   'use strict';
-  const CATALOG = 'sensor.champ_task_catalog';
+  const CATALOG = 'sensor.luf_task_catalog';
   const DAYS = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
   const DAY_NAMES = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   const CSS = `
@@ -82,7 +82,7 @@
       this.shadowRoot.replaceChildren();
       const style=node('style',CSS), card=node('ha-card');
       this.shadowRoot.append(style,card);
-      const theme=this._hass?.states['sensor.champ_theme']?.attributes || {};
+      const theme=this._hass?.states['sensor.luf_theme']?.attributes || {};
       this.style.setProperty('--lf-accent', /^#[a-fA-F0-9]{3,8}$/.test(theme.accent || '') ? theme.accent : '#65ddff');
       return card;
     }
@@ -100,13 +100,13 @@
   class FamilyReward extends FamilyCard {
     render() {
       const reward=cleanState(this._hass,this.config.reward_entity);
-      const theme=this._hass.states['sensor.champ_theme']?.attributes || {};
+      const theme=this._hass.states['sensor.luf_theme']?.attributes || {};
       const goal=this._hass.states[this.config.goal_entity]?.state === 'on';
       const seasonPath=/^\/local\/level_up_family\/season_\d+\/?$/.test(theme.season_path || '')
         ? theme.season_path.replace(/\/$/,'') : '/local/level_up_family/season_01';
       const rewardImage=typeof theme.reward_image==='string' && theme.reward_image.startsWith('/local/level_up_family/')
         ? theme.reward_image : `${seasonPath}/recompensa.png`;
-      const signature=JSON.stringify([reward,rewardImage,theme.accent,goal,cleanState(this._hass,'input_number.champ_weekly_goal_pct')]);
+      const signature=JSON.stringify([reward,rewardImage,theme.accent,goal,cleanState(this._hass,'input_number.luf_weekly_goal_pct')]);
       if (signature===this.signature) return;
       this.signature=signature;
       const card=this.shell(), row=node('div',undefined,'reward');
@@ -114,7 +114,7 @@
       const img=node('img'); img.alt='Recompensa semanal'; img.src=rewardImage;
       img.addEventListener('error',()=>img.replaceWith(icon),{once:true}); row.append(img);
       const text=node('div',undefined,'grow');
-      text.append(node('div','TU RECOMPENSA SEMANAL','eyebrow'),node('div',reward || 'Tu premio está por decidir','prize'),node('div',goal?'¡Objetivo semanal conseguido!':`Alcanza el ${cleanState(this._hass,'input_number.champ_weekly_goal_pct') || '75'}% de tus misiones semanales`,'goal'));
+      text.append(node('div','TU RECOMPENSA SEMANAL','eyebrow'),node('div',reward || 'Tu premio está por decidir','prize'),node('div',goal?'¡Objetivo semanal conseguido!':`Alcanza el ${cleanState(this._hass,'input_number.luf_weekly_goal_pct') || '75'}% de tus misiones semanales`,'goal'));
       row.append(text); card.append(row);
     }
   }
@@ -122,9 +122,9 @@
     render() {
       const today=new Intl.DateTimeFormat('sv-SE',{timeZone:this._hass.config?.time_zone}).format(new Date());
       const all=tasks(this._hass), now=new Date(today+'T12:00:00');
-      const theme=this._hass.states['sensor.champ_theme']?.attributes || {};
-      const start=cleanState(this._hass,'input_datetime.champ_season_start');
-      const signature=JSON.stringify([all,today,this._busy,this._error,this.config,theme,start,cleanState(this._hass,'input_boolean.champ_maintenance')]);
+      const theme=this._hass.states['sensor.luf_theme']?.attributes || {};
+      const start=cleanState(this._hass,'input_datetime.luf_season_start');
+      const signature=JSON.stringify([all,today,this._busy,this._error,this.config,theme,start,cleanState(this._hass,'input_boolean.luf_maintenance')]);
       if(signature===this.signature)return;
       this.signature=signature;
       const card=this.shell(), body=node('div',undefined,this.config.week?'body':'mission-body');card.append(body);
@@ -155,7 +155,7 @@
           button.type='button';button.setAttribute('aria-pressed',String(done));
           button.title=task.name;
           button.append(node('span',done?'✓':'○','mark'),node('span',task.name,'grow name'),node('span',`+${task.xp} XP`,'xp'));
-          button.disabled=Boolean(this._busy)||!start||today<start||cleanState(this._hass,'input_boolean.champ_maintenance')==='on';
+          button.disabled=Boolean(this._busy)||!start||today<start||cleanState(this._hass,'input_boolean.luf_maintenance')==='on';
           button.addEventListener('click',()=>this.toggle(task,today));content.append(button);
         }else{
           const holder=node('div',undefined,'week-task');holder.append(node('div',task.name+(task.once?' · una vez por semana':''),'name'));
@@ -164,7 +164,7 @@
             const date=monday(now);date.setDate(date.getDate()+i);const key=isoDate(date),b=1<<i;
             const button=node('button',DAYS[i],completed(task,b)?'done':'');button.type='button';
             button.setAttribute('aria-label',`${task.name} · ${DAY_NAMES[i]}`);button.setAttribute('aria-pressed',String(completed(task,b)));
-            button.disabled=!(task.days&b)||key>today||!start||key<start||Boolean(this._busy)||cleanState(this._hass,'input_boolean.champ_maintenance')==='on';
+            button.disabled=!(task.days&b)||key>today||!start||key<start||Boolean(this._busy)||cleanState(this._hass,'input_boolean.luf_maintenance')==='on';
             button.addEventListener('click',()=>this.toggle(task,key));buttons.append(button);
           }
           holder.append(buttons);content.append(holder);
@@ -174,7 +174,7 @@
     }
     async toggle(task,date){
       if(this._busy)return;this._busy=true;this._error='';this.render();
-      try{await this.service('champ_task_mutate',{operation:'toggle',player:this.config.player,entity:task.entity,fecha:date});}
+      try{await this.service('luf_task_mutate',{operation:'toggle',player:this.config.player,entity:task.entity,fecha:date});}
       catch(error){this._error=error.message||'No se ha podido cambiar la misión.';}
       finally{this._busy=false;this.render();}
     }
@@ -182,7 +182,7 @@
   class FamilyAdmin extends FamilyCard {
     render(){
       if(!this._hass.user?.is_admin){const card=this.shell();card.append(node('p','Administración de padres','body'));this.initialized=false;return;}
-      const roster=this._hass.states['sensor.champ_family']?.attributes?.players;
+      const roster=this._hass.states['sensor.luf_family']?.attributes?.players;
       if(Array.isArray(roster)){
         const active=roster.filter(p=>p.active), signature=JSON.stringify(active.map(p=>[p.id,p.name,p.reward_entity]));
         if(signature!==this.rosterSignature){
@@ -254,7 +254,7 @@
         const button=node('button',`Guardar premio de ${name}`);button.type='button';const status=node('p','','message');status.setAttribute('role','status');
         button.addEventListener('click',async()=>{
           button.disabled=true;status.textContent='Guardando…';status.className='message';
-          try{await this.service('champ_configurar_recompensa',{player,reward:input.value,expected:form.expected});form.expected=input.value.trim();input.value=form.expected;form.dirty=false;status.textContent='Premio guardado.';}
+          try{await this.service('luf_configurar_recompensa',{player,reward:input.value,expected:form.expected});form.expected=input.value.trim();input.value=form.expected;form.dirty=false;status.textContent='Premio guardado.';}
           catch(error){status.textContent=error.message||'No se ha podido guardar el premio.';status.className='message error';}
           finally{button.disabled=false;}
         });
@@ -271,14 +271,14 @@
       if(!name||name.length>80||this.xp.value===''||!Number.isInteger(xp)||xp<0||xp>100){this.message('Escribe un nombre y un número entero de XP entre 0 y 100.',true);return;}
       const payload={task_id:this.selected,name,player:this.playerInput.value,xp,days:this.dayInputs.reduce((mask,input,i)=>mask|(input.checked?1<<i:0),0),once:this.once.checked,expected:this.loaded.revision};
       this._busy=true;this.message('Guardando…');this.render();
-      try{await this.service('champ_configurar_tarea',payload);this.dirty=false;this.loaded=null;this.message('Tarea guardada.');}
+      try{await this.service('luf_configurar_tarea',payload);this.dirty=false;this.loaded=null;this.message('Tarea guardada.');}
       catch(error){this.message(error.message||'No se ha podido guardar la tarea.',true);}
       finally{this._busy=false;this.render();}
     }
   }
   class FamilyRoster extends FamilyCard {
     render(){
-      const state=this._hass.states[this.config.entity || 'sensor.champ_family'];
+      const state=this._hass.states[this.config.entity || 'sensor.luf_family'];
       const data=state?.attributes;
       const signature=JSON.stringify([data,this._busy,this._message,this._error,this._review,this._hass.user?.is_admin]);
       if(signature===this.signature)return;this.signature=signature;

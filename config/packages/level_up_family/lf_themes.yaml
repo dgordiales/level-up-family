@@ -9,10 +9,10 @@
 # temporada.
 #
 # La temporada activa se obtiene de:
-#   input_number.champ_season_number
+#   input_number.luf_season_number
 #
 # Los recursos gráficos se obtienen de:
-#   sensor.champ_season_path
+#   sensor.luf_season_path
 #
 # Cuando una temporada todavía no tenga tema propio definido,
 # se utilizará temporalmente el tema de Season 1 - Zero Point.
@@ -28,14 +28,14 @@ template:
   - sensor:
 
       - name: "Level Up Family - Theme"
-        unique_id: champ_theme
-        default_entity_id: sensor.champ_theme
+        unique_id: luf_theme
+        default_entity_id: sensor.luf_theme
         icon: mdi:palette
 
         # El estado identifica la temporada activa.
         state: >-
           {% set season =
-            states('input_number.champ_season_number') | int(1)
+            states('input_number.luf_season_number') | int(1)
           %}
           season_{{ '%02d' | format(season) }}
 
@@ -47,13 +47,13 @@ template:
 
           season_number: >-
             {{
-              states('input_number.champ_season_number')
+              states('input_number.luf_season_number')
               | int(1)
             }}
 
           season_name: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
             {% set names = {
               1: 'Zero Point',
@@ -73,7 +73,7 @@ template:
 
           season_path: >-
             {{
-              states('sensor.champ_season_path')
+              states('sensor.luf_season_path')
             }}
 
 
@@ -85,7 +85,7 @@ template:
 
           primary: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -103,7 +103,7 @@ template:
 
           secondary: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -121,7 +121,7 @@ template:
 
           highlight: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -139,7 +139,7 @@ template:
 
           accent: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -155,7 +155,7 @@ template:
 
           glow: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -171,7 +171,7 @@ template:
 
           card_background: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -187,7 +187,7 @@ template:
 
           border: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -205,7 +205,7 @@ template:
 
           border_strong: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {
@@ -223,7 +223,7 @@ template:
 
           track: >-
             {% set season =
-              states('input_number.champ_season_number') | int(1)
+              states('input_number.luf_season_number') | int(1)
             %}
 
             {% set themes = {

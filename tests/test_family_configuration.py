@@ -75,7 +75,7 @@ class FamilyConfigurationTests(unittest.TestCase):
     def test_third_player_scores_and_mutation_policy_are_not_limited_to_two(self):
         cfg = self.make([{'id': f'player{i}', 'name': str(i)} for i in range(1, 4)])
         fixture = self.fixture(cfg)
-        fixture.values['input_text.champ_player3_active_week'] = '2026-W45'
+        fixture.values['input_text.luf_player3_active_week'] = '2026-W45'
         for task in fixture.defaults:
             fixture.values[task['entity']] = '127'
         fixture.refresh()
@@ -84,22 +84,22 @@ class FamilyConfigurationTests(unittest.TestCase):
         self.assertFalse(fixture.rejects('Revisa el nombre', name='Leer', player='player3', xp=20, days=31, once=False))
         self.assertTrue(fixture.rejects('Revisa el nombre', name='Leer', player='player4', xp=20, days=31, once=False))
         guard = fixture.edit_steps()[0]['if'][0]['value_template']
-        fixture.values['input_text.champ_player3_active_week'] = '2026-W44'
+        fixture.values['input_text.luf_player3_active_week'] = '2026-W44'
         self.assertEqual(fixture.render(guard, task=fixture.catalog[0]), 'True')
-        fixture.values['input_text.champ_player3_active_week'] = '2026-W45'
+        fixture.values['input_text.luf_player3_active_week'] = '2026-W45'
         self.assertEqual(fixture.render(guard, task=fixture.catalog[0]), 'False')
         recheck = fixture.edit_steps()[-1]['then'][0]['repeat']['sequence']
         self.assertEqual(recheck[1]['repeat']['sequence'][0]['action'], '{{ repeat.item }}')
         targets = fixture.render(recheck[1]['repeat']['for_each'])
         self.assertEqual(__import__('ast').literal_eval(targets),
-                         [f'script.champ_player{i}_cerrar_dia' for i in range(1, 4)])
+                         [f'script.luf_player{i}_cerrar_dia' for i in range(1, 4)])
 
     def test_retired_player_keeps_helpers_but_not_buttons_closures_or_week_guards(self):
         cfg = self.make([{'id': 'player1', 'name': 'Uno'}, {'id': 'player2', 'name': 'Dos', 'active': False},
                          {'id': 'player3', 'name': 'Tres'}])
         fixture = self.fixture(cfg)
-        fixture.values['input_text.champ_player2_active_week'] = '2025-W01'
-        fixture.values['input_text.champ_player3_active_week'] = '2026-W45'
+        fixture.values['input_text.luf_player2_active_week'] = '2025-W01'
+        fixture.values['input_text.luf_player3_active_week'] = '2026-W45'
         fixture.refresh()
         self.assertEqual({t['player'] for t in fixture.catalog}, {'player1', 'player3'})
         guard = fixture.edit_steps()[0]['if'][0]['value_template']
@@ -107,7 +107,7 @@ class FamilyConfigurationTests(unittest.TestCase):
         retired = yaml.safe_load((cfg / 'packages/level_up_family/lf_player2.yaml').read_text(encoding='utf-8'))
         self.assertTrue(retired['input_number'])
         self.assertEqual(retired['automation'], [])
-        self.assertEqual(retired['script']['champ_player2_cerrar_semana']['sequence'][0]['value_template'], '{{ false }}')
+        self.assertEqual(retired['script']['luf_player2_cerrar_semana']['sequence'][0]['value_template'], '{{ false }}')
         panel = (cfg / 'panel/level_up_family/player2.yaml').read_text(encoding='utf-8')
         self.assertNotIn('custom:level-up-family-missions', panel)
         parents = yaml.safe_load((cfg / 'panel/level_up_family/parents.yaml').read_text(encoding='utf-8'))
@@ -151,9 +151,9 @@ class FamilyConfigurationTests(unittest.TestCase):
     def test_database_sync_retains_ids_activity_and_retired_history(self):
         cfg = self.make([{'id': 'player1', 'name': 'Uno'}, {'id': 'player2', 'name': 'Dos'}, {'id': 'player3', 'name': 'Tres'}])
         code = cfg / 'level_up_family/python'
-        db = module_at(code / 'champion_db.py', 'family_database_test')
+        db = module_at(code / 'luf_db.py', 'family_database_test')
         db.BASE_DIR = self.temp / 'data'
-        db.DB_PATH = db.BASE_DIR / 'champion.db'
+        db.DB_PATH = db.BASE_DIR / 'luf.db'
         capture(db.init_database)
         capture(db.add_penalty, 'player2', 10, 'Prueba')
         capture(db.close_day, 'player2', '2026-11-02', 1)
@@ -173,7 +173,7 @@ class FamilyConfigurationTests(unittest.TestCase):
         self.assertEqual([r[0] for r in rows('players')], ids)
         self.assertEqual(rows('players')[1][2:4], ('Nombre nuevo', 0))
         self.assertEqual({t: rows(t) for t in activity}, activity)
-        history = module_at(code / 'champion_history.py', 'family_history_test')
+        history = module_at(code / 'luf_history.py', 'family_history_test')
         history.DB_PATH = db.DB_PATH
         record = json.loads(capture(history.main))
         self.assertEqual(record['weeks'][0]['player_name'], 'Nombre nuevo')
@@ -187,9 +187,9 @@ class FamilyConfigurationTests(unittest.TestCase):
         self.assertEqual(rows('players')[1][3], 1)
 
     def test_legacy_init_without_manifest_keeps_existing_names_and_players(self):
-        db = module_at(ROOT / 'config/level_up_family/python/champion_db.py', 'legacy_family_test')
+        db = module_at(ROOT / 'config/level_up_family/python/luf_db.py', 'legacy_family_test')
         db.BASE_DIR = self.temp / 'data'
-        db.DB_PATH = db.BASE_DIR / 'champion.db'
+        db.DB_PATH = db.BASE_DIR / 'luf.db'
         db.FAMILY_PATH = self.temp / 'missing.json'
         capture(db.init_database)
         with db.connect() as conn:

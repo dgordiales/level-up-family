@@ -25,4 +25,3 @@ Queda implementar la reactivación desde el panel, especialmente después de sem
 - Mantener identificadores genéricos y excluir datos reales, copias y credenciales.
 - Probar cambios visuales en Home Assistant antes de desplegarlos.
 - Incluir migración y vuelta atrás cuando cambie el estado persistente.
-
