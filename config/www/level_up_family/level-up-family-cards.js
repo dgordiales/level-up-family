@@ -38,6 +38,7 @@
     .week-days button { padding:9px 0; font-size:12px; border-radius:8px; } .week-days button.done { background:rgba(25,149,113,.5); border-color:#67efc4; }
     details summary { cursor:pointer; font-weight:700; font-size:14px; } .reward { padding:18px; display:flex; gap:16px; align-items:center; }
     .reward ha-icon,.reward img { --mdc-icon-size:48px; width:54px; height:54px; object-fit:contain; filter:drop-shadow(0 0 9px rgba(101,221,255,.35)); }
+    .reward img { width:80px; height:80px; flex:0 0 80px; }
     .eyebrow { color:var(--lf-accent); font-size:11px; font-weight:900; letter-spacing:1px; } .prize { font-size:17px; font-weight:800; margin:5px 0; white-space:pre-wrap; overflow-wrap:anywhere; } .goal { font-size:12px; opacity:.75; }
     @media(max-width:540px) { .form { grid-template-columns:1fr; } .body { padding:15px; } .day-label { padding:8px 5px; } }
   `;
@@ -101,15 +102,17 @@
       const reward=cleanState(this._hass,this.config.reward_entity);
       const theme=this._hass.states['sensor.champ_theme']?.attributes || {};
       const goal=this._hass.states[this.config.goal_entity]?.state === 'on';
-      const signature=JSON.stringify([reward,theme.reward_image,theme.accent,goal,cleanState(this._hass,'input_number.champ_weekly_goal_pct')]);
+      const seasonPath=/^\/local\/level_up_family\/season_\d+\/?$/.test(theme.season_path || '')
+        ? theme.season_path.replace(/\/$/,'') : '/local/level_up_family/season_01';
+      const rewardImage=typeof theme.reward_image==='string' && theme.reward_image.startsWith('/local/level_up_family/')
+        ? theme.reward_image : `${seasonPath}/recompensa.png`;
+      const signature=JSON.stringify([reward,rewardImage,theme.accent,goal,cleanState(this._hass,'input_number.champ_weekly_goal_pct')]);
       if (signature===this.signature) return;
       this.signature=signature;
       const card=this.shell(), row=node('div',undefined,'reward');
       const icon=node('ha-icon'); icon.setAttribute('icon','mdi:gift-outline');
-      if (typeof theme.reward_image==='string' && theme.reward_image.startsWith('/local/level_up_family/')) {
-        const img=node('img'); img.alt='Recompensa semanal'; img.src=theme.reward_image;
-        img.addEventListener('error',()=>img.replaceWith(icon),{once:true}); row.append(img);
-      } else row.append(icon);
+      const img=node('img'); img.alt='Recompensa semanal'; img.src=rewardImage;
+      img.addEventListener('error',()=>img.replaceWith(icon),{once:true}); row.append(img);
       const text=node('div',undefined,'grow');
       text.append(node('div','TU RECOMPENSA SEMANAL','eyebrow'),node('div',reward || 'Tu premio está por decidir','prize'),node('div',goal?'¡Objetivo semanal conseguido!':`Alcanza el ${cleanState(this._hass,'input_number.champ_weekly_goal_pct') || '75'}% de tus misiones semanales`,'goal'));
       row.append(text); card.append(row);

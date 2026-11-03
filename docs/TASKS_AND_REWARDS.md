@@ -24,7 +24,7 @@ Esta versión edita o desactiva los 20 espacios existentes. Crear espacios adici
 
 Escribe el premio de cada jugador y pulsa su botón **Guardar premio**. Cada panel infantil muestra únicamente su propio premio, bajo sus datos de nivel, rachas y bonus. El premio sigue configurado hasta que los padres lo cambien; no se entrega ni se borra automáticamente al cambiar de semana. Un texto vacío muestra **Tu premio está por decidir**.
 
-La tarjeta usa por ahora `mdi:gift-outline`, con los colores de la temporada. Cuando se cree el icono específico de cada temporada, el sensor de tema podrá exponer `reward_image` con una ruta bajo `/local/level_up_family/`. La tarjeta usará esa imagen y conservará el icono provisional si no puede cargarla.
+La tarjeta carga automáticamente `recompensa.png` de la carpeta de la temporada activa, por ejemplo `/local/level_up_family/season_01/recompensa.png`. Al cambiar `sensor.champ_theme.season_path`, cambia también la imagen, sin modificar el YAML del panel. Se puede indicar una imagen alternativa con el atributo `reward_image` del tema, bajo `/local/level_up_family/`. Si el archivo no puede cargar, se muestra el icono de regalo. Cada temporada debe incluir su propio `recompensa.png`. La imagen se muestra en un espacio fijo de **80 × 80 px**, conservando sus proporciones.
 
 ## Panel infantil
 
@@ -34,7 +34,7 @@ Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas 
 
 `task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.champ_task_config_*`; los premios, en `input_text.champ_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
 
-El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.2` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
+El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.4` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
 
 Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
 
