@@ -148,7 +148,7 @@ views:
               );
 
             const names = {
-              1: 'ZERO POINT',
+              1: 'THE ORIGIN',
               2: 'THE CONVERGENCE',
               3: 'CHROME STORM',
               4: 'NEON BLOOM',

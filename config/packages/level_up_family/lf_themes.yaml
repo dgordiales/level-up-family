@@ -15,7 +15,7 @@
 #   sensor.luf_season_path
 #
 # Cuando una temporada todavía no tenga tema propio definido,
-# se utilizará temporalmente el tema de Season 1 - Zero Point.
+# se utilizará temporalmente el tema de Season 1 - THE ORIGIN.
 # ============================================================
 
 
@@ -56,7 +56,7 @@ template:
               states('input_number.luf_season_number') | int(1)
             %}
             {% set names = {
-              1: 'Zero Point',
+              1: 'The Origin',
               2: 'The Convergence',
               3: 'Chrome Storm',
               4: 'Neon Bloom',
@@ -69,7 +69,7 @@ template:
               11: 'Override',
               12: 'The Finale'
             } %}
-            {{ names.get(season, 'Zero Point') }}
+            {{ names.get(season, 'The Origin') }}
 
           season_path: >-
             {{
