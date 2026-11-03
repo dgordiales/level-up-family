@@ -20,7 +20,7 @@ Sin días seleccionados, la tarea queda desactivada. La opción de una vez por s
 
 Los totales previstos, XP, objetivos, días perfectos y cierres semanales se calculan desde el mismo catálogo. Al cambiar días o asignación de una tarea sin progreso se recalculan también los días ya cerrados de la semana actual. La reasignación conserva el identificador de progreso de la tarea; su nombre interno puede seguir conteniendo el jugador original.
 
-Esta versión edita o desactiva los 20 espacios existentes. Crear espacios adicionales y eliminarlos físicamente queda para una ampliación del catálogo.
+Esta versión edita o desactiva los espacios existentes: 20 en el ejemplo y diez más por cada alta de un hijo. Las altas desde Familia los crean con todos los días desactivados. Crear espacios adicionales para un jugador existente y eliminarlos físicamente queda para una ampliación del catálogo.
 
 ## Recompensa semanal
 
@@ -41,3 +41,4 @@ El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level
 Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
 
 La administración se muestra en el panel de padres y el formulario solo aparece para administradores. Se mantienen los permisos existentes de Home Assistant sobre scripts y helpers.
+

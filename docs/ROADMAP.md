@@ -10,11 +10,13 @@ Preparar cada temporada en una rama, con sus recursos en `season_XX`, textos y c
 
 Ya se pueden editar las 20 tareas actuales (nombre, XP, jugador, días y frecuencia), desactivarlas y definir un premio por jugador desde **Tareas y premios**. Los cambios de reglas se aplican esta semana si la tarea todavía no tiene progreso; los formularios antiguos y los cambios de reglas con progreso se rechazan.
 
-Queda ampliar el catálogo para crear espacios adicionales, ordenar tareas desde la interfaz y retirar espacios sin tocar YAML. También quedan el historial de premios entregados y los iconos de recompensa específicos de cada temporada. La ampliación deberá mantener identificadores estables e incluir una migración del progreso existente.
+Cada alta de un hijo crea diez espacios nuevos. Queda crear espacios adicionales para un hijo existente, ordenar tareas y retirar espacios desde la interfaz. También queda el historial de premios entregados. La tarjeta ya admite `recompensa.png` por temporada y la muestra a 80 × 80 px; el arte debe aportarse para cada temporada. Las ampliaciones deberán mantener identificadores estables e incluir una migración del progreso existente.
 
 ## Configuración familiar
 
-La composición familiar ya se configura con un archivo privado y el generador descrito en [Configurar la familia](FAMILY_CONFIGURATION.md). Queda una futura interfaz de altas, retiradas y nombres desde padres; deberá coordinar helpers, paneles y SQLite sin borrar identidades históricas.
+La pestaña **Familia** ya permite altas, retiradas y cambios de nombre desde padres, conservando identidades, helpers e histórico. El generador sigue disponible para preparar una instalación inicial con uno o más hijos. Consulta [Configurar la familia](FAMILY_CONFIGURATION.md).
+
+Queda implementar la reactivación desde el panel, especialmente después de semanas de ausencia: requiere reconciliar semana activa, máscaras y rachas. Esta versión exige mantener al menos un hijo activo.
 
 ## Criterios para cada PR
 
@@ -23,3 +25,4 @@ La composición familiar ya se configura con un archivo privado y el generador d
 - Mantener identificadores genéricos y excluir datos reales, copias y credenciales.
 - Probar cambios visuales en Home Assistant antes de desplegarlos.
 - Incluir migración y vuelta atrás cuando cambie el estado persistente.
+

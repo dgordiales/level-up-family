@@ -24,13 +24,15 @@ Para configurar uno o más hijos y sus nombres, utiliza primero el [generador fa
    python3 /config/level_up_family/python/champion_db.py init
    ```
 
-   Se crea `/config/level_up_family/data/champion.db` con `player1` y `player2`. Las 20 tareas iniciales se cargan desde `/config/level_up_family/task_defaults.json`; después se editan desde el panel de padres.
+   Se crea `/config/level_up_family/data/champion.db` con los jugadores de `family.json`. La copia de ejemplo contiene `player1` y `player2`, con 20 tareas; el generador prepara diez espacios por hijo registrado. Después se editan desde padres.
 
 5. Comprueba la configuración con las herramientas de Home Assistant y reinícialo si es válida. Asegúrate de que los comandos Python se ejecutan en el mismo entorno que Home Assistant; una terminal de un complemento puede tener otro intérprete o permisos.
 6. Establece `input_number.champ_season_number` en `1` y `input_datetime.champ_season_start` en la fecha elegida. Ajusta las reglas de XP, objetivos y penalizaciones desde sus helpers. La fecha determina 28 días naturales, incluyendo el inicio; el último día es inicio + 27 días.
-7. Revisa que `input_boolean.champ_maintenance` esté apagado. Los dos paneles deben mostrar nivel 1, XP 0 y misiones pendientes en una instalación nueva. Comprueba temporada, misiones, penalizaciones e histórico con datos de prueba y una copia de seguridad antes de usarlos de forma habitual.
+7. Revisa que `input_boolean.champ_maintenance` esté apagado. Cada panel activo debe mostrar nivel 1, XP 0 y misiones pendientes en una instalación nueva. Comprueba temporada, misiones, penalizaciones e histórico con datos de prueba y una copia de seguridad antes de usarlos de forma habitual.
 
 Los enlaces de paneles son `/level-up-family-player1/player1-champion`, `/level-up-family-player2/player2-champion` y `/level-up-family-parents/control-champion`. La segunda pestaña de padres es `historico-champion`. `require_admin` restringe la navegación al panel de padres; no convierte los scripts o helpers en un sistema de permisos por jugador.
+
+En el ejemplo, la gestión de hijos está en `/level-up-family-parents/family`. Debe estar registrado también `/level-up-family-children`, aunque todavía no tenga vistas: se utilizará para las altas futuras. La acción de gestión de familia exige administrador en el servidor; esto no añade permisos individuales a los scripts antiguos del juego. La versión comprobada en la instalación existente es HA 2026.10.4, integración 0.4.1 y tarjetas 2.5.1; otras versiones requieren su propia comprobación de configuración.
 
 ## Reinicios y limpieza
 
@@ -40,8 +42,9 @@ La utilidad actúa únicamente sobre SQLite. No reinicia los helpers de Home Ass
 
 ## Personalización actual
 
-Los nombres de los hijos y las altas, retiradas y reactivaciones se configuran mediante [Configurar la familia](FAMILY_CONFIGURATION.md). El generador conserva las identidades internas y prepara todos los paneles y paquetes correspondientes.
+Los nombres, las altas y las retiradas se gestionan desde **Familia**. No hay una acción de reactivación en esta versión. El [generador familiar](FAMILY_CONFIGURATION.md) prepara la instalación inicial y conserva las identidades internas.
 
 Abre **Tareas y premios** en el panel de padres para cambiar nombres, XP, jugador, días y premio semanal. Consulta [Tareas y premios](TASKS_AND_REWARDS.md) para las reglas de protección del progreso. Las notificaciones a teléfonos personales se han retirado de esta distribución. Los nombres de jugador son genéricos también en las claves SQLite y en los identificadores de entidades.
 
 Los recursos de `www/level_up_family/season_01` se sirven en `/local/level_up_family/season_01`. No guardes datos privados en `www`.
+

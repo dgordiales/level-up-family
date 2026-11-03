@@ -20,7 +20,11 @@ El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.5
 
 Antes de sustituir archivos, realiza una copia completa. No reemplaces `data/`, los valores de los helpers ni `task_defaults.json` con el ejemplo del repositorio. Tampoco sustituyas el registro familiar existente por el ejemplo.
 
-Una instalación antigua necesita vincular una sola vez `id`, `entity_prefix`, `db_key`, `dashboard_url` y `dashboard_path` en su registro de versión 2. Por ejemplo, el identificador público `player1` puede apuntar a entidades `champ_legacy_one_*` y a la clave SQLite `player_1`. Cambiar el nombre visible no cambia esas vinculaciones. Configura `parents_dashboard` y `children_dashboard` en `lf_family.yaml` si sus rutas difieren de las del ejemplo.
+Una instalación antigua necesita vincular una sola vez `id`, `entity_prefix`, `db_key`, `dashboard_url` y `dashboard_path` en su registro de versión 2. Por ejemplo, el identificador público `player1` puede apuntar a entidades `champ_legacy_one_*` y a la clave SQLite `player_1`. Cambiar el nombre visible no cambia esas vinculaciones. Configura `parents_dashboard` en `lf_family.yaml` si difiere del ejemplo. Mantén el panel compartido en `level-up-family-children`: las altas generan esa ruta. Todos los paneles vinculados, incluidos los de jugadores retirados, deben seguir registrados para que la gestión pueda cargar sus vistas.
+
+Las vistas del juego se reconstruyen desde las plantillas distribuidas al cambiar la familia. Conserva una copia de cualquier personalización dentro de esas vistas antes de migrar; las pestañas ajenas al juego y los ajustes generales del panel se mantienen.
+
+El archivo de entrada del generador utiliza `version: 1` y campos `id`, `name` y `active`. Su salida de ejecución utiliza `version: 2`, añade `revision` y las vinculaciones anteriores. Después de instalar, el registro de HA es el vigente: no vuelvas a copiar sobre él un archivo privado inicial que ya esté desactualizado. No publiques registros de ejecución con nombres reales ni las copias de seguridad.
 
 Las operaciones desde el panel actualizan solo las pestañas del juego. Las copias contienen los paneles originales para recuperación. Si un alta queda pendiente o HA no puede recuperar todos los helpers, el juego permanece en mantenimiento y Familia informa del problema; conserva `family_pending.json` y su copia de seguridad para resolverlo. No ejecutes un reset para corregir una instalación.
 
@@ -62,7 +66,7 @@ python tools/validate_config.py build/family-v1/config
 python tools/validate_panels_js.py build/family-v1/config/panel/level_up_family
 ```
 
-La salida contiene `config/`, un resumen `generation.json` y `configuration.fragment.yaml`, que se combina con la configuración existente de HA. Dentro de `config/level_up_family/`, `family.json` contiene la copia generada del registro familiar; conserva el archivo privado original para futuros cambios.
+La salida contiene `config/`, un resumen `generation.json` y `configuration.fragment.yaml`, que se combina con la configuración existente de HA. Dentro de `config/level_up_family/`, `family.json` contiene el registro de ejecución generado. Conserva el archivo de entrada como referencia inicial; las modificaciones posteriores desde el panel se guardan en el registro de HA.
 
 La carpeta de salida debe ser nueva. El generador no instala nada en HA, no lee bases de datos ni sobrescribe una carpeta anterior. No uses `/config` de HA como salida.
 
@@ -101,7 +105,7 @@ Para el uso habitual utiliza la pestaña **Familia**. El flujo siguiente queda c
 
 El generador conserva los identificadores físicos y espacios de tareas aunque cambien el nombre o el orden de un hijo. Los cambios de tareas y premios realizados desde padres continúan en los helpers persistentes; no se sustituyen por los valores iniciales del JSON.
 
-## Retirar y reactivar
+## Retirada y reactivación offline
 
 Termina primero el cierre de su semana y resuelve las multas pendientes. Cambiar la familia no liquida semanas ni reparte XP automáticamente.
 
@@ -115,7 +119,7 @@ Mantén al hijo en el archivo y cambia solo su estado:
 
 Aplica el mismo procedimiento de generación, actualización y `sync_family`. El jugador desaparece de selectores, multas nuevas, correcciones y cierres automáticos. Sus tareas dejan de participar en el catálogo activo. Se mantienen sus helpers y metadatos sin reiniciarlos y sus scripts quedan detenidos.
 
-Su panel no aparece en el nuevo fragmento de navegación. Si quedó un registro antiguo en HA, el archivo de panel muestra un aviso de retirada y no ofrece botones de misiones; retira también ese registro de `configuration.yaml`.
+El generador no añade el panel retirado al nuevo fragmento de navegación; su archivo muestra un aviso y no ofrece botones de misiones. Si utilizas también la integración de Familia, conserva su registro de panel en HA, porque sigue vinculado al jugador. Para instalaciones nuevas, empieza con jugadores activos y realiza las retiradas desde Familia después de instalar.
 
 SQLite conserva días, semanas, años y multas. El histórico sigue mostrando sus semanas y resúmenes, con una sección marcada como retirado. No borres su fila ni helpers: las relaciones de SQLite tienen borrado en cascada y una eliminación física podría borrar actividad.
 
@@ -130,3 +134,6 @@ Sin `family.json`, el motor conserva la inicialización compatible con `player1`
 Este procedimiento corresponde a instalaciones de **la distribución genérica del repositorio**. Una instalación con claves propias, como `player_1`, o entidades que contienen nombres anteriores necesita una migración específica: copiar estos archivos directamente crearía entidades diferentes. El generador no cambia la instalación original que dio lugar al proyecto.
 
 Para volver atrás, restaura conjuntamente configuración, SQLite y estado de helpers desde la copia anterior. Restaurar solo los YAML no revierte una sincronización de nombres o retiradas en la base.
+
+Para una recuperación manual, detén primero los escritores del juego y conserva la carpeta de copia completa. `helpers.json` contiene los valores anteriores, `family.json` el registro anterior y `champion.db` la copia SQLite; las vistas que se modifican se guardan como `dashboard_*.json`. En un alta, `files.json` conserva el contenido anterior de los archivos aprovisionados y señala los que antes no existían. Restaura el conjunto compatible o una copia completa de HA, comprueba la configuración y revisa contadores y paneles antes de reanudar. No borres `family_pending.json` ni apagues mantenimiento para ocultar una recuperación fallida: primero resuelve la causa o restaura la copia.
+
