@@ -1,7 +1,24 @@
 {
-  "version": 1,
+  "version": 2,
+  "revision": 0,
   "players": [
-    {"id": "player1", "name": "player1", "active": true},
-    {"id": "player2", "name": "player2", "active": true}
+    {
+      "id": "player1",
+      "name": "player1",
+      "active": true,
+      "entity_prefix": "player1",
+      "db_key": "player1",
+      "dashboard_url": "level-up-family-player1",
+      "dashboard_path": "player1-champion"
+    },
+    {
+      "id": "player2",
+      "name": "player2",
+      "active": true,
+      "entity_prefix": "player2",
+      "db_key": "player2",
+      "dashboard_url": "level-up-family-player2",
+      "dashboard_path": "player2-champion"
+    }
   ]
 }

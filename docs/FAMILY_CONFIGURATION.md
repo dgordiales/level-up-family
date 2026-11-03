@@ -2,7 +2,27 @@
 
 Los dos jugadores del repositorio son un ejemplo. El generador prepara la configuración de tu familia desde **un archivo privado**: nombres, jugadores activos y jugadores retirados. Genera paneles, helpers, espacios iniciales de tareas, recompensas, multas y cierres. No hace falta duplicar manualmente todas las referencias de un jugador.
 
-Esta versión administra la familia mediante un archivo y un comando; no añade todavía botones de alta/baja al panel de padres.
+Una vez instalada esta versión, **Familia**, en el panel de padres, permite cambiar nombres, retirar hijos y dar de alta otros sin editar archivos. El generador que se explica después sirve para preparar una instalación nueva.
+
+## Gestionar desde el panel de padres
+
+- **Guardar nombre** actualiza el nombre visible y el mostrado en el histórico. Conserva los identificadores, las misiones completadas, los XP y los cierres anteriores. No necesita reiniciar HA.
+- **Retirar** muestra primero una confirmación. El hijo desaparece de los controles activos y su panel muestra que está retirado. Se conservan sus helpers, las marcas de tareas, los premios y todas las filas de SQLite. Familia muestra un resumen de su progreso al retirarse; Histórico conserva sus semanas y años. Debe quedar al menos un hijo activo.
+- **Preparar alta** valida el nombre y muestra una propuesta. **Aplicar alta y reiniciar HA** crea una identidad nueva, su panel y diez tareas inicialmente desactivadas. Comprueba la configuración, guarda una copia de seguridad y reinicia HA para cargar las nuevas entidades. Al arrancar restaura los valores anteriores de los helpers antes de quitar el mantenimiento. Después asigna los días y XP desde Tareas y recompensas.
+
+Las altas nuevas aparecen en el panel **Level Up Family · Hijos**. Los paneles anteriores conservan sus rutas y sus otras pestañas. Los identificadores retirados nunca se reutilizan. Esta versión no incluye una acción de reactivación tras semanas de ausencia; no cambies `active` manualmente en una instalación en uso.
+
+La acción `level_up_family.manage_family` comprueba en el servidor que quien la invoca es administrador. Los formularios rechazan revisiones antiguas si dos sesiones cambian la familia a la vez. Cada operación crea una copia en `/config/level_up_family/backups/family_*`; retirar nunca ejecuta un borrado de datos.
+
+El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.5.1`. Es necesario instalar también `config/custom_components/level_up_family`, `lf_family.yaml`, el registro familiar de versión 2 y el panel compartido de hijos. La integración se carga al reiniciar HA. No basta con cambiar la tarjeta JavaScript.
+
+## Actualizar una instalación anterior
+
+Antes de sustituir archivos, realiza una copia completa. No reemplaces `data/`, los valores de los helpers ni `task_defaults.json` con el ejemplo del repositorio. Tampoco sustituyas el registro familiar existente por el ejemplo.
+
+Una instalación antigua necesita vincular una sola vez `id`, `entity_prefix`, `db_key`, `dashboard_url` y `dashboard_path` en su registro de versión 2. Por ejemplo, el identificador público `player1` puede apuntar a entidades `champ_legacy_one_*` y a la clave SQLite `player_1`. Cambiar el nombre visible no cambia esas vinculaciones. Configura `parents_dashboard` y `children_dashboard` en `lf_family.yaml` si sus rutas difieren de las del ejemplo.
+
+Las operaciones desde el panel actualizan solo las pestañas del juego. Las copias contienen los paneles originales para recuperación. Si un alta queda pendiente o HA no puede recuperar todos los helpers, el juego permanece en mantenimiento y Familia informa del problema; conserva `family_pending.json` y su copia de seguridad para resolverlo. No ejecutes un reset para corregir una instalación.
 
 ## Identificador y nombre
 
@@ -61,7 +81,9 @@ python3 /config/level_up_family/python/champion_db.py players
 
 Configura el inicio de temporada y comprueba la configuración en tu versión de HA antes del arranque. Las validaciones del repositorio comprueban archivos y plantillas; la comprobación de configuración y la revisión visual en HA siguen siendo necesarias.
 
-## Añadir un hijo o cambiar su nombre
+## Flujo offline para instalaciones detenidas
+
+Para el uso habitual utiliza la pestaña **Familia**. El flujo siguiente queda como herramienta de migración para una instalación detenida y revisada; generar de nuevo el ejemplo puede sobrescribir personalizaciones si se copia sin compararlas.
 
 1. Guarda una copia completa de HA y del archivo familiar privado.
 2. Cambia `name`, manteniendo `id`, o añade una entrada con un identificador nuevo. Nunca reutilices el de otro hijo retirado.

@@ -15,6 +15,14 @@ FAMILY_PATH = Path(__file__).resolve().parent.parent / "family.json"
 
 def validate_family(data):
     """Validate identities separately from visible names; never derive IDs from names."""
+    if isinstance(data, dict) and data.get('version') == 2:
+        # Runtime registry carries stable aliases for installations created before playerN.
+        path = Path(__file__).resolve().parents[2] / 'custom_components/level_up_family/model.py'
+        import importlib.util
+        spec = importlib.util.spec_from_file_location('level_up_family_model', path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+        return module.validate(data)['players']
     if not isinstance(data, dict) or type(data.get("version")) is not int or data["version"] != 1:
         raise ValueError("La configuración familiar debe tener version: 1.")
     if set(data) - {"version", "players"}:
@@ -230,7 +238,7 @@ def create_schema(conn):
 
 def seed_players(conn, players=None):
     players = load_family() if players is None else players
-    keys = [p["id"] for p in players]
+    keys = [p.get("db_key", p["id"]) for p in players]
     configured = FAMILY_PATH.is_file()
     if configured:
         conn.execute("UPDATE players SET active=0 WHERE player_key NOT IN (" + ",".join("?" for _ in keys) + ")", keys)
@@ -249,7 +257,7 @@ def seed_players(conn, players=None):
             ON CONFLICT(player_key)
             """ + conflict,
             (
-                player["id"],
+                player.get("db_key", player["id"]),
                 player["name"],
                 int(player["active"]),
                 utc_now(),

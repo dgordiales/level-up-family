@@ -29,7 +29,6 @@ def main():
                 INNER JOIN players AS pl
                     ON pl.id = p.player_id
                 WHERE p.cancelled = 0
-                  AND pl.active = 1
                 ORDER BY p.id DESC
                 """
             ).fetchall()

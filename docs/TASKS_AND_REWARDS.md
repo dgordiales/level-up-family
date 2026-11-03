@@ -36,7 +36,7 @@ Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas 
 
 `task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.champ_task_config_*`; los premios, en `input_text.champ_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
 
-El nuevo paquete es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.4` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones y recompensa. Se conserva button-card para el resto del diseño. No se necesita otra tarjeta de HACS ni una integración personalizada.
+El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.5.1` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones, recompensa y familia. Se conserva button-card para el resto del diseño. La gestión de hijos utiliza la integración local `custom_components/level_up_family`; consulta [Familia](FAMILY_CONFIGURATION.md).
 
 Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
 

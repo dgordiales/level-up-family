@@ -30,7 +30,7 @@ tools/                         Validadores de configuración y paneles
 
 Consulta la [instalación](docs/INSTALLATION.md), [Tareas y premios](docs/TASKS_AND_REWARDS.md), la [arquitectura](docs/ARCHITECTURE.md) y la [hoja de ruta](docs/ROADMAP.md).
 
-Para adaptar el número de hijos y sus nombres, sigue [Configurar la familia](docs/FAMILY_CONFIGURATION.md). Se edita un archivo privado y se generan los paneles, paquetes, tareas y cierres necesarios.
+En **Familia**, dentro del panel de padres, puedes añadir hijos, retirarlos conservando su progreso e histórico y cambiar sus nombres. Las altas requieren un reinicio comprobado de HA; nombres y retiradas se aplican al guardar. Consulta [Configurar la familia](docs/FAMILY_CONFIGURATION.md) para instalar esta función o preparar una familia inicial con el generador.
 
 ## Desarrollo
 

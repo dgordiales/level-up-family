@@ -115,6 +115,8 @@ def validate(root):
             result["errors"].append(f"{path.relative_to(root)}: {exc}")
             continue
         if isinstance(data, dict):
+            if 'level_up_family' in data:
+                definitions['sensor.champ_family'] = str(path) + ' (custom integration)'
             for domain in domains:
                 domain_data = data.get(domain)
                 if not isinstance(domain_data, dict):

@@ -6,10 +6,10 @@
 - Python 3 en el entorno donde se ejecuta Home Assistant; SQLite forma parte de Python.
 - La tarjeta [button-card](https://github.com/custom-cards/button-card), instalada y registrada como recurso JavaScript, para el diseño existente de los paneles.
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalado y registrado como recurso JavaScript, para aplicar el estilo de Level Up Family a las tarjetas nativas del panel de padres.
-- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.4`, que registra las tarjetas de tareas y recompensas incluidas en este repositorio.
+- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.5.1`, que registra las tarjetas incluidas en este repositorio.
 - Acceso al directorio `/config` y permisos de escritura para Home Assistant en `/config/level_up_family/data`.
 
-Esta es una configuración YAML para Home Assistant, no una integración instalable desde HACS. La validación local comprueba sintaxis y referencias; la comprobación de configuración de la versión de Home Assistant instalada y la revisión visual de sus tarjetas siguen siendo necesarias.
+El juego utiliza paquetes YAML y una pequeña integración local para administrar la familia. Copia también `custom_components/level_up_family`; no se instala desde HACS. La validación local comprueba sintaxis y referencias; la comprobación de configuración de la versión de Home Assistant instalada y la revisión visual de sus tarjetas siguen siendo necesarias.
 
 ## Instalación nueva
 

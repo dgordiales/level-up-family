@@ -89,7 +89,9 @@ class FamilyConfigurationTests(unittest.TestCase):
         fixture.values['input_text.champ_player3_active_week'] = '2026-W45'
         self.assertEqual(fixture.render(guard, task=fixture.catalog[0]), 'False')
         recheck = fixture.edit_steps()[-1]['then'][0]['repeat']['sequence']
-        self.assertEqual([s['action'] for s in recheck[1:]],
+        self.assertEqual(recheck[1]['repeat']['sequence'][0]['action'], '{{ repeat.item }}')
+        targets = fixture.render(recheck[1]['repeat']['for_each'])
+        self.assertEqual(__import__('ast').literal_eval(targets),
                          [f'script.champ_player{i}_cerrar_dia' for i in range(1, 4)])
 
     def test_retired_player_keeps_helpers_but_not_buttons_closures_or_week_guards(self):

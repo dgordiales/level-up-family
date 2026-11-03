@@ -170,6 +170,9 @@ script:
         selector:
           date: null
     sequence:
+    - condition: template
+      value_template: '{{ ''player2'' in (state_attr(''sensor.champ_family'',''active_ids'') | default([], true))
+        }}'
     - action: script.champ_task_mutate
       data:
         operation: mark
@@ -196,6 +199,9 @@ script:
         selector:
           date: null
     sequence:
+    - condition: template
+      value_template: '{{ ''player2'' in (state_attr(''sensor.champ_family'',''active_ids'') | default([], true))
+        }}'
     - action: script.champ_task_mutate
       data:
         operation: unmark
@@ -225,6 +231,9 @@ script:
         selector:
           date: null
     sequence:
+    - condition: template
+      value_template: '{{ ''player2'' in (state_attr(''sensor.champ_family'',''active_ids'') | default([], true))
+        }}'
     - action: script.champ_task_mutate
       data:
         operation: toggle
@@ -246,6 +255,9 @@ script:
         selector:
           date: null
     sequence:
+    - condition: template
+      value_template: '{{ ''player2'' in (state_attr(''sensor.champ_family'',''active_ids'') | default([], true))
+        }}'
     - condition: state
       entity_id: input_boolean.champ_maintenance
       state: 'off'
@@ -253,35 +265,22 @@ script:
       value_template: '{{ has_value(''sensor.champ_task_catalog'') }}'
     - variables:
         fecha_cierre: '{{ fecha }}'
-        semana_fecha: |-
-          {{
-            '%04d-W%02d'
-            | format(
-                strptime(fecha, '%Y-%m-%d').isocalendar().year | int,
-                strptime(fecha, '%Y-%m-%d').isocalendar().week | int
-              )
-          }}
+        semana_fecha: "{{\n  '%04d-W%02d'\n  | format(\n      strptime(fecha, '%Y-%m-%d').isocalendar().year | int,\n\
+          \      strptime(fecha, '%Y-%m-%d').isocalendar().week | int\n    )\n}}"
         semana_activa: '{{ states(''input_text.champ_player2_active_week'') }}'
         indice_dia: '{{ strptime(fecha, ''%Y-%m-%d'').weekday() | int }}'
         bit: '{% set d = strptime(fecha, ''%Y-%m-%d'').weekday() %} {{ [1, 2, 4, 8, 16, 32, 64][d] }}'
     - condition: template
       value_template: '{{ semana_fecha == semana_activa }}'
     - variables:
-        dia_perfecto: |-
-          {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
-          {% set ns = namespace(due=0, done=0) %}
-          {% set b = [1,2,4,8,16,32,64][indice_dia | int] %}
-          {% for task in tasks if not task.once %}
-            {% if task.days | bitwise_and(b) %}
-              {% set ns.due = ns.due + 1 %}
-              {% if states(task.entity) | int(0) | bitwise_and(b) %}{% set ns.done = ns.done + 1 %}{% endif %}
-            {% endif %}
-          {% endfor %}
-          {{ 1 if ns.due > 0 and ns.done == ns.due else 0 }}
+        dia_perfecto: "{% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player',\
+          \ 'eq', 'player2') | list %}\n{% set ns = namespace(due=0, done=0) %}\n{% set b = [1,2,4,8,16,32,64][indice_dia\
+          \ | int] %}\n{% for task in tasks if not task.once %}\n  {% if task.days | bitwise_and(b) %}\n    {% set\
+          \ ns.due = ns.due + 1 %}\n    {% if states(task.entity) | int(0) | bitwise_and(b) %}{% set ns.done = ns.done\
+          \ + 1 %}{% endif %}\n  {% endif %}\n{% endfor %}\n{{ 1 if ns.due > 0 and ns.done == ns.due else 0 }}"
     - condition: template
-      value_template: |-
-        {% set start = states('input_datetime.champ_season_start') %} {{ start not in ['', 'unknown', 'unavailable']
-           and fecha_cierre | string >= start }}
+      value_template: "{% set start = states('input_datetime.champ_season_start') %} {{ start not in ['', 'unknown',\
+        \ 'unavailable']\n   and fecha_cierre | string >= start }}"
     - action: shell_command.champ_db_close_day
       data:
         player_key: player2
@@ -309,202 +308,76 @@ script:
     icon: mdi:calendar-check
     mode: single
     sequence:
+    - condition: template
+      value_template: '{{ ''player2'' in (state_attr(''sensor.champ_family'',''active_ids'') | default([], true))
+        }}'
     - condition: state
       entity_id: input_boolean.champ_maintenance
       state: 'off'
     - condition: template
       value_template: '{{ has_value(''sensor.champ_task_catalog'') }}'
     - variables:
-        fin_semana: |-
-          {{
-            (
-              now()
-              - timedelta(days=now().isoweekday())
-            ).date()
-          }}
-        inicio_semana: |-
-          {{
-            (
-              now()
-              - timedelta(days=now().isoweekday() + 6)
-            ).date()
-          }}
-        ano_semana: |-
-          {{
-            (
-              now()
-              - timedelta(days=now().isoweekday())
-            ).strftime('%G') | int
-          }}
-        numero_semana: |-
-          {{
-            (
-              now()
-              - timedelta(days=now().isoweekday())
-            ).strftime('%V') | int
-          }}
-        clave_semana: |-
-          {{
-            '%04d-W%02d'
-            | format(ano_semana | int, numero_semana | int)
-          }}
-        clave_semana_actual: |-
-          {{
-            '%04d-W%02d'
-            | format(
-                now().strftime('%G') | int,
-                now().strftime('%V') | int
-              )
-          }}
+        fin_semana: "{{\n  (\n    now()\n    - timedelta(days=now().isoweekday())\n  ).date()\n}}"
+        inicio_semana: "{{\n  (\n    now()\n    - timedelta(days=now().isoweekday() + 6)\n  ).date()\n}}"
+        ano_semana: "{{\n  (\n    now()\n    - timedelta(days=now().isoweekday())\n  ).strftime('%G') | int\n}}"
+        numero_semana: "{{\n  (\n    now()\n    - timedelta(days=now().isoweekday())\n  ).strftime('%V') | int\n\
+          }}"
+        clave_semana: "{{\n  '%04d-W%02d'\n  | format(ano_semana | int, numero_semana | int)\n}}"
+        clave_semana_actual: "{{\n  '%04d-W%02d'\n  | format(\n      now().strftime('%G') | int,\n      now().strftime('%V')\
+          \ | int\n    )\n}}"
         temporada: '{{ states(''input_number.champ_season_number'') | int(1) }}'
         misiones_previstas: '{{ states(''sensor.player2_misiones_previstas_calculadas'') | int(0) }}'
-        misiones_completadas: |-
-          {{
-            states(
-              'sensor.player2_misiones_completadas_calculadas'
-            ) | int(0)
-          }}
-        xp_tareas: |-
-          {{
-            states(
-              'sensor.player2_xp_tareas_semana'
-            ) | int(0)
-          }}
-        penalizaciones: |-
-          {{
-            states(
-              'input_number.champ_player2_penalties_this_week'
-            ) | int(0)
-          }}
-        task_entities: |-
-          {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
-          {{ tasks | map(attribute='entity') | list }}
+        misiones_completadas: "{{\n  states(\n    'sensor.player2_misiones_completadas_calculadas'\n  ) | int(0)\n\
+          }}"
+        xp_tareas: "{{\n  states(\n    'sensor.player2_xp_tareas_semana'\n  ) | int(0)\n}}"
+        penalizaciones: "{{\n  states(\n    'input_number.champ_player2_penalties_this_week'\n  ) | int(0)\n}}"
+        task_entities: '{% set tasks = state_attr(''sensor.champ_task_catalog'', ''tasks'') | default([], true)
+          | selectattr(''player'', ''eq'', ''player2'') | list %}
+
+          {{ tasks | map(attribute=''entity'') | list }}'
     - condition: template
       value_template: '{{ states(''input_text.champ_player2_active_week'') == clave_semana or states(''input_text.champ_player2_last_applied_week'')
         == clave_semana }}'
     - variables:
-        calculo_dias_semana: |-
-          {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
-          {% set ns = namespace(total=0) %}
-          {% set limit = 7 %}
-          {% for i in range(limit | int) %}
-            {% set b = [1,2,4,8,16,32,64][i] %}
-            {% set day = namespace(due=0, done=0) %}
-            {% for task in tasks if not task.once %}
-              {% if task.days | bitwise_and(b) %}
-                {% set day.due = day.due + 1 %}
-                {% if states(task.entity) | int(0) | bitwise_and(b) %}{% set day.done = day.done + 1 %}{% endif %}
-              {% endif %}
-            {% endfor %}
-            {% if day.due > 0 and day.done == day.due %}{% set ns.total = ns.total + 1 %}{% endif %}
-          {% endfor %}
-          {{ ns.total }}
+        calculo_dias_semana: "{% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true)\
+          \ | selectattr('player', 'eq', 'player2') | list %}\n{% set ns = namespace(total=0) %}\n{% set limit =\
+          \ 7 %}\n{% for i in range(limit | int) %}\n  {% set b = [1,2,4,8,16,32,64][i] %}\n  {% set day = namespace(due=0,\
+          \ done=0) %}\n  {% for task in tasks if not task.once %}\n    {% if task.days | bitwise_and(b) %}\n  \
+          \    {% set day.due = day.due + 1 %}\n      {% if states(task.entity) | int(0) | bitwise_and(b) %}{% set\
+          \ day.done = day.done + 1 %}{% endif %}\n    {% endif %}\n  {% endfor %}\n  {% if day.due > 0 and day.done\
+          \ == day.due %}{% set ns.total = ns.total + 1 %}{% endif %}\n{% endfor %}\n{{ ns.total }}"
     - variables:
         dias_perfectos_cierre: '{{ calculo_dias_semana | int(0) }}'
-        racha_diaria_fin: |-
-          {{
-            states('input_number.champ_player2_streak_days')
-            | int(0)
-          }}
+        racha_diaria_fin: "{{\n  states('input_number.champ_player2_streak_days')\n  | int(0)\n}}"
     - variables:
-        bonus_semana: |-
-          {{
-            (dias_perfectos_cierre | int)
-            *
-            (
-              states('input_number.champ_xp_daily_bonus')
-              | int(25)
-            )
-          }}
-        xp_bruto: |-
-          {{
-            (xp_tareas | int)
-            +
-            (bonus_semana | int)
-          }}
+        bonus_semana: "{{\n  (dias_perfectos_cierre | int)\n  *\n  (\n    states('input_number.champ_xp_daily_bonus')\n\
+          \    | int(25)\n  )\n}}"
+        xp_bruto: "{{\n  (xp_tareas | int)\n  +\n  (bonus_semana | int)\n}}"
         porcentaje_cumplimiento: '{{ (misiones_completadas | float(0) / misiones_previstas | float(1) * 100) | round(2)
           if misiones_previstas | int(0) > 0 else 0 }}'
-        objetivo_semanal_pct: |-
-          {{
-            states('input_number.champ_weekly_goal_pct')
-            | float(75)
-          }}
+        objetivo_semanal_pct: "{{\n  states('input_number.champ_weekly_goal_pct')\n  | float(75)\n}}"
         objetivo_conseguido: '{{ 1 if misiones_previstas | int(0) > 0 and porcentaje_cumplimiento | float(0) >=
           objetivo_semanal_pct | float(75) else 0 }}'
-        racha_semanal_inicio: |-
-          {{
-            states(
-              'input_number.champ_player2_streak_weeks'
-            ) | int(0)
-          }}
+        racha_semanal_inicio: "{{\n  states(\n    'input_number.champ_player2_streak_weeks'\n  ) | int(0)\n}}"
     - variables:
-        racha_semanal_fin: |-
-          {% if objetivo_conseguido | int(0) == 1 %}
-            {{ (racha_semanal_inicio | int(0)) + 1 }}
-          {% else %}
-            0
-          {% endif %}
-        multiplicador_aplicado: |-
-          {% if
-            objetivo_conseguido | int(0) == 1
-            and
-            racha_semanal_inicio | int(0) >= 1
-          %}
-            {{
-              states(
-                'input_number.champ_weekly_streak_multiplier'
-              ) | float(1.25)
-            }}
-          {% else %}
-            1
-          {% endif %}
+        racha_semanal_fin: "{% if objetivo_conseguido | int(0) == 1 %}\n  {{ (racha_semanal_inicio | int(0)) + 1\
+          \ }}\n{% else %}\n  0\n{% endif %}"
+        multiplicador_aplicado: "{% if\n  objetivo_conseguido | int(0) == 1\n  and\n  racha_semanal_inicio | int(0)\
+          \ >= 1\n%}\n  {{\n    states(\n      'input_number.champ_weekly_streak_multiplier'\n    ) | float(1.25)\n\
+          \  }}\n{% else %}\n  1\n{% endif %}"
     - variables:
-        xp_con_racha: |-
-          {{
-            (
-              (xp_bruto | float(0))
-              *
-              (multiplicador_aplicado | float(1))
-            ) | round(0) | int
-          }}
-        xp_efectivo: |-
-          {{
-            [
-              (xp_con_racha | int)
-              -
-              (penalizaciones | int),
-              0
-            ] | max
-          }}
+        xp_con_racha: "{{\n  (\n    (xp_bruto | float(0))\n    *\n    (multiplicador_aplicado | float(1))\n  ) |\
+          \ round(0) | int\n}}"
+        xp_efectivo: "{{\n  [\n    (xp_con_racha | int)\n    -\n    (penalizaciones | int),\n    0\n  ] | max\n\
+          }}"
     - variables:
-        nivel_inicio: |-
-          {{
-            (
-              (
-                states(
-                  'input_number.champ_player2_points_total'
-                ) | int(0)
-              ) // 500
-            ) + 1
-          }}
-        nivel_fin: |-
-          {{
-            (
-              (
-                (
-                  states(
-                    'input_number.champ_player2_points_total'
-                  ) | int(0)
-                )
-                +
-                (xp_efectivo | int)
-              ) // 500
-            ) + 1
-          }}
+        nivel_inicio: "{{\n  (\n    (\n      states(\n        'input_number.champ_player2_points_total'\n      )\
+          \ | int(0)\n    ) // 500\n  ) + 1\n}}"
+        nivel_fin: "{{\n  (\n    (\n      (\n        states(\n          'input_number.champ_player2_points_total'\n\
+          \        ) | int(0)\n      )\n      +\n      (xp_efectivo | int)\n    ) // 500\n  ) + 1\n}}"
     - condition: template
-      value_template: |-
-        {% set start = states('input_datetime.champ_season_start') %} {{ start not in ['', 'unknown', 'unavailable']
-           and inicio_semana | string >= start }}
+      value_template: "{% set start = states('input_datetime.champ_season_start') %} {{ start not in ['', 'unknown',\
+        \ 'unavailable']\n   and inicio_semana | string >= start }}"
     - action: shell_command.champ_db_close_week
       data:
         player_key: player2
@@ -531,14 +404,8 @@ script:
     - variables:
         respuesta_db: '{{ resultado.stdout | from_json }}'
     - condition: template
-      value_template: |-
-        {{
-          respuesta_db.ok | default(false)
-          and
-          states(
-            'input_text.champ_player2_last_applied_week'
-          ) != clave_semana
-        }}
+      value_template: "{{\n  respuesta_db.ok | default(false)\n  and\n  states(\n    'input_text.champ_player2_last_applied_week'\n\
+        \  ) != clave_semana\n}}"
     - action: input_number.set_value
       target:
         entity_id: input_number.champ_player2_points_total
@@ -557,17 +424,8 @@ script:
     - choose:
       - conditions:
         - condition: template
-          value_template: |-
-            {{
-              states(
-                'input_text.champ_player2_active_week'
-              ) in [
-                '',
-                'unknown',
-                'unavailable',
-                clave_semana
-              ]
-            }}
+          value_template: "{{\n  states(\n    'input_text.champ_player2_active_week'\n  ) in [\n    '',\n    'unknown',\n\
+            \    'unavailable',\n    clave_semana\n  ]\n}}"
         sequence:
         - if:
           - condition: template
@@ -621,107 +479,98 @@ template:
     unique_id: player2_misiones_completadas_calculadas
     unit_of_measurement: misiones
     icon: mdi:clipboard-check
-    state: |-
-      {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
+    state: '{% set tasks = state_attr(''sensor.champ_task_catalog'', ''tasks'') | default([], true) | selectattr(''player'',
+      ''eq'', ''player2'') | list %}
+
       {% set ns = namespace(total=0) %}
+
       {% for task in tasks %}
+
       {% set mask = states(task.entity) | int(0) | bitwise_and(task.days) %}
+
       {% if task.once %}{% if mask > 0 %}{% set ns.total = ns.total + 1 %}{% endif %}{% else %}
-      {% for b in [1,2,4,8,16,32,64] %}{% if mask | bitwise_and(b) %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}{% endif %}
+
+      {% for b in [1,2,4,8,16,32,64] %}{% if mask | bitwise_and(b) %}{% set ns.total = ns.total + 1 %}{% endif %}{%
+      endfor %}{% endif %}
+
       {% endfor %}
-      {{ ns.total }}
+
+      {{ ns.total }}'
     availability: '{{ has_value(''sensor.champ_task_catalog'') }}'
   - name: player2 - XP tareas semana
     unique_id: player2_xp_tareas_semana
     unit_of_measurement: XP
     icon: mdi:star
-    state: |-
-      {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
+    state: '{% set tasks = state_attr(''sensor.champ_task_catalog'', ''tasks'') | default([], true) | selectattr(''player'',
+      ''eq'', ''player2'') | list %}
+
       {% set ns = namespace(total=0) %}
+
       {% for task in tasks %}
+
       {% set mask = states(task.entity) | int(0) | bitwise_and(task.days) %}
+
       {% if task.once %}{% if mask > 0 %}{% set ns.total = ns.total + task.xp %}{% endif %}{% else %}
-      {% for b in [1,2,4,8,16,32,64] %}{% if mask | bitwise_and(b) %}{% set ns.total = ns.total + task.xp %}{% endif %}{% endfor %}{% endif %}
+
+      {% for b in [1,2,4,8,16,32,64] %}{% if mask | bitwise_and(b) %}{% set ns.total = ns.total + task.xp %}{% endif
+      %}{% endfor %}{% endif %}
+
       {% endfor %}
-      {{ ns.total }}
+
+      {{ ns.total }}'
     availability: '{{ has_value(''sensor.champ_task_catalog'') }}'
   - name: player2 - Días perfectos semana
     unique_id: player2_dias_perfectos_semana
     unit_of_measurement: días
     icon: mdi:trophy-variant
-    state: |-
-      {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
-      {% set ns = namespace(total=0) %}
-      {% set limit = 7 if states('input_text.champ_player2_active_week') != now().strftime('%G-W%V') else now().weekday() %}
-      {% for i in range(limit | int) %}
-        {% set b = [1,2,4,8,16,32,64][i] %}
-        {% set day = namespace(due=0, done=0) %}
-        {% for task in tasks if not task.once %}
-          {% if task.days | bitwise_and(b) %}
-            {% set day.due = day.due + 1 %}
-            {% if states(task.entity) | int(0) | bitwise_and(b) %}{% set day.done = day.done + 1 %}{% endif %}
-          {% endif %}
-        {% endfor %}
-        {% if day.due > 0 and day.done == day.due %}{% set ns.total = ns.total + 1 %}{% endif %}
-      {% endfor %}
-      {{ ns.total }}
+    state: "{% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player',\
+      \ 'eq', 'player2') | list %}\n{% set ns = namespace(total=0) %}\n{% set limit = 7 if states('input_text.champ_player2_active_week')\
+      \ != now().strftime('%G-W%V') else now().weekday() %}\n{% for i in range(limit | int) %}\n  {% set b = [1,2,4,8,16,32,64][i]\
+      \ %}\n  {% set day = namespace(due=0, done=0) %}\n  {% for task in tasks if not task.once %}\n    {% if task.days\
+      \ | bitwise_and(b) %}\n      {% set day.due = day.due + 1 %}\n      {% if states(task.entity) | int(0) | bitwise_and(b)\
+      \ %}{% set day.done = day.done + 1 %}{% endif %}\n    {% endif %}\n  {% endfor %}\n  {% if day.due > 0 and\
+      \ day.done == day.due %}{% set ns.total = ns.total + 1 %}{% endif %}\n{% endfor %}\n{{ ns.total }}"
     availability: '{{ has_value(''sensor.champ_task_catalog'') }}'
   - name: player2 - XP bonus semana
     unique_id: player2_xp_bonus_semana
     unit_of_measurement: XP
     icon: mdi:trophy-award
-    state: |-
-      {{
-        (
-          states('sensor.player2_dias_perfectos_semana') | int(0)
-        )
-        *
-        (
-          states('input_number.champ_xp_daily_bonus') | int(25)
-        )
-      }}
+    state: "{{\n  (\n    states('sensor.player2_dias_perfectos_semana') | int(0)\n  )\n  *\n  (\n    states('input_number.champ_xp_daily_bonus')\
+      \ | int(25)\n  )\n}}"
   - name: player2 - XP semana bruto
     unique_id: player2_xp_semana_bruto
     unit_of_measurement: XP
     icon: mdi:star-box
-    state: |-
-      {{
-        (
-          states('sensor.player2_xp_tareas_semana') | int(0)
-        )
-        +
-        (
-          states('sensor.player2_xp_bonus_semana') | int(0)
-        )
-      }}
+    state: "{{\n  (\n    states('sensor.player2_xp_tareas_semana') | int(0)\n  )\n  +\n  (\n    states('sensor.player2_xp_bonus_semana')\
+      \ | int(0)\n  )\n}}"
   - name: player2 - XP semana efectivo
     unique_id: player2_xp_semana_efectivo
     unit_of_measurement: XP
     icon: mdi:star-check
-    state: |-
-      {% set bruto =
-        states('sensor.player2_xp_semana_bruto') | int(0)
-      %}
-      {% set penalizaciones =
-        states(
-          'input_number.champ_player2_penalties_this_week'
-        ) | int(0)
-      %}
-      {{ [bruto - penalizaciones, 0] | max }}
+    state: "{% set bruto =\n  states('sensor.player2_xp_semana_bruto') | int(0)\n%}\n{% set penalizaciones =\n \
+      \ states(\n    'input_number.champ_player2_penalties_this_week'\n  ) | int(0)\n%}\n{{ [bruto - penalizaciones,\
+      \ 0] | max }}"
   - name: player2 - Misiones previstas calculadas
     unique_id: player2_misiones_previstas_calculadas
     default_entity_id: sensor.player2_misiones_previstas_calculadas
     unit_of_measurement: misiones
     icon: mdi:clipboard-list
     availability: '{{ has_value(''sensor.champ_task_catalog'') }}'
-    state: |-
-      {% set tasks = state_attr('sensor.champ_task_catalog', 'tasks') | default([], true) | selectattr('player', 'eq', 'player2') | list %}
+    state: '{% set tasks = state_attr(''sensor.champ_task_catalog'', ''tasks'') | default([], true) | selectattr(''player'',
+      ''eq'', ''player2'') | list %}
+
       {% set ns = namespace(total=0) %}
+
       {% for task in tasks %}
+
       {% if task.once %}{% if task.days > 0 %}{% set ns.total = ns.total + 1 %}{% endif %}{% else %}
-      {% for b in [1,2,4,8,16,32,64] %}{% if task.days | bitwise_and(b) %}{% set ns.total = ns.total + 1 %}{% endif %}{% endfor %}{% endif %}
+
+      {% for b in [1,2,4,8,16,32,64] %}{% if task.days | bitwise_and(b) %}{% set ns.total = ns.total + 1 %}{% endif
+      %}{% endfor %}{% endif %}
+
       {% endfor %}
-      {{ ns.total }}
+
+      {{ ns.total }}'
 - binary_sensor:
   - name: player2 - Objetivo semanal conseguido
     unique_id: player2_objetivo_semanal_conseguido
@@ -730,21 +579,13 @@ template:
       | float(0)) / (states(''sensor.player2_misiones_previstas_calculadas'') | float(0)) * 100 if (states(''sensor.player2_misiones_previstas_calculadas'')
       | float(0)) > 0 else 0) >= states(''input_number.champ_weekly_goal_pct'') | float(75) }}'
     attributes:
-      misiones_completadas: |-
-        {{
-          states(
-            'sensor.player2_misiones_completadas_calculadas'
-          ) | int(0)
-        }}
+      misiones_completadas: "{{\n  states(\n    'sensor.player2_misiones_completadas_calculadas'\n  ) | int(0)\n\
+        }}"
       misiones_previstas: '{{ states(''sensor.player2_misiones_previstas_calculadas'') | float(0) | int(0) }}'
       porcentaje_actual: '{{ ((states(''sensor.player2_misiones_completadas_calculadas'') | float(0)) / (states(''sensor.player2_misiones_previstas_calculadas'')
         | float(0)) * 100 if (states(''sensor.player2_misiones_previstas_calculadas'') | float(0)) > 0 else 0) |
         round(2) }}'
-      objetivo_pct: |-
-        {{
-          states('input_number.champ_weekly_goal_pct')
-          | float(75)
-        }}
+      objetivo_pct: "{{\n  states('input_number.champ_weekly_goal_pct')\n  | float(75)\n}}"
     availability: '{{ has_value(''sensor.champ_task_catalog'') }}'
 automation:
 - id: champ_player2_cierre_diario_0005

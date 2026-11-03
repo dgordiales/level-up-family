@@ -116,7 +116,7 @@ def child_panel(source, player, base):
 def parents_panel(panel, players):
     panel = deepcopy(panel)
     active = [p for p in players if p['active']]
-    control, history, editor = panel['views']
+    control, history, editor = panel['views'][:3]
     sections = control['sections']
     fines = deepcopy(sections[3])
     fine_grid = fines['cards'][0]['cards'][1]
@@ -146,40 +146,17 @@ def parents_panel(panel, players):
 
 
 def task_package(package, players, defaults):
-    active = [p['id'] for p in players if p['active']]
-    allowed = json.dumps(active, separators=(',', ':'))
-    old_weeks = (r"states\('input_text.champ_player1_active_week'\) == now\(\).strftime\('%G-W%V'\)"
-                 r"\s+and\s+states\('input_text.champ_player2_active_week'\) == now\(\).strftime\('%G-W%V'\)")
-    ready = ' and '.join(f"states('input_text.champ_{key}_active_week') == now().strftime('%G-W%V')" for key in active)
-    package = transform(package, lambda s: re.sub(old_weeks, lambda _: ready, s).replace("['player1','player2']", allowed))
+    package = deepcopy(package)
     package['input_text'] = {f"champ_task_config_{t['id']}": {
         'name': 'Level Up Family - Configuración tarea ' + t['id'], 'max': 255,
         'icon': 'mdi:clipboard-edit-outline'} for t in defaults}
-    sensor = package['template'][0]['sensor'][0]
-    catalog = sensor['attributes']['tasks']
-    needle = '{% set ns.tasks = ns.tasks + [task] %}'
-    if catalog.count(needle) != 1:
-        raise ValueError('Ha cambiado la plantilla del catálogo; revisa el generador.')
-    sensor['attributes']['tasks'] = catalog.replace(needle, '{% if task.player in ' + allowed + ' %}' + needle + '{% endif %}')
-    steps = package['script']['champ_task_mutate']['sequence']
-    choices = next(s['choose'] for s in steps if 'choose' in s)
-    rewards = next(c['sequence'] for c in choices if c['conditions'] == '{{ operation == "reward" }}')
-    reward_map = json.dumps({key: f'input_text.champ_{key}_weekly_reward' for key in active})
-    next(s['variables'] for s in rewards if 'reward_entity' in s.get('variables', {}))['reward_entity'] = '{{ ' + reward_map + '.get(player, "") }}'
-    edits = next(c['sequence'] for c in choices if c['conditions'] == '{{ operation == "edit" }}')
-    recheck = edits[-1]['then'][0]['repeat']['sequence']
-    recheck[1:] = [{'action': f'script.champ_{key}_cerrar_dia', 'data': {'fecha': '{{ recheck_date }}'}} for key in active]
-    return transform(package, lambda s: s.replace('de los dos jugadores', 'de los jugadores activos'))
+    return package
 
 
 def core_package(package, players):
     package = deepcopy(package)
     fields = package['script']['champ_aplicar_penalizacion']['fields']
     fields['player_key']['description'] = 'Identificador estable del jugador configurado en family.json.'
-    mapping = json.dumps({p['id']: f"input_number.champ_{p['id']}_penalties_this_week" for p in players})
-    for step in package['script']['champ_anular_penalizacion']['sequence']:
-        if 'entidad_penalizaciones' in step.get('variables', {}):
-            step['variables']['entidad_penalizaciones'] = '{{ ' + mapping + '.get(jugador, "unknown") }}'
     return package
 
 
@@ -231,10 +208,15 @@ def generate(family_path, output, source=ROOT):
     save(packages / 'lf_core.yaml', core_package(load(source / 'config/packages/level_up_family/lf_core.yaml'), players))
     save(panels / 'parents.yaml', parents_panel(load(source / 'config/panel/level_up_family/parents.yaml'), players))
     (cfg / 'level_up_family/task_defaults.json').write_text(json.dumps({'version': 1, 'tasks': defaults}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    (cfg / 'level_up_family/family.json').write_text(json.dumps({'version': 1, 'players': players}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    registry = {'version': 2, 'revision': 0, 'players': [dict(p, entity_prefix=p['id'], db_key=p['id'],
+                dashboard_url='level-up-family-' + p['id'], dashboard_path=p['id'] + '-champion') for p in players]}
+    (cfg / 'level_up_family/family.json').write_text(json.dumps(registry, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    (cfg / 'panel/level_up_family/children.yaml').write_text('title: Level Up Family\nviews: []\n', encoding='utf-8')
     dashboards['level-up-family-parents'] = {'mode': 'yaml', 'title': 'Level Up Family - Padres',
         'icon': 'mdi:shield-account', 'show_in_sidebar': True, 'require_admin': True,
         'filename': 'panel/level_up_family/parents.yaml'}
+    dashboards['level-up-family-children'] = {'mode': 'yaml', 'title': 'Level Up Family - Hijos',
+        'icon': 'mdi:account-group', 'show_in_sidebar': True, 'filename': 'panel/level_up_family/children.yaml'}
     # Inclusion tags are written literally; this is a fragment to merge into HA.
     (output / 'configuration.fragment.yaml').write_text(
         'homeassistant:\n  packages: !include_dir_named packages\n\n' +
