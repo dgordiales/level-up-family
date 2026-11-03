@@ -1,17 +1,17 @@
 # ============================================================
 # LEVEL UP FAMILY - HISTÓRICO
-# Fuente de verdad: /config/level_up_family/data/champion.db
-# Lector: /config/level_up_family/python/champion_history.py
+# Fuente de verdad: /config/level_up_family/data/luf.db
+# Lector: /config/level_up_family/python/luf_history.py
 # ============================================================
 
 command_line:
 
   - sensor:
-      name: "Champion - Histórico"
-      unique_id: champion_historico
+      name: "Luf - Histórico"
+      unique_id: luf_historico
 
       command: >-
-        python3 /config/level_up_family/python/champion_history.py
+        python3 /config/level_up_family/python/luf_history.py
 
       scan_interval: 60
 

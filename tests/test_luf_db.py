@@ -1,7 +1,7 @@
 """Regression checks run only against isolated, disposable SQLite databases.
 
-Usage: python test_champion_db.py [path/to/champion_db.py]
-Or set CHAMPION_MODULE to select a prepared copy.
+Usage: python test_luf_db.py [path/to/luf_db.py]
+Or set LUF_MODULE to select a prepared copy.
 """
 
 import contextlib
@@ -17,13 +17,13 @@ import tempfile
 import unittest
 
 
-PACKAGED_MODULE = Path(__file__).resolve().parent.parent / "config/level_up_family/python/champion_db.py"
-MODULE_PATH = Path(os.environ.get("CHAMPION_MODULE", str(PACKAGED_MODULE)))
+PACKAGED_MODULE = Path(__file__).resolve().parent.parent / "config/level_up_family/python/luf_db.py"
+MODULE_PATH = Path(os.environ.get("LUF_MODULE", str(PACKAGED_MODULE)))
 if len(sys.argv) > 1 and sys.argv[1].endswith(".py"):
     MODULE_PATH = Path(sys.argv.pop(1))
-spec = importlib.util.spec_from_file_location("champion_under_test", MODULE_PATH)
-champion = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(champion)
+spec = importlib.util.spec_from_file_location("luf_under_test", MODULE_PATH)
+luf = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(luf)
 
 
 class DatabaseTests(unittest.TestCase):
@@ -34,9 +34,9 @@ class DatabaseTests(unittest.TestCase):
         # sqlite3's context manager commits but does not close the connection.
         # Collect released connection cycles before deleting fixtures on Windows.
         self.addCleanup(gc.collect)
-        champion.BASE_DIR = Path(self.temp.name)
-        champion.DB_PATH = champion.BASE_DIR / "test.db"
-        self.call(champion.init_database)
+        luf.BASE_DIR = Path(self.temp.name)
+        luf.DB_PATH = luf.BASE_DIR / "test.db"
+        self.call(luf.init_database)
 
     def call(self, function, *args, **kwargs):
         output = io.StringIO()
@@ -48,7 +48,7 @@ class DatabaseTests(unittest.TestCase):
         return json.loads(self.call(function, *args, **kwargs))
 
     def rows(self, query, params=()):
-        with contextlib.closing(sqlite3.connect(champion.DB_PATH)) as conn:
+        with contextlib.closing(sqlite3.connect(luf.DB_PATH)) as conn:
             conn.row_factory = sqlite3.Row
             return [dict(row) for row in conn.execute(query, params)]
 
@@ -61,43 +61,43 @@ class DatabaseTests(unittest.TestCase):
                       level_end=2, weekly_goal_achieved=1,
                       daily_streak_end=2, weekly_streak_end=1)
         values.update(changes)
-        return self.json_call(champion.close_week, **values)
+        return self.json_call(luf.close_week, **values)
 
     def test_init_seeds_players_without_duplicates(self):
-        self.call(champion.init_database)
+        self.call(luf.init_database)
         rows = self.rows("SELECT player_key,display_name,active FROM players ORDER BY id")
         self.assertEqual(rows, [
             dict(player_key="player1", display_name="player1", active=1),
             dict(player_key="player2", display_name="player2", active=1)])
 
     def test_penalty_cancel_preserves_audit_record(self):
-        self.call(champion.add_penalty, "player1", 25, 'Prueba "comillas" y ñ')
+        self.call(luf.add_penalty, "player1", 25, 'Prueba "comillas" y ñ')
         row = self.rows("SELECT * FROM penalties")[0]
         self.assertEqual(row["amount"], 25)
         self.assertEqual(row["reason"], 'Prueba "comillas" y ñ')
-        answer = self.json_call(champion.cancel_penalty, row["id"])
+        answer = self.json_call(luf.cancel_penalty, row["id"])
         self.assertEqual(answer["amount"], 25)
         row = self.rows("SELECT * FROM penalties")[0]
         self.assertEqual(row["cancelled"], 1)
         self.assertTrue(row["cancelled_at"])
         with self.assertRaises(SystemExit):
-            self.call(champion.cancel_penalty, row["id"])
+            self.call(luf.cancel_penalty, row["id"])
         self.assertEqual(len(self.rows("SELECT * FROM penalties")), 1)
 
     def test_unknown_or_inactive_player_does_not_write(self):
         with self.assertRaises(SystemExit):
-            self.call(champion.add_penalty, "missing", 10, "test")
-        with contextlib.closing(sqlite3.connect(champion.DB_PATH)) as conn:
+            self.call(luf.add_penalty, "missing", 10, "test")
+        with contextlib.closing(sqlite3.connect(luf.DB_PATH)) as conn:
             conn.execute("UPDATE players SET active=0 WHERE player_key='player2'")
             conn.commit()
         with self.assertRaises(SystemExit):
-            self.call(champion.close_day, "player2", "2026-11-02", 1)
+            self.call(luf.close_day, "player2", "2026-11-02", 1)
         self.assertFalse(self.rows("SELECT * FROM penalties"))
         self.assertFalse(self.rows("SELECT * FROM days"))
 
     def test_day_duplicate_is_idempotent(self):
-        first = self.json_call(champion.close_day, "player1", "2026-11-02", 1)
-        second = self.json_call(champion.close_day, "player1", "2026-11-02", 1)
+        first = self.json_call(luf.close_day, "player1", "2026-11-02", 1)
+        second = self.json_call(luf.close_day, "player1", "2026-11-02", 1)
         self.assertFalse(first["already_closed"])
         self.assertTrue(second["already_closed"])
         self.assertEqual(second["current_streak"], 1)
@@ -105,8 +105,8 @@ class DatabaseTests(unittest.TestCase):
 
     def test_daily_correction_recalculates_later_days(self):
         for day, perfect in [("2026-11-02", 1), ("2026-11-03", 0), ("2026-11-04", 1)]:
-            self.json_call(champion.close_day, "player1", day, perfect)
-        answer = self.json_call(champion.close_day, "player1", "2026-11-03", 1)
+            self.json_call(luf.close_day, "player1", day, perfect)
+        answer = self.json_call(luf.close_day, "player1", "2026-11-03", 1)
         self.assertTrue(answer["corrected"])
         self.assertEqual(answer["daily_streak_end"], 2)
         self.assertEqual(answer["current_streak"], 3)
@@ -116,28 +116,28 @@ class DatabaseTests(unittest.TestCase):
     def test_days_reject_invalid_date_and_flag_without_writes(self):
         for day, perfect in [("2026-02-30", 1), ("2026-11-02", 2), ("2026-11-02", "bad")]:
             with self.subTest(day=day, perfect=perfect), self.assertRaises(SystemExit):
-                self.call(champion.close_day, "player1", day, perfect)
+                self.call(luf.close_day, "player1", day, perfect)
         self.assertFalse(self.rows("SELECT * FROM days"))
 
     def test_player_streaks_remain_independent(self):
-        self.json_call(champion.close_day, "player1", "2026-11-02", 1)
-        self.json_call(champion.close_day, "player2", "2026-11-02", 0)
-        one = self.json_call(champion.close_day, "player1", "2026-11-03", 1)
-        two = self.json_call(champion.close_day, "player2", "2026-11-03", 1)
+        self.json_call(luf.close_day, "player1", "2026-11-02", 1)
+        self.json_call(luf.close_day, "player2", "2026-11-02", 0)
+        one = self.json_call(luf.close_day, "player1", "2026-11-03", 1)
+        two = self.json_call(luf.close_day, "player2", "2026-11-03", 1)
         self.assertEqual((one["current_streak"], two["current_streak"]), (2, 1))
 
     def test_missing_calendar_day_breaks_streak(self):
-        self.json_call(champion.close_day, "player1", "2026-11-02", 1)
-        after_gap = self.json_call(champion.close_day, "player1", "2026-11-04", 1)
-        consecutive = self.json_call(champion.close_day, "player1", "2026-11-05", 1)
+        self.json_call(luf.close_day, "player1", "2026-11-02", 1)
+        after_gap = self.json_call(luf.close_day, "player1", "2026-11-04", 1)
+        consecutive = self.json_call(luf.close_day, "player1", "2026-11-05", 1)
         self.assertEqual(after_gap["current_streak"], 1)
         self.assertEqual(consecutive["current_streak"], 2)
 
     def test_week_baseline_requires_adjacent_calendar_day(self):
         self.close_week(player_key="player1", daily_streak_end=4)
         self.close_week(player_key="player2", daily_streak_end=4)
-        adjacent = self.json_call(champion.close_day, "player1", "2026-11-09", 1)
-        stale = self.json_call(champion.close_day, "player2", "2026-11-11", 1)
+        adjacent = self.json_call(luf.close_day, "player1", "2026-11-09", 1)
+        stale = self.json_call(luf.close_day, "player2", "2026-11-11", 1)
         self.assertEqual(adjacent["current_streak"], 5)
         self.assertEqual(stale["current_streak"], 1)
 
@@ -176,16 +176,16 @@ class DatabaseTests(unittest.TestCase):
     def test_delete_test_weeks_is_not_a_full_reset(self):
         self.close_week()
         self.close_week(year=2099, week_start="2099-11-02", week_end="2099-11-08")
-        self.call(champion.add_penalty, "player1", 15, "test remains")
-        self.json_call(champion.close_day, "player1", "2099-11-02", 1)
-        answer = self.json_call(champion.delete_test_weeks)
+        self.call(luf.add_penalty, "player1", 15, "test remains")
+        self.json_call(luf.close_day, "player1", "2099-11-02", 1)
+        answer = self.json_call(luf.delete_test_weeks)
         self.assertEqual((answer["deleted_weeks"], answer["deleted_years"]), (1, 1))
         self.assertEqual([r["year"] for r in self.rows("SELECT year FROM weeks")], [2026])
         self.assertEqual([r["year"] for r in self.rows("SELECT year FROM years")], [2026])
         self.assertEqual(len(self.rows("SELECT * FROM players")), 2)
         self.assertEqual(len(self.rows("SELECT * FROM penalties")), 1)
         self.assertEqual(len(self.rows("SELECT * FROM days")), 1)
-        again = self.json_call(champion.delete_test_weeks)
+        again = self.json_call(luf.delete_test_weeks)
         self.assertEqual((again["deleted_weeks"], again["deleted_years"]), (0, 0))
 
 

@@ -28,8 +28,8 @@ class DistributionTests(unittest.TestCase):
                 path = PANELS / (player + '.yaml')
                 text = path.read_text(encoding='utf-8')
                 panel = yaml.safe_load(text)
-                self.assertEqual([v['path'] for v in panel['views']], [player + '-champion'])
-                self.assertNotIn('champ_' + other, text)
+                self.assertEqual([v['path'] for v in panel['views']], [player + '-luf'])
+                self.assertNotIn('luf_' + other, text)
                 mission_cards = [card for card in nodes(panel['views'][0])
                                  if card.get('type') == 'custom:level-up-family-missions']
                 self.assertEqual(len(mission_cards), 1)
@@ -58,7 +58,7 @@ class DistributionTests(unittest.TestCase):
 
     def test_week_corrections_remain_in_the_parents_panel(self):
         panel = yaml.safe_load((PANELS / 'parents.yaml').read_text(encoding='utf-8'))
-        control = next(view for view in panel['views'] if view['path'] == 'control-champion')
+        control = next(view for view in panel['views'] if view['path'] == 'control-luf')
         corrections = [card for card in nodes(control)
                        if card.get('type') == 'custom:level-up-family-missions'
                        and card.get('week', False)]
@@ -68,7 +68,7 @@ class DistributionTests(unittest.TestCase):
     def test_parents_panel_contains_control_and_history_only(self):
         data = yaml.safe_load((PANELS / 'parents.yaml').read_text(encoding='utf-8'))
         self.assertEqual([v['path'] for v in data['views']],
-                         ['control-champion', 'historico-champion', 'tasks-rewards', 'family'])
+                         ['control-luf', 'historico-luf', 'tasks-rewards', 'family'])
 
     def test_no_household_devices_or_notification_destinations_in_panels(self):
         for path in PANELS.glob('*.yaml'):
@@ -91,8 +91,8 @@ class DistributionTests(unittest.TestCase):
         self.assertEqual(len(data), 4)
         self.assertEqual(len({a['id'] for a in data}), 4)
         for player in ('player1', 'player2'):
-            close = next(a for a in data if a['id'] == 'champ_' + player + '_weekly_close')
-            self.assertEqual(close['actions'], [{'action': 'script.champ_' + player + '_cerrar_semana'}])
+            close = next(a for a in data if a['id'] == 'luf_' + player + '_weekly_close')
+            self.assertEqual(close['actions'], [{'action': 'script.luf_' + player + '_cerrar_semana'}])
 
 
 if __name__ == '__main__':

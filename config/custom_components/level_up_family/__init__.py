@@ -38,7 +38,7 @@ class FamilyManager:
         self.root = Path(hass.config.config_dir)
         self.app = self.root / 'level_up_family'
         self.file = self.app / 'family.json'
-        self.db = self.app / 'data/champion.db'
+        self.db = self.app / 'data/luf.db'
         self.pending_file = self.app / 'family_pending.json'
         self.registry = validate(json.loads(self.file.read_text(encoding='utf-8')))
         self.templates = json.loads((Path(__file__).parent / 'templates.json').read_text(encoding='utf-8'))
@@ -49,7 +49,7 @@ class FamilyManager:
 
     @callback
     def publish(self):
-        self.hass.states.async_set('sensor.champ_family', len([p for p in self.registry['players'] if p['active']]),
+        self.hass.states.async_set('sensor.luf_family', len([p for p in self.registry['players'] if p['active']]),
             {'friendly_name': 'Level Up Family · Familia', 'icon': 'mdi:account-group',
              'revision': self.registry['revision'], 'players': public_players(self.registry),
              'active_ids': [p['id'] for p in self.registry['players'] if p['active']],
@@ -59,18 +59,18 @@ class FamilyManager:
     def snapshot(self):
         return {s.entity_id: s.state for s in self.hass.states.async_all()
                 if s.domain in ('input_number', 'input_text', 'input_datetime', 'input_boolean')
-                and s.object_id.startswith('champ_') and s.entity_id != 'input_boolean.champ_maintenance'
+                and s.object_id.startswith('luf_') and s.entity_id != 'input_boolean.luf_maintenance'
                 and s.state not in ('unknown', 'unavailable')}
 
     async def maintenance(self, enabled):
         await self.hass.services.async_call('input_boolean', 'turn_on' if enabled else 'turn_off',
-                    {'entity_id': 'input_boolean.champ_maintenance'}, blocking=True)
+                    {'entity_id': 'input_boolean.luf_maintenance'}, blocking=True)
 
     async def quiesce(self):
         await self.maintenance(True)
         for _ in range(100):
             running = [s for s in self.hass.states.async_all('script')
-                       if s.object_id.startswith('champ_') and (s.state == 'on' or s.attributes.get('current', 0))]
+                       if s.object_id.startswith('luf_') and (s.state == 'on' or s.attributes.get('current', 0))]
             if not running:
                 return
             await asyncio.sleep(.1)
@@ -81,7 +81,7 @@ class FamilyManager:
         folder.mkdir(parents=True)
         save_json(folder / 'helpers.json', helpers)
         save_json(folder / 'family.json', self.registry)
-        with closing(sqlite3.connect(self.db)) as source, closing(sqlite3.connect(folder / 'champion.db')) as target:
+        with closing(sqlite3.connect(self.db)) as source, closing(sqlite3.connect(folder / 'luf.db')) as target:
             source.backup(target)
             if target.execute('PRAGMA integrity_check').fetchone()[0] != 'ok':
                 raise ValueError('No se ha podido verificar la copia de seguridad.')
@@ -202,7 +202,7 @@ class FamilyManager:
             else:
                 proposed = change(self.registry, operation, call.data['revision'], call.data.get('player_id'), call.data.get('name'))
             previous = deepcopy(self.registry)
-            was_maintenance = self.hass.states.is_state('input_boolean.champ_maintenance', 'on')
+            was_maintenance = self.hass.states.is_state('input_boolean.luf_maintenance', 'on')
             configs = await self.dashboard_configs(proposed)
             backup, saved, restart = None, [], False
             safe_to_resume = False
@@ -219,10 +219,10 @@ class FamilyManager:
                         state = self.hass.states.get(entity)
                         return state.state if state else '0'
                     player['retired_summary'] = {
-                        'level': value(f'sensor.{prefix}_nivel_champion'),
-                        'total_xp': value(f'input_number.champ_{prefix}_points_total'),
+                        'level': value(f'sensor.{prefix}_nivel_luf'),
+                        'total_xp': value(f'input_number.luf_{prefix}_points_total'),
                         'weekly_xp': value(f'sensor.{prefix}_xp_semana_efectivo'),
-                        'week': value(f'input_text.champ_{prefix}_active_week')}
+                        'week': value(f'input_text.luf_{prefix}_active_week')}
                 backup = await self.hass.async_add_executor_job(self.backup, helpers)
                 if operation == 'apply_add':
                     saved = await self.hass.async_add_executor_job(self.provision, proposed, backup)
@@ -280,8 +280,8 @@ class FamilyManager:
                 await self.maintenance(True)
                 await self.restore_helpers(pending['helpers'])
                 player = pending['registry']['players'][-1]
-                for entity in [f"input_text.champ_{player['entity_prefix']}_active_week",
-                               f"input_number.champ_{player['entity_prefix']}_points_total"]:
+                for entity in [f"input_text.luf_{player['entity_prefix']}_active_week",
+                               f"input_number.luf_{player['entity_prefix']}_points_total"]:
                     state = self.hass.states.get(entity)
                     if state is None or state.state in ('unknown', 'unavailable'):
                         raise HomeAssistantError('Faltan entidades del nuevo hijo; el juego seguirá en mantenimiento.')

@@ -1,12 +1,12 @@
 input_number:
-  champ_season_number:
+  luf_season_number:
     name: Level Up Family - Temporada actual
     min: 1
     max: 12
     step: 1
     mode: box
     icon: mdi:shield-star
-  champ_xp_minor:
+  luf_xp_minor:
     name: Level Up Family - XP misión sencilla
     min: 0
     max: 100
@@ -14,7 +14,7 @@ input_number:
     mode: box
     initial: 10
     icon: mdi:star-outline
-  champ_xp_standard:
+  luf_xp_standard:
     name: Level Up Family - XP misión estándar
     min: 0
     max: 100
@@ -22,7 +22,7 @@ input_number:
     mode: box
     initial: 15
     icon: mdi:star-half-full
-  champ_xp_complex:
+  luf_xp_complex:
     name: Level Up Family - XP misión importante
     min: 0
     max: 100
@@ -30,7 +30,7 @@ input_number:
     mode: box
     initial: 20
     icon: mdi:star
-  champ_xp_daily_bonus:
+  luf_xp_daily_bonus:
     name: Level Up Family - Bonus diario
     min: 0
     max: 200
@@ -38,7 +38,7 @@ input_number:
     mode: box
     initial: 25
     icon: mdi:trophy-award
-  champ_weekly_goal_pct:
+  luf_weekly_goal_pct:
     name: Level Up Family - Objetivo semanal
     min: 0
     max: 100
@@ -47,7 +47,7 @@ input_number:
     initial: 75
     unit_of_measurement: '%'
     icon: mdi:target
-  champ_weekly_streak_multiplier:
+  luf_weekly_streak_multiplier:
     name: Level Up Family - Multiplicador racha semanal
     min: 1
     max: 3
@@ -55,21 +55,21 @@ input_number:
     mode: box
     initial: 1.25
     icon: mdi:creation
-  champ_penalty_minor:
+  luf_penalty_minor:
     name: Level Up Family - Penalización leve
     min: 0
     max: 200
     step: 5
     mode: box
     icon: mdi:alert-outline
-  champ_penalty_medium:
+  luf_penalty_medium:
     name: Level Up Family - Penalización media
     min: 0
     max: 200
     step: 5
     mode: box
     icon: mdi:alert
-  champ_penalty_major:
+  luf_penalty_major:
     name: Level Up Family - Penalización grave
     min: 0
     max: 500
@@ -77,12 +77,12 @@ input_number:
     mode: box
     icon: mdi:alert-octagon
 input_text:
-  champ_current_season:
+  luf_current_season:
     name: Level Up Family - Nombre temporada actual
     max: 50
     icon: mdi:shield-star
 input_datetime:
-  champ_season_start:
+  luf_season_start:
     name: Level Up Family - Inicio de temporada
     has_date: true
     has_time: false
@@ -90,20 +90,20 @@ input_datetime:
 template:
 - sensor:
   - name: Level Up Family - Carpeta temporada
-    unique_id: champ_season_folder
-    default_entity_id: sensor.champ_season_folder
+    unique_id: luf_season_folder
+    default_entity_id: sensor.luf_season_folder
     icon: mdi:folder-image
-    state: "{% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}\n\
+    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n\
       \  season_0{{ temporada }}\n{% else %}\n  season_{{ temporada }}\n{% endif %}"
   - name: Level Up Family - Ruta temporada
-    unique_id: champ_season_path
-    default_entity_id: sensor.champ_season_path
+    unique_id: luf_season_path
+    default_entity_id: sensor.luf_season_path
     icon: mdi:folder-multiple-image
-    state: "{% set temporada = states('input_number.champ_season_number') | int(1) %} {% if temporada < 10 %}\n\
+    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n\
       \  /local/level_up_family/season_0{{ temporada }}\n{% else %}\n  /local/level_up_family/season_{{ temporada\
       \ }}\n{% endif %}"
 script:
-  champ_marcar_mision:
+  luf_marcar_mision:
     alias: Level Up Family - Marcar misión
     icon: mdi:checkbox-marked-circle-outline
     fields:
@@ -119,7 +119,7 @@ script:
         selector:
           date: null
     sequence:
-    - action: script.champ_task_mutate
+    - action: script.luf_task_mutate
       data:
         operation: mark
         entity: '{{ tarea }}'
@@ -127,7 +127,7 @@ script:
       response_variable: mutation
     - condition: template
       value_template: '{{ mutation.ok | default(false) }}'
-  champ_desmarcar_mision:
+  luf_desmarcar_mision:
     alias: Level Up Family - Desmarcar misión
     icon: mdi:checkbox-blank-circle-outline
     fields:
@@ -143,7 +143,7 @@ script:
         selector:
           date: null
     sequence:
-    - action: script.champ_task_mutate
+    - action: script.luf_task_mutate
       data:
         operation: unmark
         entity: '{{ tarea }}'
@@ -151,7 +151,7 @@ script:
       response_variable: mutation
     - condition: template
       value_template: '{{ mutation.ok | default(false) }}'
-  champ_aplicar_penalizacion:
+  luf_aplicar_penalizacion:
     alias: Level Up Family - Aplicar penalización
     icon: mdi:alert-octagon-outline
     fields:
@@ -184,9 +184,9 @@ script:
             unit_of_measurement: XP
     sequence:
     - condition: state
-      entity_id: input_boolean.champ_maintenance
+      entity_id: input_boolean.luf_maintenance
       state: 'off'
-    - action: shell_command.champ_db_add_penalty
+    - action: shell_command.luf_db_add_penalty
       data:
         player_key: '{{ player_key }}'
         amount: '{{ cantidad | int }}'
@@ -201,7 +201,7 @@ script:
         entity_id: '{{ penalizaciones }}'
       data:
         value: "{{\n  (actual | int)\n  +\n  (cantidad | int)\n}}"
-  champ_anular_penalizacion:
+  luf_anular_penalizacion:
     alias: Level Up Family - Anular penalización
     icon: mdi:undo-variant
     fields:
@@ -216,9 +216,9 @@ script:
             mode: box
     sequence:
     - condition: state
-      entity_id: input_boolean.champ_maintenance
+      entity_id: input_boolean.luf_maintenance
       state: 'off'
-    - action: shell_command.champ_db_cancel_penalty
+    - action: shell_command.luf_db_cancel_penalty
       data:
         penalty_id: '{{ penalty_id | int }}'
       response_variable: resultado
@@ -230,7 +230,7 @@ script:
         jugador: '{{ penalizacion.player_key }}'
         importe: '{{ penalizacion.amount | int }}'
     - variables:
-        entidad_penalizaciones: '{{ (state_attr(''sensor.champ_family'',''players'') | default([], true) | selectattr(''db_key'',''eq'',jugador)
+        entidad_penalizaciones: '{{ (state_attr(''sensor.luf_family'',''players'') | default([], true) | selectattr(''db_key'',''eq'',jugador)
           | map(attribute=''penalty_entity'') | list | first) | default(''unknown'') }}'
     - condition: template
       value_template: '{{ entidad_penalizaciones != ''unknown'' }}'
@@ -241,6 +241,6 @@ script:
         value: "{{\n  [\n    (states(entidad_penalizaciones) | int(0))\n    -\n    (importe | int),\n    0\n  ]\
           \ | max\n}}"
 input_boolean:
-  champ_maintenance:
+  luf_maintenance:
     name: Level Up Family - Mantenimiento
     icon: mdi:tools

@@ -1,88 +1,88 @@
 input_text:
-  champ_task_config_task01:
+  luf_task_config_task01:
     name: Level Up Family - Configuración tarea task01
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task02:
+  luf_task_config_task02:
     name: Level Up Family - Configuración tarea task02
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task03:
+  luf_task_config_task03:
     name: Level Up Family - Configuración tarea task03
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task04:
+  luf_task_config_task04:
     name: Level Up Family - Configuración tarea task04
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task05:
+  luf_task_config_task05:
     name: Level Up Family - Configuración tarea task05
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task06:
+  luf_task_config_task06:
     name: Level Up Family - Configuración tarea task06
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task07:
+  luf_task_config_task07:
     name: Level Up Family - Configuración tarea task07
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task08:
+  luf_task_config_task08:
     name: Level Up Family - Configuración tarea task08
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task09:
+  luf_task_config_task09:
     name: Level Up Family - Configuración tarea task09
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task10:
+  luf_task_config_task10:
     name: Level Up Family - Configuración tarea task10
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task11:
+  luf_task_config_task11:
     name: Level Up Family - Configuración tarea task11
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task12:
+  luf_task_config_task12:
     name: Level Up Family - Configuración tarea task12
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task13:
+  luf_task_config_task13:
     name: Level Up Family - Configuración tarea task13
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task14:
+  luf_task_config_task14:
     name: Level Up Family - Configuración tarea task14
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task15:
+  luf_task_config_task15:
     name: Level Up Family - Configuración tarea task15
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task16:
+  luf_task_config_task16:
     name: Level Up Family - Configuración tarea task16
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task17:
+  luf_task_config_task17:
     name: Level Up Family - Configuración tarea task17
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task18:
+  luf_task_config_task18:
     name: Level Up Family - Configuración tarea task18
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task19:
+  luf_task_config_task19:
     name: Level Up Family - Configuración tarea task19
     max: 255
     icon: mdi:clipboard-edit-outline
-  champ_task_config_task20:
+  luf_task_config_task20:
     name: Level Up Family - Configuración tarea task20
     max: 255
     icon: mdi:clipboard-edit-outline
 command_line:
 - sensor:
-    name: Champ task defaults
-    unique_id: champ_task_defaults
+    name: Luf task defaults
+    unique_id: luf_task_defaults
     command: cat /config/level_up_family/task_defaults.json
     scan_interval: 86400
     value_template: '{{ value_json.tasks | length }}'
@@ -90,25 +90,25 @@ command_line:
     - tasks
 template:
 - sensor:
-  - name: Champ task catalog
-    unique_id: champ_task_catalog
-    default_entity_id: sensor.champ_task_catalog
-    availability: "{% set defaults = state_attr('sensor.champ_task_defaults', 'tasks') %} {% set ns = namespace(ok=defaults\
+  - name: Luf task catalog
+    unique_id: luf_task_catalog
+    default_entity_id: sensor.luf_task_catalog
+    availability: "{% set defaults = state_attr('sensor.luf_task_defaults', 'tasks') %} {% set ns = namespace(ok=defaults\
       \ is not none and defaults | length > 0) %} {% for task in defaults | default([], true) %}\n  {% if not has_value(task.entity)\
       \ %}{% set ns.ok = false %}{% endif %}\n{% endfor %} {{ ns.ok }}"
-    state: '{{ state_attr(''sensor.champ_task_defaults'', ''tasks'') | default([], true) | length }}'
+    state: '{{ state_attr(''sensor.luf_task_defaults'', ''tasks'') | default([], true) | length }}'
     attributes:
-      tasks: "{% set ns = namespace(tasks=[]) %} {% for base in state_attr('sensor.champ_task_defaults', 'tasks')\
-        \ | default([], true) %}\n  {% set config_entity = 'input_text.champ_task_config_' ~ base.id %}\n  {% set\
+      tasks: "{% set ns = namespace(tasks=[]) %} {% for base in state_attr('sensor.luf_task_defaults', 'tasks')\
+        \ | default([], true) %}\n  {% set config_entity = 'input_text.luf_task_config_' ~ base.id %}\n  {% set\
         \ raw = states(config_entity) %}\n  {% set raw = '' if raw in ['unknown','unavailable',''] else raw %}\n\
         \  {% set config = raw | from_json({}) %}\n  {% set config = config if config is mapping else {} %}\n  {%\
         \ set task = dict(base,\n      name=config.get('name',base.name), player=config.get('player',base.player),\n\
         \      xp=config.get('xp',base.xp) | int, days=config.get('days',base.days) | int,\n      once=config.get('once',base.once),\
         \ progress=states(base.entity) | int(-1),\n      config_entity=config_entity, revision=raw) %}\n  {% if\
-        \ task.player in (state_attr('sensor.champ_family','active_ids') | default([], true)) %}{% set ns.tasks\
+        \ task.player in (state_attr('sensor.luf_family','active_ids') | default([], true)) %}{% set ns.tasks\
         \ = ns.tasks + [task] %}{% endif %}\n{% endfor %} {{ ns.tasks }}"
 script:
-  champ_task_mutate:
+  luf_task_mutate:
     alias: Level Up Family - Actualizar tarea
     mode: queued
     max: 50
@@ -128,7 +128,7 @@ script:
     sequence:
     - if:
       - condition: state
-        entity_id: input_boolean.champ_maintenance
+        entity_id: input_boolean.luf_maintenance
         state: 'on'
       then:
       - variables:
@@ -139,7 +139,7 @@ script:
         response_variable: reply
     - if:
       - condition: template
-        value_template: '{{ not has_value(''sensor.champ_task_catalog'') }}'
+        value_template: '{{ not has_value(''sensor.luf_task_catalog'') }}'
       then:
       - variables:
           reply:
@@ -154,7 +154,7 @@ script:
         player: '{{ player | default('''') }}'
         fecha: '{{ fecha | default('''') }}'
         expected: '{{ expected | default(''__missing__'') }}'
-        candidates: "{% set tasks = state_attr('sensor.champ_task_catalog','tasks') | default([], true) %} {{ tasks\
+        candidates: "{% set tasks = state_attr('sensor.luf_task_catalog','tasks') | default([], true) %} {{ tasks\
           \ | selectattr('id','eq',task_id) | list if operation == 'edit'\n   else tasks | selectattr('entity','eq',entity)\
           \ | list }}"
         task: '{{ candidates | first if candidates | length == 1 else {} }}'
@@ -163,7 +163,7 @@ script:
         sequence:
         - if:
           - condition: template
-            value_template: '{{ player not in (state_attr(''sensor.champ_family'',''active_ids'') | default([],
+            value_template: '{{ player not in (state_attr(''sensor.luf_family'',''active_ids'') | default([],
               true)) or reward is not defined or reward is not string or reward | length > 255 }}'
           then:
           - variables:
@@ -173,7 +173,7 @@ script:
           - stop: Elige un jugador y un premio de hasta 255 caracteres.
             response_variable: reply
         - variables:
-            reward_entity: '{{ (state_attr(''sensor.champ_family'',''players'') | default([], true) | selectattr(''id'',''eq'',player)
+            reward_entity: '{{ (state_attr(''sensor.luf_family'',''players'') | default([], true) | selectattr(''id'',''eq'',player)
               | selectattr(''active'') | map(attribute=''reward_entity'') | list | first) | default('''') }}'
             old_reward: '{{ states(reward_entity) if states(reward_entity) not in [''unknown'',''unavailable'']
               else '''' }}'
@@ -196,7 +196,7 @@ script:
         sequence:
         - if:
           - condition: template
-            value_template: '{% set ns = namespace(ready=true) %}{% for p in state_attr(''sensor.champ_family'',''players'')
+            value_template: '{% set ns = namespace(ready=true) %}{% for p in state_attr(''sensor.luf_family'',''players'')
               | default([], true) %}{% if p.active and states(p.week_entity) != now().strftime(''%G-W%V'') %}{%
               set ns.ready=false %}{% endif %}{% endfor %}{{ not task or not ns.ready }}'
           then:
@@ -209,7 +209,7 @@ script:
         - if:
           - condition: template
             value_template: "{{ name is not defined or name is not string or name | trim | length < 1 or name |\
-              \ trim | length > 80\n   or player not in (state_attr('sensor.champ_family','active_ids') | default([],\
+              \ trim | length > 80\n   or player not in (state_attr('sensor.luf_family','active_ids') | default([],\
               \ true))\n   or xp is not defined or xp is not number or xp is boolean or xp != xp | int or not 0\
               \ <= xp <= 100\n   or days is not defined or days is not number or days is boolean or days != days\
               \ | int or not 0 <= days <= 127\n   or once is not defined or once is not boolean }}"
@@ -264,7 +264,7 @@ script:
             entity_id: '{{ task.config_entity }}'
           data:
             value: '{{ config }}'
-        - wait_template: "{{ (state_attr('sensor.champ_task_catalog','tasks') | default([], true)\n     | selectattr('id','eq',task_id)\
+        - wait_template: "{{ (state_attr('sensor.luf_task_catalog','tasks') | default([], true)\n     | selectattr('id','eq',task_id)\
             \ | list | first).revision == config }}"
           timeout: 00:00:10
           continue_on_timeout: false
@@ -279,7 +279,7 @@ script:
                   recheck_date: '{{ (now() - timedelta(days=now().weekday() - repeat.index + 1)).date().isoformat()
                     }}'
               - repeat:
-                  for_each: '{{ state_attr(''sensor.champ_family'',''players'') | default([], true) | selectattr(''active'')
+                  for_each: '{{ state_attr(''sensor.luf_family'',''players'') | default([], true) | selectattr(''active'')
                     | map(attribute=''daily_script'') | list }}'
                   sequence:
                   - action: '{{ repeat.item }}'
@@ -289,7 +289,7 @@ script:
         sequence:
         - if:
           - condition: template
-            value_template: '{% set ns = namespace(ready=true) %}{% for p in state_attr(''sensor.champ_family'',''players'')
+            value_template: '{% set ns = namespace(ready=true) %}{% for p in state_attr(''sensor.luf_family'',''players'')
               | default([], true) %}{% if p.active and states(p.week_entity) != now().strftime(''%G-W%V'') %}{%
               set ns.ready=false %}{% endif %}{% endfor %}{{ not task or (player != '''' and player != task.player)
               or not ns.ready }}'
@@ -302,7 +302,7 @@ script:
             response_variable: reply
         - variables:
             valid_date: '{{ strptime(fecha, ''%Y-%m-%d'', none) is not none }}'
-            start: '{{ states(''input_datetime.champ_season_start'') }}'
+            start: '{{ states(''input_datetime.luf_season_start'') }}'
         - if:
           - condition: template
             value_template: "{{ not valid_date or fecha != strptime(fecha, '%Y-%m-%d').date().isoformat()\n   or\
@@ -339,7 +339,7 @@ script:
             entity_id: '{{ task.entity }}'
           data:
             value: '{{ new_mask | int }}'
-        - wait_template: "{{ (state_attr('sensor.champ_task_catalog','tasks') | default([], true)\n     | selectattr('entity','eq',entity)\
+        - wait_template: "{{ (state_attr('sensor.luf_task_catalog','tasks') | default([], true)\n     | selectattr('entity','eq',entity)\
             \ | list | first).progress == new_mask | int }}"
           timeout: 00:00:10
           continue_on_timeout: false
@@ -355,7 +355,7 @@ script:
           ok: true
     - stop: Actualización completada
       response_variable: reply
-  champ_configurar_tarea:
+  luf_configurar_tarea:
     alias: Level Up Family - Guardar tarea
     mode: queued
     fields:
@@ -374,7 +374,7 @@ script:
       expected:
         required: true
     sequence:
-    - action: script.champ_task_mutate
+    - action: script.luf_task_mutate
       data:
         operation: edit
         task_id: '{{ task_id }}'
@@ -387,7 +387,7 @@ script:
       response_variable: reply
     - stop: Resultado de la actualización
       response_variable: reply
-  champ_configurar_recompensa:
+  luf_configurar_recompensa:
     alias: Level Up Family - Guardar recompensa semanal
     mode: queued
     fields:
@@ -398,7 +398,7 @@ script:
       expected:
         required: true
     sequence:
-    - action: script.champ_task_mutate
+    - action: script.luf_task_mutate
       data:
         operation: reward
         player: '{{ player }}'

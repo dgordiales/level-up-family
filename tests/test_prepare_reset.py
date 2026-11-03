@@ -22,8 +22,8 @@ def load(name, path):
 
 
 reset = load("prepare_reset", HERE.parent / "config/level_up_family/python/prepare_reset.py")
-champion = load("schema_source", Path(os.environ.get(
-    "CHAMPION_MODULE", str(HERE.parent / "config/level_up_family/python/champion_db.py"))))
+luf = load("schema_source", Path(os.environ.get(
+    "LUF_MODULE", str(HERE.parent / "config/level_up_family/python/luf_db.py"))))
 
 
 class ResetTests(unittest.TestCase):
@@ -34,8 +34,8 @@ class ResetTests(unittest.TestCase):
         self.database = self.root / "fixture.db"
         self.backups = self.root / "backups"
         with closing(sqlite3.connect(self.database)) as conn:
-            champion.create_schema(conn)
-            champion.seed_players(conn)
+            luf.create_schema(conn)
+            luf.seed_players(conn)
             for player_id in (1, 2):
                 conn.execute("INSERT INTO days(player_id,day_date,year,iso_week,iso_weekday,perfect,closed_at,updated_at) VALUES(?,'2026-10-26',2026,44,1,1,'test','test')", (player_id,))
                 conn.execute("INSERT INTO weeks(player_id,year,iso_week,week_start,week_end,effective_xp,closed_at) VALUES(?,2026,44,'2026-10-26','2026-11-01',230,'test')", (player_id,))

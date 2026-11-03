@@ -51,9 +51,10 @@ Los tests crean bases de datos temporales. No leen ni modifican Home Assistant.
 
 ## Alcance de esta copia
 
-El repositorio contiene una distribución anonimizada para una instalación nueva. Los nombres internos `champ_*` y `champion_*` se conservan por compatibilidad entre los componentes. Cambiar los nombres visibles no exige renombrar esos identificadores.
+El repositorio contiene una distribución anonimizada para una instalación nueva. Los identificadores internos usan el prefijo `luf_`, correspondiente a Level Up Family. Cambiar los nombres visibles no exige renombrar esos identificadores.
+
+La [nomenclatura del repositorio](docs/REPOSITORY_NAMESPACE.md) describe archivos, entidades y rutas. Esta revisión cambia identificadores de ejecución y requiere una migración para instalaciones anteriores; no se ha aplicado a la instalación de HA en uso.
 
 No incluye bases de datos, actividad de jugadores, credenciales, copias de seguridad, dispositivos personales ni otras pestañas de los paneles de la casa. La configuración de ejemplo debe combinarse con la configuración propia de Home Assistant.
 
 La instalación que originó esta copia utiliza otros identificadores de jugador. Sustituirla directamente por estos archivos crearía entidades nuevas: una migración de esa instalación requiere mapear por separado entidades, referencias y claves SQLite. Publicar este repositorio no cambia la instalación en uso.
-

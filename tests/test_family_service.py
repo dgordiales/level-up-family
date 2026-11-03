@@ -84,7 +84,7 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         packages = self.root / 'packages/level_up_family'
         packages.mkdir(parents=True)
         (packages / 'lf_weekly.yaml').write_bytes((ROOT / 'config/packages/level_up_family/lf_weekly.yaml').read_bytes())
-        self.db = app / 'data/champion.db'
+        self.db = app / 'data/luf.db'
         with closing(sqlite3.connect(self.db)) as conn, conn:
             conn.executescript('''CREATE TABLE players(id INTEGER PRIMARY KEY AUTOINCREMENT,player_key TEXT UNIQUE,
               display_name TEXT,active INTEGER,created_at TEXT);CREATE TABLE activity(value TEXT);
@@ -92,13 +92,13 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
               INSERT INTO players VALUES(2,'player2','player2',1,'original');
               INSERT INTO activity VALUES('retained history');''')
         self.states = States()
-        for entity, value in {'input_boolean.champ_maintenance': 'off',
-                              'input_number.champ_player1_points_total': '500',
-                              'input_number.champ_player1_task_dormir_solo_week': '3',
-                              'input_text.champ_player1_active_week': '2026-W45',
-                              'input_text.champ_player2_active_week': '2026-W45',
-                              'input_number.champ_weekly_goal_pct': '85',
-                              'sensor.player1_nivel_champion': '2',
+        for entity, value in {'input_boolean.luf_maintenance': 'off',
+                              'input_number.luf_player1_points_total': '500',
+                              'input_number.luf_player1_task_dormir_solo_week': '3',
+                              'input_text.luf_player1_active_week': '2026-W45',
+                              'input_text.luf_player2_active_week': '2026-W45',
+                              'input_number.luf_weekly_goal_pct': '85',
+                              'sensor.player1_nivel_luf': '2',
                               'sensor.player1_xp_semana_efectivo': '45'}.items():
             self.states.async_set(entity, value)
         self.dashboards = {path: Dashboard({'views': []}) for path in
@@ -135,7 +135,7 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(self.manager.registry['players'][0]['name'], 'Nombre nuevo')
         self.assertEqual(self.dashboards['level-up-family-player1'].config['views'][0]['cards'], ['private house controls'])
         self.assertFalse(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'off'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'off'))
 
     async def test_retire_archives_summary_and_keeps_helpers_and_database_identity(self):
         before = self.manager.snapshot()
@@ -158,7 +158,7 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         self.manager.write_dashboard = AsyncMock(side_effect=RuntimeError('Cannot save dashboard'))
         with self.assertRaises(RuntimeError):
             await self.call(operation='rename', revision=0, player_id='player1', name='Try')
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'on'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'on'))
         self.assertTrue(self.manager.error)
         self.assertEqual(self.activity(), [('retained history',)])
 
@@ -173,7 +173,7 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual((self.app / 'task_defaults.json').read_bytes(), defaults)
         self.assertFalse((self.root / 'packages/level_up_family/lf_player3.yaml').exists())
         self.assertFalse(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'off'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'off'))
 
     async def test_add_restores_all_existing_values_before_finishing_restart(self):
         before = self.manager.snapshot()
@@ -181,20 +181,20 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         reply = await self.call(operation='apply_add', token=prepared['token'])
         self.assertTrue(reply['restart'])
         self.assertTrue(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'on'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'on'))
         self.assertEqual(len(self.scheduled), 1)
         # Simulate HA defaults being restored on startup, then recover the snapshot.
-        self.states.async_set('input_number.champ_weekly_goal_pct', '75')
-        self.states.async_set('input_number.champ_player3_points_total', '0')
-        self.states.async_set('input_text.champ_player3_active_week', '2026-W45')
+        self.states.async_set('input_number.luf_weekly_goal_pct', '75')
+        self.states.async_set('input_number.luf_player3_points_total', '0')
+        self.states.async_set('input_text.luf_player3_active_week', '2026-W45')
         await self.manager.started()
         self.assertEqual({k: self.manager.snapshot()[k] for k in before}, before)
         self.assertFalse(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'off'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'off'))
         with closing(sqlite3.connect(self.db)) as conn:
             self.assertEqual(conn.execute('SELECT player_key FROM players ORDER BY id').fetchall(), [('player1',), ('player2',), ('player3',)])
         self.assertEqual(self.activity(), [('retained history',)])
-        self.assertEqual(self.dashboards['level-up-family-children'].config['views'][0]['path'], 'player3-champion')
+        self.assertEqual(self.dashboards['level-up-family-children'].config['views'][0]['path'], 'player3-luf')
 
     async def test_missing_entity_keeps_recovery_pending_and_game_in_maintenance(self):
         prepared = await self.call(operation='prepare_add', revision=0, name='Tres')
@@ -202,17 +202,17 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         with self.assertLogs(self.component._LOGGER, level='ERROR'):
             await self.manager.started()
         self.assertTrue(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'on'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'on'))
         self.assertTrue(self.manager.error)
 
     async def test_unavailable_new_helper_keeps_recovery_pending(self):
         prepared = await self.call(operation='prepare_add', revision=0, name='Tres')
         await self.call(operation='apply_add', token=prepared['token'])
-        self.states.async_set('input_text.champ_player3_active_week', 'unavailable')
+        self.states.async_set('input_text.luf_player3_active_week', 'unavailable')
         with self.assertLogs(self.component._LOGGER, level='ERROR'):
             await self.manager.started()
         self.assertTrue(self.manager.pending_file.exists())
-        self.assertTrue(self.states.is_state('input_boolean.champ_maintenance', 'on'))
+        self.assertTrue(self.states.is_state('input_boolean.luf_maintenance', 'on'))
 
 
 if __name__ == '__main__':

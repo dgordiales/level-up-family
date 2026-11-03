@@ -26,7 +26,7 @@ Esta versión edita o desactiva los espacios existentes: 20 en el ejemplo y diez
 
 Escribe el premio de cada jugador y pulsa su botón **Guardar premio**. Cada panel infantil muestra únicamente su propio premio, bajo sus datos de nivel, rachas y bonus. El premio sigue configurado hasta que los padres lo cambien; no se entrega ni se borra automáticamente al cambiar de semana. Un texto vacío muestra **Tu premio está por decidir**.
 
-La tarjeta carga automáticamente `recompensa.png` de la carpeta de la temporada activa, por ejemplo `/local/level_up_family/season_01/recompensa.png`. Al cambiar `sensor.champ_theme.season_path`, cambia también la imagen, sin modificar el YAML del panel. Se puede indicar una imagen alternativa con el atributo `reward_image` del tema, bajo `/local/level_up_family/`. Si el archivo no puede cargar, se muestra el icono de regalo. Cada temporada debe incluir su propio `recompensa.png`. La imagen se muestra en un espacio fijo de **80 × 80 px**, conservando sus proporciones.
+La tarjeta carga automáticamente `recompensa.png` de la carpeta de la temporada activa, por ejemplo `/local/level_up_family/season_01/recompensa.png`. Al cambiar `sensor.luf_theme.season_path`, cambia también la imagen, sin modificar el YAML del panel. Se puede indicar una imagen alternativa con el atributo `reward_image` del tema, bajo `/local/level_up_family/`. Si el archivo no puede cargar, se muestra el icono de regalo. Cada temporada debe incluir su propio `recompensa.png`. La imagen se muestra en un espacio fijo de **80 × 80 px**, conservando sus proporciones.
 
 ## Panel infantil
 
@@ -34,11 +34,10 @@ Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas 
 
 ## Persistencia e instalación
 
-`task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.champ_task_config_*`; los premios, en `input_text.champ_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
+`task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.luf_task_config_*`; los premios, en `input_text.luf_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
 
-El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.5.1` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones, recompensa y familia. Se conserva button-card para el resto del diseño. La gestión de hijos utiliza la integración local `custom_components/level_up_family`; consulta [Familia](FAMILY_CONFIGURATION.md).
+El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.6.0` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones, recompensa y familia. Se conserva button-card para el resto del diseño. La gestión de hijos utiliza la integración local `custom_components/level_up_family`; consulta [Familia](FAMILY_CONFIGURATION.md).
 
 Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
 
 La administración se muestra en el panel de padres y el formulario solo aparece para administradores. Se mantienen los permisos existentes de Home Assistant sobre scripts y helpers.
-
