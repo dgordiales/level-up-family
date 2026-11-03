@@ -12,6 +12,10 @@ Ya se pueden editar las 20 tareas actuales (nombre, XP, jugador, días y frecuen
 
 Queda ampliar el catálogo para crear espacios adicionales, ordenar tareas desde la interfaz y retirar espacios sin tocar YAML. También quedan el historial de premios entregados y los iconos de recompensa específicos de cada temporada. La ampliación deberá mantener identificadores estables e incluir una migración del progreso existente.
 
+## Configuración familiar
+
+La composición familiar ya se configura con un archivo privado y el generador descrito en [Configurar la familia](FAMILY_CONFIGURATION.md). Queda una futura interfaz de altas, retiradas y nombres desde padres; deberá coordinar helpers, paneles y SQLite sin borrar identidades históricas.
+
 ## Criterios para cada PR
 
 - Describir el comportamiento que cambia y cómo se ha comprobado.

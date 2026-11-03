@@ -157,7 +157,7 @@ def validate(root):
                 references.setdefault(entity, []).append(f"{path.relative_to(root)}{breadcrumb}")
     result["static_references"] = len(references)
     for entity, locations in sorted(references.items()):
-        if entity not in definitions and (entity.split(".", 1)[1].startswith(("champ_", "champion_", "player1_", "player2_", "lf_"))):
+        if entity not in definitions and re.match(r"(?:champ_|champion_|player[1-9][0-9]*_|lf_)", entity.split(".", 1)[1]):
             result["errors"].append(f"Undefined application reference {entity}: {locations[0]}")
     for path in sorted(root.rglob("*.py")):
         try:

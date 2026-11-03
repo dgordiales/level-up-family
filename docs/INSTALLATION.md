@@ -13,6 +13,8 @@ Esta es una configuración YAML para Home Assistant, no una integración instala
 
 ## Instalación nueva
 
+Para configurar uno o más hijos y sus nombres, utiliza primero el [generador familiar](FAMILY_CONFIGURATION.md). En los pasos siguientes, usa su carpeta `config/` y su `configuration.fragment.yaml` en lugar del ejemplo fijo de dos jugadores.
+
 1. Haz una copia de seguridad de Home Assistant.
 2. Copia el contenido de `config/` en `/config/`, conservando las carpetas. No reemplaces tu `configuration.yaml`.
 3. Combina las inclusiones de `examples/configuration.yaml` con las secciones existentes. Si ya usas `homeassistant.packages`, conserva una sola inclusión que alcance `packages/level_up_family`. Los cierres semanales están en `lf_weekly.yaml`; no debes duplicarlos en `automations.yaml`.
@@ -37,6 +39,8 @@ Los enlaces de paneles son `/level-up-family-player1/player1-champion`, `/level-
 La utilidad actúa únicamente sobre SQLite. No reinicia los helpers de Home Assistant, no cambia los bitmasks de misiones y no pone una temporada en producción por sí sola. Para un reinicio completo hay que guardar y reiniciar también los contadores, las marcas semanales y las fechas de cierre, manteniendo las definiciones de misiones y las reglas. Detén Home Assistant y cualquier otro escritor durante la limpieza offline; no basta con cerrar el navegador. Conserva una copia completa para poder restaurar el estado conjunto.
 
 ## Personalización actual
+
+Los nombres de los hijos y las altas, retiradas y reactivaciones se configuran mediante [Configurar la familia](FAMILY_CONFIGURATION.md). El generador conserva las identidades internas y prepara todos los paneles y paquetes correspondientes.
 
 Abre **Tareas y premios** en el panel de padres para cambiar nombres, XP, jugador, días y premio semanal. Consulta [Tareas y premios](TASKS_AND_REWARDS.md) para las reglas de protección del progreso. Las notificaciones a teléfonos personales se han retirado de esta distribución. Los nombres de jugador son genéricos también en las claves SQLite y en los identificadores de entidades.
 

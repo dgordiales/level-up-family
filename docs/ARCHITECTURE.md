@@ -24,4 +24,4 @@ Los paneles de jugador incluyen únicamente su pestaña Level Up Family. El pane
 
 ## Compatibilidad
 
-Se conservan prefijos internos históricos (`champ_`, `champion_`) para mantener las referencias entre módulos. Las claves públicas de jugador de esta distribución son `player1` y `player2`. Renombrar una instalación existente requiere una migración de estado, no solamente copiar archivos.
+Se conservan prefijos internos históricos (`champ_`, `champion_`) para mantener las referencias entre módulos. Las claves públicas son identificadores estables como `player1`, `player2` y `player3`; el nombre visible y estado activo se describen en `family.json`. El generador `tools/configure_family.py` prepara la configuración completa desde un archivo privado, usando los dos jugadores incluidos como plantillas. Cambiar un nombre visible conserva la identidad; cambiar una clave interna de una instalación existente requiere migrar el estado.

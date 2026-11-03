@@ -1,0 +1,7 @@
+{
+  "version": 1,
+  "players": [
+    {"id": "player1", "name": "player1", "active": true},
+    {"id": "player2", "name": "player2", "active": true}
+  ]
+}

@@ -4,11 +4,50 @@ import sqlite3
 from contextlib import contextmanager
 import sys
 import json
+import re
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 
 BASE_DIR = Path(__file__).resolve().parent.parent / "data"
 DB_PATH = BASE_DIR / "champion.db"
+FAMILY_PATH = Path(__file__).resolve().parent.parent / "family.json"
+
+
+def validate_family(data):
+    """Validate identities separately from visible names; never derive IDs from names."""
+    if not isinstance(data, dict) or type(data.get("version")) is not int or data["version"] != 1:
+        raise ValueError("La configuración familiar debe tener version: 1.")
+    if set(data) - {"version", "players"}:
+        raise ValueError("La configuración familiar solo admite version y players.")
+    players = data.get("players")
+    if not isinstance(players, list) or not players:
+        raise ValueError("Añade al menos un jugador a players.")
+    result, seen = [], set()
+    for item in players:
+        if not isinstance(item, dict):
+            raise ValueError("Cada jugador necesita id, name y active.")
+        if set(item) - {"id", "name", "active"}:
+            raise ValueError("Cada jugador solo admite id, name y active. Revisa posibles erratas.")
+        key, name, active = item.get("id"), item.get("name"), item.get("active", True)
+        if not isinstance(key, str) or not re.fullmatch(r"player[1-9][0-9]{0,5}", key) or key in seen:
+            raise ValueError("Usa identificadores únicos: player1, player2, player3… (sin ceros iniciales).")
+        if not isinstance(name, str) or not 1 <= len(name.strip()) <= 40 or not name.isprintable():
+            raise ValueError("Cada nombre debe tener entre 1 y 40 caracteres, sin saltos de línea.")
+        if type(active) is not bool:
+            raise ValueError("active debe ser true o false.")
+        seen.add(key)
+        result.append({"id": key, "name": name.strip(), "active": active})
+    if not any(p["active"] for p in result):
+        raise ValueError("Mantén al menos un jugador activo.")
+    return result
+
+
+def load_family(path=None):
+    path = Path(path) if path is not None else FAMILY_PATH
+    if not path.exists() and path == FAMILY_PATH:
+        # Compatibility with older installations that have no family manifest.
+        return [{"id": key, "name": key, "active": True} for key in ("player1", "player2")]
+    return validate_family(json.loads(path.read_text(encoding="utf-8-sig")))
 
 
 def utc_now():
@@ -189,38 +228,56 @@ def create_schema(conn):
     )
 
 
-def seed_players(conn):
-    players = [
-        ("player1", "player1"),
-        ("player2", "player2"),
-    ]
-
-    for player_key, display_name in players:
+def seed_players(conn, players=None):
+    players = load_family() if players is None else players
+    keys = [p["id"] for p in players]
+    configured = FAMILY_PATH.is_file()
+    if configured:
+        conn.execute("UPDATE players SET active=0 WHERE player_key NOT IN (" + ",".join("?" for _ in keys) + ")", keys)
+    conflict = ("DO UPDATE SET display_name=excluded.display_name, active=excluded.active"
+                if configured else "DO NOTHING")
+    for player in players:
         conn.execute(
             """
             INSERT INTO players (
                 player_key,
                 display_name,
+                active,
                 created_at
             )
-            VALUES (?, ?, ?)
-            ON CONFLICT(player_key) DO NOTHING
-            """,
+            VALUES (?, ?, ?, ?)
+            ON CONFLICT(player_key)
+            """ + conflict,
             (
-                player_key,
-                display_name,
+                player["id"],
+                player["name"],
+                int(player["active"]),
                 utc_now(),
             ),
         )
 
 
 def init_database():
+    players = load_family()
     with connect() as conn:
         create_schema(conn)
-        seed_players(conn)
+        seed_players(conn, players)
         conn.commit()
 
     print(f"OK: database initialized at {DB_PATH}")
+
+
+def sync_family():
+    """Add, rename or retire players, preserving IDs and every activity row."""
+    if not FAMILY_PATH.is_file():
+        raise ValueError("Falta family.json. Genera y revisa primero la configuración familiar.")
+    players = load_family()
+    if not DB_PATH.is_file():
+        raise ValueError("Inicializa primero la base de datos con init.")
+    with connect() as conn:
+        seed_players(conn, players)
+    print(json.dumps({"ok": True, "active": [p["id"] for p in players if p["active"]],
+                      "history_preserved": True}, ensure_ascii=False))
 
 
 def show_players():
@@ -986,6 +1043,7 @@ def main():
         print("Usage:")
         print("  champion_db.py init")
         print("  champion_db.py players")
+        print("  champion_db.py sync_family")
         print("  champion_db.py add_penalty <player_key> <amount> <reason>")
         print("  champion_db.py penalties")
         print("  champion_db.py cancel_penalty <penalty_id>")
@@ -1004,6 +1062,11 @@ def main():
 
     elif command == "players":
         show_players()
+
+    elif command == "sync_family":
+        if len(sys.argv) != 2:
+            raise ValueError("Uso: champion_db.py sync_family (lee family.json junto al código del juego).")
+        sync_family()
 
     elif command == "add_penalty":
         if len(sys.argv) < 5:
@@ -1126,4 +1189,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except (ValueError, OSError) as exc:
+        print(f"ERROR: {exc}", file=sys.stderr)
+        raise SystemExit(1)

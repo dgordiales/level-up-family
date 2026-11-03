@@ -2,6 +2,8 @@
 
 En el panel de padres, abre **Tareas y premios**. El formulario edita las 20 tareas actuales sin cambiar archivos YAML.
 
+Esas 20 tareas corresponden al ejemplo de dos jugadores. El [generador familiar](FAMILY_CONFIGURATION.md) prepara diez espacios por hijo registrado y ajusta el formulario a los jugadores activos.
+
 ## Editar una tarea
 
 Selecciona una tarea, cambia los campos y pulsa **Guardar tarea**. Puedes editar:

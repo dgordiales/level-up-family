@@ -2,11 +2,12 @@
 
 Juego familiar de misiones domésticas para Home Assistant. Cada jugador completa misiones, gana XP, sube de nivel y sigue su progreso en temporadas de 28 días.
 
-Esta primera versión reúne el motor SQLite, los paquetes de Home Assistant, los paneles del juego y los recursos gráficos de la temporada 1. Los dos jugadores usan los identificadores genéricos `player1` y `player2` en todo el código.
+Esta versión reúne el motor SQLite, los paquetes de Home Assistant, los paneles del juego y los recursos gráficos de la temporada 1. Incluye dos jugadores como ejemplo y un generador para configurar uno, dos o más hijos con nombres propios e identificadores estables `player1`, `player2`, `player3`…
 
 ## Qué incluye
 
 - Panel de `player1` y panel de `player2`, cada uno con una única pestaña del juego.
+- Configuración familiar central para añadir, renombrar o retirar hijos sin borrar su histórico.
 - Panel de padres con control e histórico de Level Up Family.
 - Pestaña de padres **Tareas y premios** para editar las 20 tareas actuales: nombre, XP, jugador y calendario.
 - Un premio semanal distinto para cada jugador, visible en su propio panel con el estilo de temporada.
@@ -28,6 +29,8 @@ tools/                         Validadores de configuración y paneles
 ```
 
 Consulta la [instalación](docs/INSTALLATION.md), [Tareas y premios](docs/TASKS_AND_REWARDS.md), la [arquitectura](docs/ARCHITECTURE.md) y la [hoja de ruta](docs/ROADMAP.md).
+
+Para adaptar el número de hijos y sus nombres, sigue [Configurar la familia](docs/FAMILY_CONFIGURATION.md). Se edita un archivo privado y se generan los paneles, paquetes, tareas y cierres necesarios.
 
 ## Desarrollo
 

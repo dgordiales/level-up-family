@@ -1,0 +1,11 @@
+# Copia este archivo fuera del repositorio y personaliza los nombres allí.
+# Conserva siempre el id aunque cambie el nombre. No reutilices ids retirados.
+version: 1
+players:
+  - id: player1
+    name: player1
+    active: true
+  - id: player2
+    name: player2
+    active: true
+# Para añadir otro hijo, añade player3. Para retirarlo, usa active: false.
