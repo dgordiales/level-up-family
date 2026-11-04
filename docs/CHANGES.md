@@ -1,3 +1,50 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# Cumulative changes: configurable family and seasonal reward
+
+This document describes the update compared with `main` before family management. Existing task editing, individual rewards, and dashboard layouts remain and have been generalized for more players.
+
+## User-facing changes
+
+- **Family in the parents' dashboard:** change display names and retire children on save; prepare additions with review and confirmation of an HA restart. Retiring preserves identities, helpers, and SQLite activity. The last active child cannot be retired.
+- **One or more children:** the initial generator accepts stable `playerN` IDs, including non-consecutive ones, and names up to 40 characters. It generates packages, dashboards, tasks, rewards, and automations without manual duplication of player references.
+- **Additions from HA:** each new child receives a new identity without reusing retired IDs, a view in the shared dashboard, and ten initially disabled tasks. Parents select their days and XP under Tasks & Rewards.
+- **Rewards:** seasonal reward artwork is displayed at **80 × 80 px** with aspect ratio preserved. `recompensa.png` is selected automatically, falling back to an icon if it fails to load.
+- **History and penalties:** retired players remain in historical views and their outstanding penalties remain accessible. Active task catalogs and closing routines no longer include them.
+
+## Components and persistence
+
+Local integration 0.4.1 introduces the administrator action `level_up_family.manage_family` and `sensor.luf_family`. Registry version 2 separates display name, public identity, existing entities, SQLite key, and dashboard path. This allows an older installation to map existing identifiers without recreating players for the same children.
+
+Operations validate revisions to reject stale forms. Adding a player backs up SQLite and helper state, generates files, validates configuration, and stores pending recovery before restart. Startup restores prior values before resuming. If recovery fails, the game remains in maintenance. Metadata writes do not delete activity tables.
+
+Extensive YAML changes include serialized operations and generalized player references backed by a family registry. Provisioning templates are stored in `templates.json`; a test compares them with their sources. See [Architecture](ARCHITECTURE.md).
+
+## Installation and limitations
+
+Follow [Installation](INSTALLATION.md) for new setups and [Family Configuration](FAMILY_CONFIGURATION.md) for migration, formats, and rollback. Integration, packages, registry, dashboards, and the card resource must be installed together; the original functional release used cards version 2.5.1. Updating JavaScript alone does not enable Family.
+
+This update does not include a progress reset or a new season. Existing installations must preserve mappings, the database, customized tasks, and helper values. Runtime registries and backups may contain personal data and must not be published.
+
+Reactivation from the parents' dashboard, adding extra task slots for an existing player, and a history of delivered rewards remain pending. Game views are regenerated from templates: save your customizations before upgrading. Unrelated dashboard views are preserved. The route for new player views is `level-up-family-children`.
+
+## Validation
+
+The real-world HA checks below refer to functionality **before** the [namespace consolidation](REPOSITORY_NAMESPACE.md). The naming revision 0.5.0 was tested in the repository and had **not yet been deployed** to the existing installation.
+
+- **86 automated tests:** SQLite engine and isolated reset; seasons; catalog, scoring, and editing rules; one, three, and non-consecutive players; identity and history preservation; additions, retirements, stale revisions, rollback, and helper recovery after restart.
+- Static validation of **15 YAML files**, **379 Jinja templates**, and **106 dashboard JavaScript templates**, plus card module syntax.
+- Installation and configuration checks on **HA 2026.10.4**. After loading integration 0.4.1, all game helper values and player, day, week, year, and penalty rows were compared and remained unchanged.
+- In the running installation, saving a name unchanged, rejecting a stale form, and cancelling proposed additions/retirements were checked. Actual add/retire mutations with test data were verified in isolated environments; no real players were added or retired just for testing.
+
+Static checks and HA adapters do not guarantee compatibility with other HA versions. Keep a full backup and run your own Home Assistant configuration check before deployment.
+
+---
+
+<a id="español"></a>
+
 # Cambios acumulados: familia configurable y recompensa de temporada
 
 Este documento describe la actualización respecto a `main` anterior a la gestión de familia. La edición de tareas, los premios individuales y el diseño de los paneles ya existentes se mantienen y se adaptan a más jugadores.
