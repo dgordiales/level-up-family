@@ -118,7 +118,7 @@ config/www/level_up_family/
     └── ...
 ```
 
-`season_XX` illustrates the naming convention for future seasons; it is not a literal directory you need to create. `banner.png` is the season header; `fondo_vertical.png` is the child's dashboard background; `icono_*.png` supplies metric icons; and `recompensa.png` is displayed as the weekly reward image at **80 × 80 px**, preserving aspect ratio. A gift icon is shown if the reward image cannot load. Optional artwork may include `emblema.png`, `estela.png`, and `elementos_flotantes.png`.
+`season_XX` illustrates the naming convention for future seasons; it is not a literal directory you need to create. `banner.png` is the season header; `fondo_vertical.png` is the child's dashboard background; `icono_*.png` supplies metric icons; and `recompensa.png` is displayed as the weekly reward image at **80 × 80 px**, preserving aspect ratio. A gift icon is shown if the reward image cannot load.
 
 Home Assistant exposes `config/www/level_up_family/season_01` under `/local/level_up_family/season_01`. For a new season, review `lf_themes.yaml`, UI strings, and artwork, then rebuild provisioning templates:
 
@@ -323,7 +323,7 @@ config/www/level_up_family/
     └── ...
 ```
 
-`season_XX` representa el patrón de carpetas futuras, no una carpeta que debas crear literalmente. `banner.png` se usa como cabecera; `fondo_vertical.png`, como fondo infantil; `icono_*.png`, como iconos de métricas; y `recompensa.png`, como imagen de premio de **80 × 80 px**, respetando proporciones. Si falta la imagen del premio, se muestra un icono alternativo. Pueden añadirse otros recursos complementarios como `emblema.png`, `estela.png` y `elementos_flotantes.png`.
+`season_XX` representa el patrón de carpetas futuras, no una carpeta que debas crear literalmente. `banner.png` se usa como cabecera; `fondo_vertical.png`, como fondo infantil; `icono_*.png`, como iconos de métricas; y `recompensa.png`, como imagen de premio de **80 × 80 px**, respetando proporciones. Si falta la imagen del premio, se muestra un icono alternativo.
 
 En HA, `config/www/level_up_family/season_01` se sirve bajo `/local/level_up_family/season_01`. Para una temporada nueva, revisa `lf_themes.yaml`, textos y recursos; después regenera las plantillas:
 
