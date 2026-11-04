@@ -1,3 +1,55 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# Tasks and rewards
+
+Open **Tasks & Rewards** in the parents' dashboard. The form edits the existing 20 tasks without changing YAML files.
+
+Those 20 tasks belong to the two-player example. The [family generator](FAMILY_CONFIGURATION.md) creates ten slots per registered child and adjusts the form to active players.
+
+## Editing a task
+
+Select a task, edit its fields, and press **Save task**. You can change:
+
+- Name (up to 80 characters).
+- Assigned player.
+- Difficulty: easy (10 XP), standard (15 XP), important (20 XP), or custom XP between 0 and 100.
+- Days of the week.
+- Whether the task must be completed on every selected day or only once on any of those days during the week.
+
+Changes apply to the current week. Once a task has progress, only its name can be changed. The server enforces this rule as well as disabling fields in the form. Changes are blocked while a player's weekly close is pending. If two sessions edit simultaneously, an outdated form submission is rejected to avoid overwriting changes.
+
+With no selected days, the task is disabled. The once-per-week option retains the behavior of the school-bag mission: selecting Saturday and Sunday gives two possible days to complete it, but it counts as only one mission and one XP award. Once-per-week tasks are excluded from the perfect-day bonus.
+
+Scheduled totals, XP, goals, perfect days, and weekly closes all use the same catalog. Changing days or player assignment on a task with no progress also recalculates days already closed in the current week. Reassigning keeps the task's progress identifier, so its internal name may still contain the original player's identifier.
+
+This version edits or disables existing slots: 20 in the example, plus ten for every newly added child. Family management creates those new slots with every day disabled. Creating additional slots for an existing child or physically deleting them requires a future catalog extension.
+
+## Weekly reward
+
+Enter each player's reward and select **Save reward**. Each child sees only their own reward, beneath the level, streak, and bonus metrics. The reward remains configured until the parents change it; it is not automatically delivered or cleared at the start of a new week. Empty text displays **Your reward is yet to be decided** (the current interface may show the original Spanish wording).
+
+The card automatically loads `recompensa.png` from the active season's folder, for example `/local/level_up_family/season_01/recompensa.png`. When `sensor.luf_theme.season_path` changes, the picture changes without editing dashboard YAML. A theme may specify a fallback image through `reward_image` under `/local/level_up_family/`. If the image cannot load, a gift icon is displayed. Each season should include its own `recompensa.png`. The image fits an **80 × 80 px** area while preserving aspect ratio.
+
+## Child dashboard
+
+The dashboard retains the seasonal header, name, weekly progress, and XP, daily streak, and penalty metrics. Below are the mission header and task rows using the original design and editable catalog. Level, weekly streak, bonus, and reward appear beneath the missions. Rows show status circles only, without pictograms or a shared background. Corrections for other days of the current week are available only in the parents' dashboard.
+
+## Persistence and installation
+
+`task_defaults.json` supplies initial values only. Changes are stored in `input_text.luf_task_config_*` helpers and rewards in `input_text.luf_<player>_weekly_reward`. They have no `initial` value, so HA restores them after restarting. Include these helpers in backups; do not delete them when updating a season.
+
+The task package is `lf_tasks.yaml`. The JavaScript resource `/local/level_up_family/level-up-family-cards.js?v=2.6.0` must be registered as a **module**. This file registers administration, mission, reward, and family cards. button-card remains in use for the rest of the design. Family management uses `custom_components/level_up_family`; see [Family Configuration](FAMILY_CONFIGURATION.md).
+
+Control and History share dark-blue backgrounds, rounded corners, and seasonal accents with Tasks & Rewards. Native cards retain their controls and confirmations and are styled with card-mod; metrics and tables use button-card styles. Style changes require only a dashboard reload.
+
+Administration is displayed in the parents' dashboard, and its form appears only for administrators. Existing Home Assistant permissions still apply to scripts and helpers.
+
+---
+
+<a id="español"></a>
+
 # Tareas y premios
 
 En el panel de padres, abre **Tareas y premios**. El formulario edita las 20 tareas actuales sin cambiar archivos YAML.
