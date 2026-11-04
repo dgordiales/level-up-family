@@ -1,3 +1,49 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# How it works
+
+## Game state
+
+Home Assistant stores weekly mission completion in numeric helpers: each bit represents a day, from Monday (`1`) to Sunday (`64`). Sensors derive XP, progress, goals, and levels. `task_defaults.json` provides initial values, while `lf_tasks.yaml` merges them with editable metadata persisted in text helpers to publish `sensor.luf_task_catalog`.
+
+Dashboards, calculations, and closing processes read that catalog. Configuration changes and mark, unmark, or toggle operations are serialized through `script.luf_task_mutate`. Before writing, it validates form revision, types, bounds, active week, player, and day. Changes to task rules are rejected once progress exists; the task name remains editable.
+
+Reassignment preserves the mission's physical helper. Each weekly close resets only the tasks assigned to the player being closed, even if their entities retain an earlier name. This avoids clearing another player's missions. Legacy difficulty-based XP helpers remain for compatibility; task XP now comes from the catalog.
+
+`lf_core.yaml` contains shared rules and access scripts. `lf_player1.yaml` and `lf_player2.yaml` group each player's helpers, sensors, actions, and daily closes. `lf_weekly.yaml` initializes and closes the week, including startup recovery. `lf_season.yaml` calculates status and dates for a 28-day season. `lf_themes.yaml` defines seasonal presentation.
+
+## Persistence
+
+`luf_db.py` stores players, days, weeks, years, and penalties in SQLite. Closing operations use unique keys and updates to avoid duplicating activity if run more than once. Individual missions are not stored in SQLite in this release.
+
+`luf_history.py` and `luf_active_penalties.py` read the database for history and active-penalty sensors. Their JSON responses surface errors rather than fabricating results. `lf_database.yaml` connects script writes to Python commands; `lf_history.yaml` and `lf_admin.yaml` connect reads and penalty controls.
+
+Writing scripts check the maintenance helper. The daily close also checks the season start date and the week to which mission data belongs. Season calculations report the current period; moving to another season and migrating its assets are not automatic.
+
+## Dashboards
+
+Player dashboards contain only their Level Up Family view. The parents' dashboard contains Control, History, Tasks & Rewards, and Family. The local `level-up-family-cards.js` module registers administration, mission, reward, and family cards using Home Assistant's `hass` object and text nodes for names and rewards. It contains no general home-automation tabs or references to household devices. Newly added players appear as views in the shared children's dashboard.
+
+## Family management
+
+`custom_components/level_up_family` loads version 2 of `family.json`, publishes `sensor.luf_family`, and registers `level_up_family.manage_family` with server-side administrator authorization. Its registry separates public player ID, display name, entity prefix, SQLite key, and dashboard path. Engine commands also accept the initial version 1 format; the UI requires version 2.
+
+Operations are serialized with a lock and validate the registry revision. Renaming or retiring a player updates metadata, preserves numeric SQLite identities, and keeps activity tables. Retired children are excluded from the active task catalog and closes, but remain visible in history and any outstanding penalties can still be viewed. When dashboards are updated, game views are replaced with their templates; other views and general settings are preserved.
+
+An addition is prepared with a token that expires after ten minutes. Applying it places the game in maintenance mode, waits for scripts to finish, backs up SQLite and helpers, generates the new player's package, and extends tasks and automations. It validates the HA configuration and saves `family_pending.json` before restarting. On startup, it restores helper values, checks the new player's entities, synchronizes SQLite, and updates dashboards before restoring the previous maintenance state. Incomplete recovery keeps maintenance enabled and reports the error.
+
+`templates.json` contains generic templates used for dashboards and provisioning. Rebuild it with `python tools/build_family_templates.py`; a test verifies alignment with source YAML and initial values. Styling changes to managed views must update this generated file as well.
+
+## Compatibility
+
+Repository components consistently use the `luf_` prefix. Public keys are stable IDs such as `player1`, `player2`, and `player3`; `family.json` defines display names and active state. The `tools/configure_family.py` generator produces a complete setup from a private file, using the included two-player configuration as templates. Changing a display name preserves identity; changing an internal key in an existing installation requires migrating state. See [Repository Namespace](REPOSITORY_NAMESPACE.md) before updating an older setup.
+
+---
+
+<a id="español"></a>
+
 # Funcionamiento
 
 ## Estado de juego
