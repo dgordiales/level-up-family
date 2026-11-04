@@ -1,3 +1,44 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# Level Up Family namespace
+
+This revision consolidates the current repository under the Level Up Family name and the technical prefix `luf`. It covers source code, files, tests, documentation, generated templates, entity IDs, actions, and paths. Player identifiers remain `player1`, `player2`, and so on.
+
+| Component | Current name |
+| --- | --- |
+| SQLite engine | `config/level_up_family/python/luf_db.py` |
+| History reader | `config/level_up_family/python/luf_history.py` |
+| Penalty reader | `config/level_up_family/python/luf_active_penalties.py` |
+| Runtime database | `/config/level_up_family/data/luf.db` |
+| Game helpers and actions | `luf_*` |
+| Task catalog | `sensor.luf_task_catalog` |
+| Family registry | `sensor.luf_family` |
+| Child dashboard view | `playerN-luf` |
+| Parents' control and history | `control-luf`, `historico-luf` |
+
+The integration domain, folder, and frontend cards remain `level_up_family` and `level-up-family-*`. The integration version changes to 0.5.0 to flag the identifier changes. The card resource uses `?v=2.6.0` to refresh the cache; reload the browser as well. User-facing titles use Level Up Family.
+
+## Scope and updating
+
+**This change only affects the repository. It does not modify, deploy, or restart the Home Assistant installation currently in use.** Previous real-world HA checks refer to the earlier functional release; this naming revision was verified using repository tests and validators.
+
+For a new installation, use all the files from this revision together. For an older installation, replacing only the three Python scripts is not enough: packages, scripts, entities, routes, the database, and references also change. This revision does not include an automatic migration for those names.
+
+Before migrating an installation with existing activity:
+
+1. Back up the entire HA installation, SQLite, the family registry, customized tasks, and helper values. Stop the game's writers.
+2. Make an explicit mapping of current entity IDs, unique IDs, actions, and paths to their counterparts in this revision. Preserve player identities and progress; do not create new players for the same children.
+3. Coordinate the `luf.db` location, Python commands, and `family.json` mappings. Do not replace an active database by initializing a blank one.
+4. Validate configuration in a copy and compare activity, counters, and dashboards before deployment. Retain a complete backup for rollback.
+
+Commit history preserves earlier versions of the project. This cleanup changes the current files without rewriting that history.
+
+---
+
+<a id="español"></a>
+
 # Nomenclatura de Level Up Family
 
 Esta revisión unifica el contenido actual del repositorio bajo Level Up Family y el prefijo técnico `luf`. Incluye código, archivos, pruebas, documentación, plantillas generadas, nombres de entidades, acciones y rutas. Los identificadores personales siguen siendo `player1`, `player2`, etc.
