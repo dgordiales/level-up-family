@@ -1,3 +1,63 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# Installation
+
+## Requirements
+
+- Home Assistant with YAML packages, templates, `command_line`, and `shell_command`.
+- Python 3 in the environment running Home Assistant; SQLite is included with Python.
+- [button-card](https://github.com/custom-cards/button-card), installed and registered as a JavaScript resource, for the existing dashboard design.
+- [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered as a JavaScript resource, to style native cards in the parents' dashboard.
+- Local module `/local/level_up_family/level-up-family-cards.js?v=2.6.0`, which registers the cards included in this repository.
+- Access to `/config` and write permissions for Home Assistant in `/config/level_up_family/data`.
+
+The game uses YAML packages and a small local integration for family management. Copy `custom_components/level_up_family` as well; this integration is **not installed through HACS**. Local validation checks syntax and references. You must still validate configuration against your installed HA version and visually check its cards.
+
+## New installation
+
+To configure one or more children and their names, first use the [family generator](FAMILY_CONFIGURATION.md). In the steps below, use its generated `config/` folder and `configuration.fragment.yaml` instead of the fixed two-player example.
+
+1. Create a Home Assistant backup.
+2. Copy the contents of `config/` into `/config/`, keeping the directory structure. Do not replace your `configuration.yaml`.
+3. Merge the includes from `examples/configuration.yaml` into existing sections. If you already use `homeassistant.packages`, retain a single include covering `packages/level_up_family`. Weekly closes are in `lf_weekly.yaml`; do not duplicate them in `automations.yaml`.
+4. Initialize the new database inside the HA environment:
+
+   ```sh
+   python3 /config/level_up_family/python/luf_db.py init
+   ```
+
+   This creates `/config/level_up_family/data/luf.db` using the players in `family.json`. The example includes `player1` and `player2` with 20 tasks; the generator creates ten slots per registered child. Edit them afterwards in the parents' dashboard.
+
+5. Check configuration using Home Assistant's tools, then restart only if validation succeeds. Make sure the Python commands run in the same environment as HA; an add-on terminal may have a different interpreter or permissions.
+6. Set `input_number.luf_season_number` to `1` and `input_datetime.luf_season_start` to your chosen date. Adjust XP, goals, and penalty rules through their helpers. The start date counts as the first of 28 calendar days; the last day is start + 27 days.
+7. Verify that `input_boolean.luf_maintenance` is off. Each active player's dashboard should display level 1, XP 0, and pending missions on a new installation. Test seasons, missions, penalties, and history using test data, with a backup, before regular use.
+
+The example dashboard URLs are `/level-up-family-player1/player1-luf`, `/level-up-family-player2/player2-luf`, and `/level-up-family-parents/control-luf`. The second parents' tab is `historico-luf`. `require_admin` restricts navigation to the parents' dashboard; it does not turn scripts and helpers into a per-player permissions system.
+
+Family management is at `/level-up-family-parents/family` in the example. Register `/level-up-family-children` even when it has no views yet; it is used for future additions. The family management action checks administrator status on the server, but does not add individual permissions to older game scripts.
+
+The prior functionality was checked on **HA 2026.10.4**, integration **0.4.1**, and cards **2.5.1**. This revision uses integration **0.5.0** and a new namespace, validated through repository tests but **not deployed to the running HA instance**. See [Repository Namespace](REPOSITORY_NAMESPACE.md) and validate your own configuration before installing.
+
+## Resets and cleanup
+
+`prepare_reset.py` first generates a plan and requires an explicit apply operation before deleting activity. Read `--help` before using it. It preserves players, validates the schema, creates an SQLite backup, and clears days, weeks, years, and penalties.
+
+The utility affects SQLite only. It does not reset HA helpers, task bitmasks, or activate a new season. A complete reset must also reset counters, weekly checkmarks, and closing dates while retaining task definitions and rules. Stop Home Assistant and all other writers during offline cleanup; closing the browser is insufficient. Keep a complete backup to restore the combined state.
+
+## Current customization
+
+Names, additions, and retirements are managed in **Family**. Reactivation is not available in this version. The [family generator](FAMILY_CONFIGURATION.md) prepares the initial installation while preserving internal identities.
+
+Open **Tasks & Rewards** in the parents' dashboard to edit names, XP, assigned player, days, and weekly reward. See [Tasks & Rewards](TASKS_AND_REWARDS.md) for progress-protection rules. Personal phone notifications have been removed from this distribution. Player names are generic in SQLite keys and entity IDs as well.
+
+Files in `www/level_up_family/season_01` are served at `/local/level_up_family/season_01`. Do not store private data in `www`.
+
+---
+
+<a id="español"></a>
+
 # Instalación
 
 ## Requisitos
