@@ -1,3 +1,150 @@
+🌐 **Language / Idioma:** [English](#english) · [Español](#español)
+
+<a id="english"></a>
+
+# Configure one, two, or more children
+
+The repository's two players are an example. The generator prepares your family's configuration from **a private file** containing names and active or retired players. It generates dashboards, helpers, initial task slots, rewards, penalties, and closing routines. You do not need to manually duplicate every player reference.
+
+Once this version is installed, **Family** in the parents' dashboard allows you to rename, retire, and add children without editing files. The generator below is intended for preparing a new installation.
+
+## Manage players from the parents' dashboard
+
+- **Save name** updates the displayed name, including in history. It preserves IDs, completed missions, XP, and prior closes. HA does not need to restart.
+- **Retire** first asks for confirmation. The child disappears from active controls and their dashboard indicates they are retired. Helpers, task checkmarks, rewards, and all SQLite rows remain. Family shows a progress summary at retirement, and History retains weeks and years. At least one child must remain active.
+- **Prepare addition** validates the name and shows a proposal. **Apply addition and restart HA** creates a new identity, dashboard, and ten initially disabled tasks. It checks configuration, saves a backup, and restarts HA to load new entities. On startup it restores prior helper values before leaving maintenance mode. Parents then assign days and XP under Tasks & Rewards.
+
+New children appear in the **Level Up Family · Children** dashboard. Existing dashboards retain their routes and other tabs. Retired IDs are never reused. This release does not include a reactivation action after weeks of absence; do not manually change `active` in a running installation.
+
+The `level_up_family.manage_family` action checks administrator privileges on the server. Forms reject stale revisions when two sessions edit family settings simultaneously. Each operation creates a backup under `/config/level_up_family/backups/family_*`; retiring a player never deletes their data.
+
+The frontend module is `/local/level_up_family/level-up-family-cards.js?v=2.6.0`. You must also install `config/custom_components/level_up_family`, `lf_family.yaml`, the version 2 family registry, and the shared children's dashboard. HA loads the integration on restart. Updating only the JavaScript card is insufficient.
+
+## Update an older installation
+
+Take a complete backup before replacing files. Do not overwrite `data/`, HA helper values, or `task_defaults.json` with repository examples. Do not overwrite an existing family registry with the example either.
+
+An older installation must map `id`, `entity_prefix`, `db_key`, `dashboard_url`, and `dashboard_path` exactly once in its version 2 registry. For example, public ID `player1` can refer to `luf_legacy_one_*` entities and SQLite key `player_1`. Renaming the display name does not change these mappings. Set `parents_dashboard` in `lf_family.yaml` if it differs from the example. Keep the shared dashboard at `level-up-family-children`; additions generate this route. All linked dashboards, including those for retired players, must remain registered so family management can load their views.
+
+Game views are rebuilt from distributed templates when the family changes. Back up customizations within those views before migration; unrelated tabs and general dashboard settings are preserved.
+
+The generator's input uses `version: 1` with `id`, `name`, and `active`. Its runtime output uses `version: 2`, adding `revision` and the mappings above. After installation, HA's registry becomes authoritative: do not overwrite it with an outdated private initial file. Do not publish runtime registries containing real names or backups.
+
+Dashboard operations update only game tabs. Backups contain the original dashboards for recovery. If an addition remains pending or HA cannot restore all helper values, the game stays in maintenance and Family reports the problem. Keep `family_pending.json` and its backup to resolve it. Do not run a reset to repair an installation.
+
+## Player ID and display name
+
+| Field | Example | Meaning |
+| --- | --- | --- |
+| `id` | `player3` | Stable identity for entities, tasks, and SQLite. Never change or reuse it. |
+| `name` | `Luna` | Name shown on dashboards, controls, and history. It can be changed. |
+| `active` | `true` | If `false`, the player is retired while retaining history and helpers. |
+
+Names support accented letters, spaces, and quotation marks, up to 40 characters. IDs follow `player1`, `player2`, `player3`… without leading zeroes; they need not be consecutive. Reordering the file changes presentation, not identity.
+
+## Prepare the files
+
+With Python 3.12 or later and dependencies from `requirements-dev.txt`, copy `examples/family.yaml` to `family.local.yaml`. That filename and `build/` are ignored by Git to prevent publishing real names.
+
+Example with three children:
+
+```yaml
+version: 1
+players:
+  - id: player1
+    name: Luna
+    active: true
+  - id: player2
+    name: Leo
+    active: true
+  - id: player3
+    name: Mía
+    active: true
+```
+
+For a new one-child installation, keep only `player1`. Generate and validate a new directory:
+
+```sh
+python tools/configure_family.py --family family.local.yaml --output build/family-v1
+python tools/validate_config.py build/family-v1/config
+python tools/validate_panels_js.py build/family-v1/config/panel/level_up_family
+```
+
+The output includes `config/`, a `generation.json` summary, and `configuration.fragment.yaml`, which must be merged with the existing HA configuration. Inside `config/level_up_family/`, `family.json` contains the generated runtime registry. Retain the input file as an initial reference; later dashboard changes are stored in HA's registry.
+
+The output directory must be new. The generator does not install into HA, read databases, or overwrite a previous output directory. Never use HA's `/config` as the generator output.
+
+## New installation
+
+Follow [Installation](INSTALLATION.md) with the generated `config/` directory and configuration fragment. Merge includes; do not replace other device configuration. Keep the JavaScript resources described in the guide, including the custom card module and card-mod.
+
+In the environment where the game runs:
+
+```sh
+python3 /config/level_up_family/python/luf_db.py init
+python3 /config/level_up_family/python/luf_db.py players
+```
+
+`init` reads `/config/level_up_family/family.json`. Each active child gets a dashboard, reward, and ten initial task slots. `player1` retains the sleeping-alone task template; other players start with the personal-hygiene template. Tasks can be edited or disabled in **Tasks & Rewards**.
+
+Set the season start date and check the configuration against your HA version before starting. Repository validators check files and templates, but HA configuration validation and visual inspection are still required.
+
+## Offline workflow for stopped installations
+
+For normal use, prefer the **Family** tab. The following process remains a migration tool for a stopped and reviewed installation; regenerating the example may overwrite customizations if copied without comparison.
+
+1. Back up HA completely and retain the private family file.
+2. Edit `name` while preserving `id`, or add an entry with a new ID. Never reuse a retired child's ID.
+3. Generate and validate a new directory, such as `build/family-v2`.
+4. With HA and game writers stopped, update game files. Replace only `packages/level_up_family/` and `panel/level_up_family/` with generated versions to avoid leftover old files. Update the code and JSON files under `level_up_family/` while **always preserving `data/`**, backups, and HA helper values. The generated output contains no databases.
+5. Merge panel registrations from `configuration.fragment.yaml` into the existing configuration.
+6. With writers stopped, synchronize the family to the existing database:
+
+   ```sh
+   python3 /config/level_up_family/python/luf_db.py sync_family
+   python3 /config/level_up_family/python/luf_db.py players
+   ```
+
+7. Validate configuration, start HA, and review names, missions, rewards, and history. A new player starts without activity; existing players retain their entities and counters.
+
+The generator preserves physical IDs and task slots when a child is renamed or reordered. Changes to tasks and rewards made in the parents' dashboard remain in persistent helpers and are not overwritten by JSON defaults.
+
+## Offline retirement and reactivation
+
+First close the player's current week and resolve outstanding penalties. Changing the family does not automatically settle weeks or award XP.
+
+Keep the child in the file and change only their status:
+
+```yaml
+- id: player2
+  name: Leo
+  active: false
+```
+
+Follow the same generation, update, and `sync_family` process. The player disappears from selectors, new penalties, corrections, and automatic closes. Their tasks leave the active catalog. Helpers and metadata remain without being reset, and their scripts stop running.
+
+The generator excludes a retired player's dashboard from the new navigation fragment; the view displays a notice and no mission buttons. If the Family integration is also used, keep its dashboard registration in HA because it remains linked to that player. On new installations, start with active players and retire them through Family after setup.
+
+SQLite preserves days, weeks, years, and penalties. History continues to show the player's weeks and summaries in a retired section. Do not delete their row or helpers: SQLite relationships use cascading deletion, so physically removing a player could erase activity.
+
+If an ID is omitted from the file, `sync_family` also deactivates it in SQLite. Keeping the entry with `active: false` is preferable to preserve helpers and display names across dashboards.
+
+Changing back to `active: true` restores the same SQLite identity. If several weeks have passed, you must reconcile the active week, masks, and streaks before reactivating the game: this generator does not automate that progress migration. Never change a week date while masks still refer to another week. At least one player must remain active.
+
+## Compatibility and recovery
+
+Without `family.json`, the engine retains compatible initial behavior for `player1` and `player2`. Invalid family files produce errors rather than silently falling back to other names.
+
+This procedure applies to the **generic repository distribution**. Installations with custom keys such as `player_1` or entities containing old names require a specific migration; copying these files directly would create different entities. The generator does not change the original installation from which the project evolved.
+
+To roll back, restore configuration, SQLite, and helper state **together** from the previous backup. Restoring YAML files alone does not undo synchronized names or retirements in the database.
+
+For manual recovery, first stop game writers and retain the entire backup directory. `helpers.json` stores prior values, `family.json` the former registry, and `luf.db` the SQLite copy; modified views are saved as `dashboard_*.json`. During additions, `files.json` preserves prior provisioned file contents and identifies files that did not exist before. Restore a consistent set or a full HA backup, validate configuration, and review counters and dashboards before resuming. Do not delete `family_pending.json` or turn off maintenance just to hide failed recovery: resolve the cause or restore the backup first.
+
+---
+
+<a id="español"></a>
+
 # Configurar uno, dos o más hijos
 
 Los dos jugadores del repositorio son un ejemplo. El generador prepara la configuración de tu familia desde **un archivo privado**: nombres, jugadores activos y jugadores retirados. Genera paneles, helpers, espacios iniciales de tareas, recompensas, multas y cierres. No hace falta duplicar manualmente todas las referencias de un jugador.
