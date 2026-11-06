@@ -73,8 +73,7 @@ views:
         **Estado:** {{ states(''sensor.luf_season_status'') }} · **Días restantes (incluye hoy):** {{ states(''sensor.luf_season_days_remaining'')
         }}
 
-        **Objetivo semanal:** {{ states(''input_number.luf_weekly_goal_pct'') | int }}% · **Bonus por racha:**
-        ×{{ states(''input_number.luf_weekly_streak_multiplier'') }}
+        **Bonus por racha:** ×{{ states(''input_number.luf_weekly_streak_multiplier'') }}
 
 
         ℹ️ **Ayuda:** en ordenador, deja el cursor sobre el texto de ayuda de cada métrica. En pantalla táctil,
@@ -366,13 +365,26 @@ views:
         triggers_update:
         - sensor.luf_theme
     - type: markdown
-      content: "### Estado semanal\n**Objetivo:** {% if is_state('binary_sensor.player1_objetivo_semanal_conseguido','on')\
-        \ %}✅ Conseguido{% else %}⏳ Pendiente{% endif %}\n\n**Multas:** {{ states('input_number.luf_player1_penalties_this_week')\
-        \ | int }} XP\n\n**Bonus de racha:** {% if states('input_number.luf_player1_streak_weeks') | int >= 2\
-        \ %}⚡ Activo ×{{ states('input_number.luf_weekly_streak_multiplier') }}{% else %}Pendiente{% endif %}\n\
-        \nℹ️ **Objetivo semanal:** se consigue al alcanzar el porcentaje configurado de misiones.  \nℹ️ **Multas:**\
-        \ XP descontado esta semana; no reduce el XP histórico.  \nℹ️ **Bonus de racha:** se activa desde la segunda\
-        \ semana buena consecutiva.\n"
+      content: '### Estado semanal
+
+        **Objetivo:** {% if is_state(''binary_sensor.player1_objetivo_semanal_conseguido'',''on'') %}✅ Conseguido{%
+        else %}⏳ Pendiente{% endif %}
+
+
+        **XP para el objetivo:** {{ states(''sensor.player1_xp_semana_efectivo'') }} / {{ state_attr(''binary_sensor.player1_objetivo_semanal_conseguido'',''xp_objetivo'')
+        }} XP
+
+
+        **Multas:** {{ states(''input_number.luf_player1_penalties_this_week'') | int(0) }} XP
+
+
+        **Multiplicador de racha:** ×{{ states(''sensor.player1_multiplicador_racha_semanal'') }}
+
+
+        ℹ️ Los bonus y la racha suman XP; las multas restan. El 100 % corresponde a los XP de las misiones previstas.
+        La racha anterior se aplica esta semana; al cierre se mantiene o se pierde según el resultado.
+
+        '
       card_mod:
         style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n  --primary-text-color:\
           \ #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color: var(--lf-accent);\n \
@@ -381,6 +393,9 @@ views:
           \  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius: 20px;\n  --ha-card-box-shadow:\
           \ none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n  border: 1px solid rgba(101,221,255,.35);\n\
           \  border-radius: 20px;\n  box-shadow: none;\n  color: #ffffff;\n}\n"
+    - type: custom:level-up-family-goal
+      player: player1
+      goal_entity: binary_sensor.player1_objetivo_semanal_conseguido
   - type: grid
     cards:
     - type: heading
@@ -655,14 +670,26 @@ views:
         triggers_update:
         - sensor.luf_theme
     - type: markdown
-      content: "### Estado semanal\n**Objetivo:** {% set c = states('sensor.player2_misiones_completadas_calculadas')\
-        \ | float(0) %}{% set g = states('input_number.luf_weekly_goal_pct') | float(75) %}{% if is_state('binary_sensor.player2_objetivo_semanal_conseguido',\
-        \ 'on') %}✅ Conseguido{% else %}⏳ Pendiente{% endif %}\n\n**Multas:** {{ states('input_number.luf_player2_penalties_this_week')\
-        \ | int }} XP\n\n**Bonus de racha:** {% if states('input_number.luf_player2_streak_weeks') | int >= 2\
-        \ %}⚡ Activo ×{{ states('input_number.luf_weekly_streak_multiplier') }}{% else %}Pendiente{% endif %}\n\
-        \nℹ️ **Objetivo semanal:** se consigue al alcanzar el porcentaje configurado de misiones.  \nℹ️ **Multas:**\
-        \ XP descontado esta semana; no reduce el XP histórico.  \nℹ️ **Bonus de racha:** se activa desde la segunda\
-        \ semana buena consecutiva.\n"
+      content: '### Estado semanal
+
+        **Objetivo:** {% if is_state(''binary_sensor.player2_objetivo_semanal_conseguido'',''on'') %}✅ Conseguido{%
+        else %}⏳ Pendiente{% endif %}
+
+
+        **XP para el objetivo:** {{ states(''sensor.player2_xp_semana_efectivo'') }} / {{ state_attr(''binary_sensor.player2_objetivo_semanal_conseguido'',''xp_objetivo'')
+        }} XP
+
+
+        **Multas:** {{ states(''input_number.luf_player2_penalties_this_week'') | int(0) }} XP
+
+
+        **Multiplicador de racha:** ×{{ states(''sensor.player2_multiplicador_racha_semanal'') }}
+
+
+        ℹ️ Los bonus y la racha suman XP; las multas restan. El 100 % corresponde a los XP de las misiones previstas.
+        La racha anterior se aplica esta semana; al cierre se mantiene o se pierde según el resultado.
+
+        '
       card_mod:
         style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n  --primary-text-color:\
           \ #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color: var(--lf-accent);\n \
@@ -671,6 +698,9 @@ views:
           \  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius: 20px;\n  --ha-card-box-shadow:\
           \ none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n  border: 1px solid rgba(101,221,255,.35);\n\
           \  border-radius: 20px;\n  box-shadow: none;\n  color: #ffffff;\n}\n"
+    - type: custom:level-up-family-goal
+      player: player2
+      goal_entity: binary_sensor.player2_objetivo_semanal_conseguido
   - type: grid
     column_span: 2
     cards:
@@ -713,14 +743,13 @@ views:
 
               '
             card_mod:
-              style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
-                \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
-                \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
-                \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
-                \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
-                \ 20px;\n  --ha-card-box-shadow: none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n\
-                \  border: 1px solid rgba(101,221,255,.35);\n  border-radius: 20px;\n  box-shadow: none;\n  color:\
-                \ #ffffff;\n}\n"
+              style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n  --primary-text-color:\
+                \ #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color: var(--lf-accent);\n\
+                \  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n  --card-mod-icon-color:\
+                \ var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background: rgba(4,14,38,.94);\n\
+                \  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius: 20px;\n  --ha-card-box-shadow:\
+                \ none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n  border: 1px solid\
+                \ rgba(101,221,255,.35);\n  border-radius: 20px;\n  box-shadow: none;\n  color: #ffffff;\n}\n"
           - type: horizontal-stack
             cards:
             - type: button
@@ -740,8 +769,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -765,8 +794,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -790,8 +819,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -805,14 +834,13 @@ views:
 
               '
             card_mod:
-              style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
-                \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
-                \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
-                \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
-                \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
-                \ 20px;\n  --ha-card-box-shadow: none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n\
-                \  border: 1px solid rgba(101,221,255,.35);\n  border-radius: 20px;\n  box-shadow: none;\n  color:\
-                \ #ffffff;\n}\n"
+              style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n  --primary-text-color:\
+                \ #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color: var(--lf-accent);\n\
+                \  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n  --card-mod-icon-color:\
+                \ var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background: rgba(4,14,38,.94);\n\
+                \  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius: 20px;\n  --ha-card-box-shadow:\
+                \ none;\n  color: #ffffff;\n}\nha-card {\n  background: rgba(4,14,38,.94);\n  border: 1px solid\
+                \ rgba(101,221,255,.35);\n  border-radius: 20px;\n  box-shadow: none;\n  color: #ffffff;\n}\n"
           - type: horizontal-stack
             cards:
             - type: button
@@ -832,8 +860,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -857,8 +885,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -882,8 +910,8 @@ views:
               hold_action:
                 action: none
               card_mod:
-                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n\
-                  \  --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
+                style: ":host {\n  --lf-accent: {{ state_attr('sensor.luf_theme', 'accent') or '#65ddff' }};\n \
+                  \ --primary-text-color: #ffffff;\n  --secondary-text-color: rgba(255,255,255,.72);\n  --primary-color:\
                   \ var(--lf-accent);\n  --state-icon-color: var(--lf-accent);\n  --state-icon-active-color: var(--lf-accent);\n\
                   \  --card-mod-icon-color: var(--lf-accent);\n  --ha-card-header-color: #ffffff;\n  --ha-card-background:\
                   \ rgba(4,14,38,.94);\n  --ha-card-border-color: rgba(101,221,255,.35);\n  --ha-card-border-radius:\
@@ -988,10 +1016,10 @@ views:
         label:
         - color: rgba(255,255,255,.72)
       custom_fields:
-        content: "[[[\n  const dbEntity = states['sensor.luf_multas_activas'];\n  if (!dbEntity || ['unknown',\
-          \ 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.items))\
-          \ {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible.\
-          \ Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const e = states['sensor.luf_multas_activas'];\n\
+        content: "[[[\n  const dbEntity = states['sensor.luf_multas_activas'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n\
+          \      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.items)) {\n    return `<div\
+          \ style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor\
+          \ y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const e = states['sensor.luf_multas_activas'];\n\
           \  const items = e?.attributes?.items || [];\n\n  if (!items.length) {\n    return `\n      <div style=\"\
           text-align:center;opacity:.72;padding:8px 0;\">\n        ✅ No hay multas activas\n      </div>\n    `;\n\
           \  }\n\n  const playerName = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2'\

@@ -10,7 +10,7 @@
 - Python 3 in the environment running Home Assistant; SQLite is included with Python.
 - [button-card](https://github.com/custom-cards/button-card), installed and registered as a JavaScript resource, for the existing dashboard design.
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered as a JavaScript resource, to style native cards in the parents' dashboard.
-- Local module `/local/level_up_family/level-up-family-cards.js?v=2.6.0`, which registers the cards included in this repository.
+- Local module `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, which registers the cards included in this repository.
 - Access to `/config` and write permissions for Home Assistant in `/config/level_up_family/data`.
 
 The game uses YAML packages and a small local integration for family management. Copy `custom_components/level_up_family` as well; this integration is **not installed through HACS**. Local validation checks syntax and references. You must still validate configuration against your installed HA version and visually check its cards.
@@ -31,14 +31,14 @@ To configure one or more children and their names, first use the [family generat
    This creates `/config/level_up_family/data/luf.db` using the players in `family.json`. The example includes `player1` and `player2` with 20 tasks; the generator creates ten slots per registered child. Edit them afterwards in the parents' dashboard.
 
 5. Check configuration using Home Assistant's tools, then restart only if validation succeeds. Make sure the Python commands run in the same environment as HA; an add-on terminal may have a different interpreter or permissions.
-6. Set `input_number.luf_season_number` to `1` and `input_datetime.luf_season_start` to your chosen date. Adjust XP, goals, and penalty rules through their helpers. The start date counts as the first of 28 calendar days; the last day is start + 27 days.
+6. Set `input_number.luf_season_number` to `1` and `input_datetime.luf_season_start` to your chosen date. Adjust XP and penalty rules through their helpers. Set each child's weekly XP goal from the parents' Control tab; see [Weekly goals](WEEKLY_GOALS.md). The start date counts as the first of 28 calendar days; the last day is start + 27 days.
 7. Verify that `input_boolean.luf_maintenance` is off. Each active player's dashboard should display level 1, XP 0, and pending missions on a new installation. Test seasons, missions, penalties, and history using test data, with a backup, before regular use.
 
 The example dashboard URLs are `/level-up-family-player1/player1-luf`, `/level-up-family-player2/player2-luf`, and `/level-up-family-parents/control-luf`. The second parents' tab is `historico-luf`. `require_admin` restricts navigation to the parents' dashboard; it does not turn scripts and helpers into a per-player permissions system.
 
 Family management is at `/level-up-family-parents/family` in the example. Register `/level-up-family-children` even when it has no views yet; it is used for future additions. The family management action checks administrator status on the server, but does not add individual permissions to older game scripts.
 
-The prior functionality was checked on **HA 2026.10.4**, integration **0.4.1**, and cards **2.5.1**. This revision uses integration **0.5.0** and a new namespace, validated through repository tests but **not deployed to the running HA instance**. See [Repository Namespace](REPOSITORY_NAMESPACE.md) and validate your own configuration before installing.
+The prior functionality was checked on **HA 2026.10.4**, integration **0.4.1**, and cards **2.5.1**. This revision uses integration **0.6.0** with individual weekly XP goals. The example uses the `luf` namespace; existing installations can retain their legacy entity bindings when applying this feature. See [Repository Namespace](REPOSITORY_NAMESPACE.md) and validate your own configuration before installing.
 
 ## Resets and cleanup
 
@@ -66,7 +66,7 @@ Files in `www/level_up_family/season_01` are served at `/local/level_up_family/s
 - Python 3 en el entorno donde se ejecuta Home Assistant; SQLite forma parte de Python.
 - La tarjeta [button-card](https://github.com/custom-cards/button-card), instalada y registrada como recurso JavaScript, para el diseño existente de los paneles.
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalado y registrado como recurso JavaScript, para aplicar el estilo de Level Up Family a las tarjetas nativas del panel de padres.
-- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.6.0`, que registra las tarjetas incluidas en este repositorio.
+- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, que registra las tarjetas incluidas en este repositorio.
 - Acceso al directorio `/config` y permisos de escritura para Home Assistant en `/config/level_up_family/data`.
 
 El juego utiliza paquetes YAML y una pequeña integración local para administrar la familia. Copia también `custom_components/level_up_family`; no se instala desde HACS. La validación local comprueba sintaxis y referencias; la comprobación de configuración de la versión de Home Assistant instalada y la revisión visual de sus tarjetas siguen siendo necesarias.
@@ -87,12 +87,12 @@ Para configurar uno o más hijos y sus nombres, utiliza primero el [generador fa
    Se crea `/config/level_up_family/data/luf.db` con los jugadores de `family.json`. La copia de ejemplo contiene `player1` y `player2`, con 20 tareas; el generador prepara diez espacios por hijo registrado. Después se editan desde padres.
 
 5. Comprueba la configuración con las herramientas de Home Assistant y reinícialo si es válida. Asegúrate de que los comandos Python se ejecutan en el mismo entorno que Home Assistant; una terminal de un complemento puede tener otro intérprete o permisos.
-6. Establece `input_number.luf_season_number` en `1` y `input_datetime.luf_season_start` en la fecha elegida. Ajusta las reglas de XP, objetivos y penalizaciones desde sus helpers. La fecha determina 28 días naturales, incluyendo el inicio; el último día es inicio + 27 días.
+6. Establece `input_number.luf_season_number` en `1` y `input_datetime.luf_season_start` en la fecha elegida. Ajusta las reglas de XP y penalizaciones desde sus helpers. El objetivo semanal de XP de cada hijo se guarda desde Control en el panel de padres; consulta [Objetivos semanales](WEEKLY_GOALS.md). La fecha determina 28 días naturales, incluyendo el inicio; el último día es inicio + 27 días.
 7. Revisa que `input_boolean.luf_maintenance` esté apagado. Cada panel activo debe mostrar nivel 1, XP 0 y misiones pendientes en una instalación nueva. Comprueba temporada, misiones, penalizaciones e histórico con datos de prueba y una copia de seguridad antes de usarlos de forma habitual.
 
 Los enlaces de paneles son `/level-up-family-player1/player1-luf`, `/level-up-family-player2/player2-luf` y `/level-up-family-parents/control-luf`. La segunda pestaña de padres es `historico-luf`. `require_admin` restringe la navegación al panel de padres; no convierte los scripts o helpers en un sistema de permisos por jugador.
 
-En el ejemplo, la gestión de hijos está en `/level-up-family-parents/family`. Debe estar registrado también `/level-up-family-children`, aunque todavía no tenga vistas: se utilizará para las altas futuras. La acción de gestión de familia exige administrador en el servidor; esto no añade permisos individuales a los scripts antiguos del juego. La funcionalidad previa se comprobó en HA 2026.10.4, integración 0.4.1 y tarjetas 2.5.1. Esta revisión usa integración 0.5.0 y una nueva nomenclatura, comprobada en las pruebas del repositorio, sin despliegue en HA. Consulta [Nomenclatura](REPOSITORY_NAMESPACE.md) y comprueba la configuración antes de instalar.
+En el ejemplo, la gestión de hijos está en `/level-up-family-parents/family`. Debe estar registrado también `/level-up-family-children`, aunque todavía no tenga vistas: se utilizará para las altas futuras. La acción de gestión de familia exige administrador en el servidor; esto no añade permisos individuales a los scripts antiguos del juego. La funcionalidad previa se comprobó en HA 2026.10.4, integración 0.4.1 y tarjetas 2.5.1. Esta revisión usa integración 0.6.0 y objetivos semanales de XP por hijo. El ejemplo utiliza el prefijo `luf`; una instalación existente puede conservar sus identificadores anteriores al aplicar esta función. Consulta [Nomenclatura](REPOSITORY_NAMESPACE.md) y comprueba la configuración antes de instalar.
 
 ## Reinicios y limpieza
 

@@ -126,6 +126,32 @@ class FamilyServiceTests(unittest.IsolatedAsyncioTestCase):
         with closing(sqlite3.connect(self.db)) as conn:
             return conn.execute('SELECT * FROM activity').fetchall()
 
+    async def test_goal_is_per_child_and_survives_a_fresh_controller(self):
+        before=self.manager.snapshot()
+        reply=await self.manager.set_weekly_goal(SimpleNamespace(data={
+            'player_id':'player1','weekly_goal_pct':60,'revision':0}))
+        self.assertTrue(reply['ok'])
+        restored=self.component.FamilyManager(self.manager.hass,self.manager.settings)
+        self.assertEqual([p['weekly_goal_pct'] for p in restored.registry['players']],[60,75])
+        self.assertEqual(restored.snapshot(),before)
+        self.assertEqual(self.activity(),[('retained history',)])
+
+    async def test_goal_write_failure_does_not_publish_or_modify_the_in_memory_goal(self):
+        before=deepcopy(self.manager.registry)
+        with patch.object(self.component,'save_json',side_effect=OSError('Disk full')):
+            with self.assertRaises(OSError):
+                await self.manager.set_weekly_goal(SimpleNamespace(data={
+                    'player_id':'player1','weekly_goal_pct':60,'revision':0}))
+        self.assertEqual(self.manager.registry,before)
+
+    async def test_goal_stale_form_is_rejected_without_overwriting_newer_settings(self):
+        await self.manager.set_weekly_goal(SimpleNamespace(data={
+            'player_id':'player1','weekly_goal_pct':60,'revision':0}))
+        with self.assertRaisesRegex(RuntimeError,'otra sesión'):
+            await self.manager.set_weekly_goal(SimpleNamespace(data={
+                'player_id':'player2','weekly_goal_pct':50,'revision':0}))
+        self.assertEqual([p['weekly_goal_pct'] for p in self.manager.registry['players']],[60,75])
+
     async def test_rename_updates_dashboard_and_metadata_without_touching_progress(self):
         before = self.manager.snapshot()
         reply = await self.call(operation='rename', revision=0, player_id='player1', name='Nombre nuevo')

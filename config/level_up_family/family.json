@@ -9,7 +9,8 @@
       "entity_prefix": "player1",
       "db_key": "player1",
       "dashboard_url": "level-up-family-player1",
-      "dashboard_path": "player1-luf"
+      "dashboard_path": "player1-luf",
+      "weekly_goal_pct": 75
     },
     {
       "id": "player2",
@@ -18,7 +19,8 @@
       "entity_prefix": "player2",
       "db_key": "player2",
       "dashboard_url": "level-up-family-player2",
-      "dashboard_path": "player2-luf"
+      "dashboard_path": "player2-luf",
+      "weekly_goal_pct": 75
     }
   ]
 }

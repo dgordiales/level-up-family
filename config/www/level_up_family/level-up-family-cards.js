@@ -101,12 +101,14 @@
     render() {
       const reward=cleanState(this._hass,this.config.reward_entity);
       const theme=this._hass.states['sensor.luf_theme']?.attributes || {};
-      const goal=this._hass.states[this.config.goal_entity]?.state === 'on';
+      const goalState=this._hass.states[this.config.goal_entity];
+      const goal=goalState?.state === 'on';
+      const target=goalState?.attributes?.objetivo_pct ?? 75;
       const seasonPath=/^\/local\/level_up_family\/season_\d+\/?$/.test(theme.season_path || '')
         ? theme.season_path.replace(/\/$/,'') : '/local/level_up_family/season_01';
       const rewardImage=typeof theme.reward_image==='string' && theme.reward_image.startsWith('/local/level_up_family/')
         ? theme.reward_image : `${seasonPath}/recompensa.png`;
-      const signature=JSON.stringify([reward,rewardImage,theme.accent,goal,cleanState(this._hass,'input_number.luf_weekly_goal_pct')]);
+      const signature=JSON.stringify([reward,rewardImage,theme.accent,goal,target]);
       if (signature===this.signature) return;
       this.signature=signature;
       const card=this.shell(), row=node('div',undefined,'reward');
@@ -114,8 +116,52 @@
       const img=node('img'); img.alt='Recompensa semanal'; img.src=rewardImage;
       img.addEventListener('error',()=>img.replaceWith(icon),{once:true}); row.append(img);
       const text=node('div',undefined,'grow');
-      text.append(node('div','TU RECOMPENSA SEMANAL','eyebrow'),node('div',reward || 'Tu premio está por decidir','prize'),node('div',goal?'¡Objetivo semanal conseguido!':`Alcanza el ${cleanState(this._hass,'input_number.luf_weekly_goal_pct') || '75'}% de tus misiones semanales`,'goal'));
+      text.append(node('div','TU RECOMPENSA SEMANAL','eyebrow'),node('div',reward || 'Tu premio está por decidir','prize'),node('div',goal?'¡Objetivo semanal conseguido!':`Alcanza el ${target}% de los XP previstos esta semana`,'goal'));
       row.append(text); card.append(row);
+    }
+  }
+  class FamilyGoal extends FamilyCard {
+    render() {
+      const family=this._hass.states['sensor.luf_family']?.attributes;
+      const player=family?.players?.find(p=>p.id===this.config.player && p.active);
+      const score=this._hass.states[this.config.goal_entity];
+      const maintenance=cleanState(this._hass,'input_boolean.luf_maintenance')==='on';
+      const signature=JSON.stringify([family,player,score,this._busy,this._message,this._error,maintenance,this.draft]);
+      if(signature===this.signature)return;
+      this.signature=signature;
+      const card=this.shell(),body=node('div',undefined,'body');card.append(body);
+      body.append(node('h2','Objetivo semanal'));
+      if(!player){body.append(node('p','La configuración de este hijo todavía no está disponible.'));return;}
+      const disabled=Boolean(this._busy||family.busy||family.restart_pending||maintenance||!this._hass.user?.is_admin);
+      const [label,input]=textField(`Objetivo semanal de ${player.name} (%)`);
+      input.type='number';input.min='0';input.max='100';input.step='1';
+      input.value=this.draft ?? player.weekly_goal_pct ?? 75;input.disabled=disabled;
+      input.addEventListener('input',()=>{this.draft=input.value;this.expected ??= family.revision;});
+      body.append(label,node('p','Un porcentaje menor deja más margen para conseguir el premio. Se guarda también para las próximas semanas.','hint'));
+      if(score && !['unavailable','unknown'].includes(score.state)){
+        const a=score.attributes;
+        body.append(node('p',`${a.xp_efectivo ?? 0} / ${a.xp_objetivo ?? 0} XP para el objetivo · ${a.porcentaje_actual ?? 0}% del total previsto.`));
+        body.append(node('p',`100% = ${a.xp_previsto ?? 0} XP de misiones. Bonus y racha suman; las multas restan.`,'hint'));
+      }
+      const actions=node('div',undefined,'actions'),save=node('button','Guardar objetivo');save.type='button';save.disabled=disabled;
+      save.addEventListener('click',()=>this.saveGoal(input.value,this.expected ?? family.revision));
+      const discard=node('button','Descartar cambios','secondary');discard.type='button';discard.disabled=disabled;
+      discard.addEventListener('click',()=>{this.draft=undefined;this.expected=undefined;this._message='';this._error=false;this.signature=null;this.render();});
+      actions.append(save,discard);body.append(actions);
+      this.status=node('p',this._message||'','message'+(this._error?' error':''));this.status.setAttribute('role','status');body.append(this.status);
+    }
+    async saveGoal(value,revision){
+      if(this._busy)return;
+      const percentage=Number(value);
+      if(value.trim()===''||!Number.isInteger(percentage)||percentage<0||percentage>100){this._error=true;this._message='Escribe un porcentaje entero entre 0 y 100.';this.render();return;}
+      this._busy=true;this._error=false;this._message='Guardando…';this.render();
+      try{
+        const result=await this._hass.callWS({type:'call_service',domain:'level_up_family',service:'set_weekly_goal',return_response:true,
+          service_data:{player_id:this.config.player,weekly_goal_pct:percentage,revision}});
+        if(!result?.response?.ok)throw new Error(result?.response?.error||'HA no ha confirmado el cambio.');
+        this.draft=undefined;this.expected=undefined;this._message=`Objetivo guardado: ${percentage}%.`;
+      }catch(error){this._error=true;this._message=error.message||'No se ha podido guardar el objetivo.';}
+      finally{this._busy=false;this.render();}
     }
   }
   class FamilyMissions extends FamilyCard {
@@ -336,11 +382,11 @@
       finally{this._busy=false;this.render();}
     }
   }
-  for(const [type,element] of [['level-up-family-reward',FamilyReward],['level-up-family-missions',FamilyMissions],['level-up-family-admin',FamilyAdmin],['level-up-family-roster',FamilyRoster]]){
+  for(const [type,element] of [['level-up-family-reward',FamilyReward],['level-up-family-goal',FamilyGoal],['level-up-family-missions',FamilyMissions],['level-up-family-admin',FamilyAdmin],['level-up-family-roster',FamilyRoster]]){
     if(!customElements.get(type))customElements.define(type,element);
   }
   window.customCards=window.customCards||[];
-  for(const [type,name] of [['level-up-family-admin','Level Up Family · Administración'],['level-up-family-missions','Level Up Family · Misiones'],['level-up-family-reward','Level Up Family · Recompensa'],['level-up-family-roster','Level Up Family · Familia']]){
+  for(const [type,name] of [['level-up-family-goal','Level Up Family · Objetivo semanal'],['level-up-family-admin','Level Up Family · Administración'],['level-up-family-missions','Level Up Family · Misiones'],['level-up-family-reward','Level Up Family · Recompensa'],['level-up-family-roster','Level Up Family · Familia']]){
     if(!window.customCards.some(card=>card.type===type))window.customCards.push({type,name,preview:false,description:'Level Up Family'});
   }
   if(typeof module!=='undefined')module.exports={isoDate,monday,completed,difficulty};

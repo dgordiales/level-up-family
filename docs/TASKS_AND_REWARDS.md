@@ -40,7 +40,7 @@ The dashboard retains the seasonal header, name, weekly progress, and XP, daily 
 
 `task_defaults.json` supplies initial values only. Changes are stored in `input_text.luf_task_config_*` helpers and rewards in `input_text.luf_<player>_weekly_reward`. They have no `initial` value, so HA restores them after restarting. Include these helpers in backups; do not delete them when updating a season.
 
-The task package is `lf_tasks.yaml`. The JavaScript resource `/local/level_up_family/level-up-family-cards.js?v=2.6.0` must be registered as a **module**. This file registers administration, mission, reward, and family cards. button-card remains in use for the rest of the design. Family management uses `custom_components/level_up_family`; see [Family Configuration](FAMILY_CONFIGURATION.md).
+The task package is `lf_tasks.yaml`. The JavaScript resource `/local/level_up_family/level-up-family-cards.js?v=2.7.0` must be registered as a **module**. This file registers administration, mission, reward, and family cards. button-card remains in use for the rest of the design. Family management uses `custom_components/level_up_family`; see [Family Configuration](FAMILY_CONFIGURATION.md).
 
 Control and History share dark-blue backgrounds, rounded corners, and seasonal accents with Tasks & Rewards. Native cards retain their controls and confirmations and are styled with card-mod; metrics and tables use button-card styles. Style changes require only a dashboard reload.
 
@@ -88,7 +88,7 @@ Conserva la cabecera de temporada, el nombre y progreso semanal y las métricas 
 
 `task_defaults.json` contiene solo los valores iniciales. Los cambios se guardan en los helpers `input_text.luf_task_config_*`; los premios, en `input_text.luf_<jugador>_weekly_reward`. No tienen `initial`, por lo que Home Assistant restaura sus valores al reiniciarse. Incluye estos helpers en las copias de seguridad y no los borres para actualizar una temporada.
 
-El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.6.0` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones, recompensa y familia. Se conserva button-card para el resto del diseño. La gestión de hijos utiliza la integración local `custom_components/level_up_family`; consulta [Familia](FAMILY_CONFIGURATION.md).
+El paquete de tareas es `lf_tasks.yaml` y el recurso JavaScript es `/local/level_up_family/level-up-family-cards.js?v=2.7.0` (tipo **módulo**). El mismo archivo registra las tarjetas de administración, misiones, recompensa y familia. Se conserva button-card para el resto del diseño. La gestión de hijos utiliza la integración local `custom_components/level_up_family`; consulta [Familia](FAMILY_CONFIGURATION.md).
 
 Las pestañas de Control e Histórico comparten con Tareas y premios los fondos azul oscuro, bordes redondeados y acentos de temporada. Las tarjetas nativas conservan sus controles y confirmaciones y se estilizan con card-mod; las métricas y tablas usan los estilos de button-card. Cambiar estos estilos solo requiere recargar el panel.
 

@@ -83,3 +83,9 @@ Los resultados en HA de esta sección corresponden a la funcionalidad previa a l
 - En la instalación real se comprobaron el guardado de un nombre sin cambiar su valor, el rechazo de un formulario antiguo y las propuestas canceladas de alta y retirada. Las mutaciones de alta y retirada con datos de prueba se verificaron en entornos aislados; no se añadieron ni retiraron jugadores reales para probarlas.
 
 Las comprobaciones estáticas y las pruebas con adaptadores de HA no garantizan compatibilidad con otras versiones de HA. Conserva una copia completa y ejecuta la comprobación de configuración de tu instalación antes del despliegue.
+
+## Individual weekly XP goals (0.6.0) / Objetivos de XP por hijo
+
+Each child has a persistent percentage, editable by parents in Control. Scheduled mission XP forms the denominator; daily bonuses and the prior weekly streak multiply earned XP, while penalties subtract. Live progress, reward cards and weekly settlement now use this same score. See [Weekly goals](WEEKLY_GOALS.md).
+
+Cada hijo tiene un porcentaje persistente, editable desde Control. Los XP de las misiones previstas forman el 100 %; los bonus y la racha ayudan a alcanzarlo, mientras las multas restan. La barra infantil, la recompensa y el cierre semanal usan el mismo cálculo. La función se puede desplegar conservando los identificadores de una instalación anterior; no exige migrar la nomenclatura ni altera semanas ya cerradas.

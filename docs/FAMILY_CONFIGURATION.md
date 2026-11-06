@@ -18,7 +18,7 @@ New children appear in the **Level Up Family · Children** dashboard. Existing d
 
 The `level_up_family.manage_family` action checks administrator privileges on the server. Forms reject stale revisions when two sessions edit family settings simultaneously. Each operation creates a backup under `/config/level_up_family/backups/family_*`; retiring a player never deletes their data.
 
-The frontend module is `/local/level_up_family/level-up-family-cards.js?v=2.6.0`. You must also install `config/custom_components/level_up_family`, `lf_family.yaml`, the version 2 family registry, and the shared children's dashboard. HA loads the integration on restart. Updating only the JavaScript card is insufficient.
+The frontend module is `/local/level_up_family/level-up-family-cards.js?v=2.7.0`. You must also install `config/custom_components/level_up_family`, `lf_family.yaml`, the version 2 family registry, and the shared children's dashboard. HA loads the integration on restart. Updating only the JavaScript card is insufficient.
 
 ## Update an older installation
 
@@ -161,7 +161,7 @@ Las altas nuevas aparecen en el panel **Level Up Family · Hijos**. Los paneles 
 
 La acción `level_up_family.manage_family` comprueba en el servidor que quien la invoca es administrador. Los formularios rechazan revisiones antiguas si dos sesiones cambian la familia a la vez. Cada operación crea una copia en `/config/level_up_family/backups/family_*`; retirar nunca ejecuta un borrado de datos.
 
-El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.6.0`. Es necesario instalar también `config/custom_components/level_up_family`, `lf_family.yaml`, el registro familiar de versión 2 y el panel compartido de hijos. La integración se carga al reiniciar HA. No basta con cambiar la tarjeta JavaScript.
+El módulo de interfaz es `/local/level_up_family/level-up-family-cards.js?v=2.7.0`. Es necesario instalar también `config/custom_components/level_up_family`, `lf_family.yaml`, el registro familiar de versión 2 y el panel compartido de hijos. La integración se carga al reiniciar HA. No basta con cambiar la tarjeta JavaScript.
 
 ## Actualizar una instalación anterior
 
