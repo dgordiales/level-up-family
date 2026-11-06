@@ -36,7 +36,7 @@ Family management checks administrator status on the server. Other scripts and h
 
 1. Parents configure tasks with a name, assigned player, XP, and applicable days. Some tasks can be completed once across several selected days.
 2. Children complete missions and see their progress on their personal dashboards.
-3. The default weekly target is **75%** of scheduled missions, and it can be adjusted. Parents choose the weekly reward description.
+3. The default weekly target is **75% of scheduled mission XP**. Each child has a separate percentage, editable from the parents' **Control** tab and retained after HA restarts. Parents choose the weekly reward description.
 4. Daily and weekly closing processes calculate results, consolidate XP, update streaks, and store history.
 
 Perfect days and consecutive successful weeks may award bonuses. Penalties subtract XP from the current week, **not** from the consolidated lifetime total; cancelling a penalty retains its record and marks it as cancelled. Weekly and lifetime XP serve different purposes: lifetime XP is consolidated at weekly close.
@@ -61,7 +61,7 @@ Level Up Family combines **YAML packages, Python scripts, a local integration, a
 - Python 3 and SQLite in the environment running Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) and [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered.
 - The included local integration at `config/custom_components/level_up_family`.
-- `/local/level_up_family/level-up-family-cards.js?v=2.6.0`, registered as a **JavaScript module**.
+- `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, registered as a **JavaScript module**.
 - A full backup before changing an existing installation.
 
 **This is not a HACS installation.** HACS can be used for the external frontend cards, but the included local integration must be installed manually.
@@ -241,7 +241,7 @@ La gestión de la familia comprueba en el servidor que el usuario sea administra
 
 1. Los padres configuran las tareas con nombre, jugador, XP y días. Algunas tareas se realizan una sola vez dentro de varios días seleccionados.
 2. Los hijos completan sus misiones y ven el progreso en tiempo real.
-3. El objetivo semanal predeterminado es completar el **75 %** de las misiones previstas, pero puede ajustarse. La recompensa es una descripción del premio que deciden los padres.
+3. El objetivo semanal predeterminado es alcanzar el **75 % de los XP previstos**. Cada hijo tiene su propio porcentaje, editable desde **Control** en el panel de padres y conservado tras reiniciar HA. La recompensa es una descripción del premio que deciden los padres.
 4. Los cierres diarios y semanales calculan resultados, consolidan XP, actualizan rachas y guardan el histórico.
 
 Los días perfectos y las semanas consecutivas que alcanzan el objetivo pueden generar bonificaciones. Las multas descuentan XP de la semana, **no** del total histórico consolidado; al anular una multa se conserva su registro marcado como cancelado. Los XP semanales y los históricos tienen funciones distintas: el total se consolida al cierre semanal.
@@ -266,7 +266,7 @@ La instalación combina **paquetes YAML, scripts Python, una integración local 
 - Python 3 y SQLite en el entorno donde se ejecuta Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) y [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalados y registrados.
 - Integración local incluida en `config/custom_components/level_up_family`.
-- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.6.0`, registrado como **módulo JavaScript**.
+- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, registrado como **módulo JavaScript**.
 - Copia de seguridad completa antes de modificar una instalación existente.
 
 **No es una instalación mediante HACS.** HACS puede utilizarse para las tarjetas externas, pero la integración local se instala manualmente.
@@ -405,3 +405,5 @@ Consulta la [hoja de ruta](docs/ROADMAP.md) para conocer otras mejoras y su esta
 **¿Subir nuevas imágenes activa otra temporada?** No; los recursos y el inicio de temporada son independientes.
 
 **¿Qué pasa si falla un alta?** Conserva la copia de seguridad y consulta el error en Familia. Si la recuperación falla, el juego permanece en mantenimiento. Sigue la guía de recuperación antes de reanudarlo.
+
+See [Individual weekly XP goals / Objetivos semanales por hijo](docs/WEEKLY_GOALS.md) for scoring, streaks and persistent settings.

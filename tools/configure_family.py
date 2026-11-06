@@ -208,7 +208,7 @@ def generate(family_path, output, source=ROOT):
     save(packages / 'lf_core.yaml', core_package(load(source / 'config/packages/level_up_family/lf_core.yaml'), players))
     save(panels / 'parents.yaml', parents_panel(load(source / 'config/panel/level_up_family/parents.yaml'), players))
     (cfg / 'level_up_family/task_defaults.json').write_text(json.dumps({'version': 1, 'tasks': defaults}, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    registry = {'version': 2, 'revision': 0, 'players': [dict(p, entity_prefix=p['id'], db_key=p['id'],
+    registry = {'version': 2, 'revision': 0, 'players': [dict(p, weekly_goal_pct=75, entity_prefix=p['id'], db_key=p['id'],
                 dashboard_url='level-up-family-' + p['id'], dashboard_path=p['id'] + '-luf') for p in players]}
     (cfg / 'level_up_family/family.json').write_text(json.dumps(registry, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     (cfg / 'panel/level_up_family/children.yaml').write_text('title: Level Up Family\nviews: []\n', encoding='utf-8')

@@ -22,7 +22,7 @@ from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.service import async_register_admin_service
 from homeassistant.components.lovelace.const import LOVELACE_DATA
 
-from .model import (DOMAIN, atomic, change, child_view, merge_views, new_player_files,
+from .model import (DOMAIN, atomic, change, child_view, goal_change, merge_views, new_player_files,
                     parents_views, public_players, save_json, sync_db, validate, yaml_text)
 
 _LOGGER = logging.getLogger(__name__)
@@ -182,6 +182,22 @@ class FamilyManager:
         except ValueError as exc:
             raise HomeAssistantError(str(exc)) from exc
 
+    async def set_weekly_goal(self, call):
+        async with self.lock:
+            if self.pending_file.exists() or self.hass.states.is_state('input_boolean.luf_maintenance', 'on'):
+                raise HomeAssistantError('El juego está en mantenimiento. Inténtalo de nuevo al terminar.')
+            try:
+                proposed = goal_change(self.registry, call.data['player_id'],
+                                       call.data['weekly_goal_pct'], call.data['revision'])
+            except ValueError as exc:
+                raise HomeAssistantError(str(exc)) from exc
+            # Persist before publishing. No helper, dashboard or activity record is rewritten.
+            await self.hass.async_add_executor_job(save_json, self.file, proposed)
+            self.registry = proposed
+            self.publish()
+            return {'ok': True, 'message': 'Objetivo semanal guardado.',
+                    'weekly_goal_pct': call.data['weekly_goal_pct']}
+
     async def manage(self, call):
         async with self.lock:
             if self.pending_file.exists():
@@ -309,5 +325,10 @@ async def async_setup(hass, config):
                          vol.Optional('name'): str, vol.Optional('token'): str})
     async_register_admin_service(hass, DOMAIN, 'manage_family', manager.handle,
                                  schema=schema, supports_response=SupportsResponse.ONLY)
+    goal_schema = vol.Schema({vol.Required('player_id'): str,
+                              vol.Required('weekly_goal_pct'): int,
+                              vol.Required('revision'): int})
+    async_register_admin_service(hass, DOMAIN, 'set_weekly_goal', manager.set_weekly_goal,
+                                 schema=goal_schema, supports_response=SupportsResponse.ONLY)
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, manager.started)
     return True

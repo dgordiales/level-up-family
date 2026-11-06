@@ -332,8 +332,8 @@ script:
           }}"
         xp_tareas: "{{\n  states(\n    'sensor.player1_xp_tareas_semana'\n  ) | int(0)\n}}"
         penalizaciones: "{{\n  states(\n    'input_number.luf_player1_penalties_this_week'\n  ) | int(0)\n}}"
-        task_entities: '{% set tasks = state_attr(''sensor.luf_task_catalog'', ''tasks'') | default([], true)
-          | selectattr(''player'', ''eq'', ''player1'') | list %}
+        task_entities: '{% set tasks = state_attr(''sensor.luf_task_catalog'', ''tasks'') | default([], true) |
+          selectattr(''player'', ''eq'', ''player1'') | list %}
 
           {{ tasks | map(attribute=''entity'') | list }}'
     - condition: template
@@ -351,29 +351,30 @@ script:
         dias_perfectos_cierre: '{{ calculo_dias_semana | int(0) }}'
         racha_diaria_fin: "{{\n  states('input_number.luf_player1_streak_days')\n  | int(0)\n}}"
     - variables:
-        bonus_semana: "{{\n  (dias_perfectos_cierre | int)\n  *\n  (\n    states('input_number.luf_xp_daily_bonus')\n\
-          \    | int(25)\n  )\n}}"
-        xp_bruto: "{{\n  (xp_tareas | int)\n  +\n  (bonus_semana | int)\n}}"
-        porcentaje_cumplimiento: '{{ (misiones_completadas | float(0) / misiones_previstas | float(1) * 100) | round(2)
-          if misiones_previstas | int(0) > 0 else 0 }}'
-        objetivo_semanal_pct: "{{\n  states('input_number.luf_weekly_goal_pct')\n  | float(75)\n}}"
-        objetivo_conseguido: '{{ 1 if misiones_previstas | int(0) > 0 and porcentaje_cumplimiento | float(0) >=
-          objetivo_semanal_pct | float(75) else 0 }}'
-        racha_semanal_inicio: "{{\n  states(\n    'input_number.luf_player1_streak_weeks'\n  ) | int(0)\n}}"
+        bonus_semana: '{{ (dias_perfectos_cierre | int) * (states(''input_number.luf_xp_daily_bonus'') | int(25))
+          }}'
+        xp_bruto: '{{ (xp_tareas | int) + (bonus_semana | int) }}'
+        xp_previsto: "{% set tasks = state_attr('sensor.luf_task_catalog','tasks') | default([], true) | selectattr('player','eq','player1')\
+          \ | list %}\n{% set ns = namespace(total=0) %}\n{% for task in tasks %}\n  {% if task.once %}\n    {%\
+          \ if task.days > 0 %}{% set ns.total = ns.total + task.xp %}{% endif %}\n  {% else %}\n    {% for b in\
+          \ [1,2,4,8,16,32,64] %}\n      {% if task.days | bitwise_and(b) %}{% set ns.total = ns.total + task.xp\
+          \ %}{% endif %}\n    {% endfor %}\n  {% endif %}\n{% endfor %}\n{{ ns.total }}"
+        objetivo_semanal_pct: '{% set p = state_attr(''sensor.luf_family'',''players'') | default([], true) | selectattr(''id'',''eq'',''player1'')
+          | list %} {{ p[0].weekly_goal_pct | default(75) if p else 75 }}'
+        racha_semanal_inicio: '{{ states(''input_number.luf_player1_streak_weeks'') | int(0) }}'
+        multiplicador_aplicado: '{{ states(''input_number.luf_weekly_streak_multiplier'') | float(1.25) if racha_semanal_inicio
+          | int(0) >= 1 else 1 }}'
     - variables:
-        racha_semanal_fin: "{% if objetivo_conseguido | int(0) == 1 %}\n  {{ (racha_semanal_inicio | int(0)) + 1\
-          \ }}\n{% else %}\n  0\n{% endif %}"
-        multiplicador_aplicado: "{% if\n  objetivo_conseguido | int(0) == 1\n  and\n  racha_semanal_inicio | int(0)\
-          \ >= 1\n%}\n  {{\n    states(\n      'input_number.luf_weekly_streak_multiplier'\n    ) | float(1.25)\n\
-          \  }}\n{% else %}\n  1\n{% endif %}"
+        xp_con_racha: '{{ ((xp_bruto | float(0)) * (multiplicador_aplicado | float(1))) | round(0) | int }}'
+        xp_efectivo: '{{ [(xp_con_racha | int) - (penalizaciones | int), 0] | max }}'
+        porcentaje_cumplimiento: '{{ (xp_efectivo | float(0) / xp_previsto | float(1) * 100) | round(2) if xp_previsto
+          | float(0) > 0 else 0 }}'
+        objetivo_conseguido: '{{ 1 if xp_previsto | float(0) > 0 and (xp_efectivo | float(0)) * 100 >= (xp_previsto
+          | float(0)) * (objetivo_semanal_pct | float(75)) else 0 }}'
+        racha_semanal_fin: '{{ (racha_semanal_inicio | int(0)) + 1 if objetivo_conseguido | int(0) == 1 else 0 }}'
     - variables:
-        xp_con_racha: "{{\n  (\n    (xp_bruto | float(0))\n    *\n    (multiplicador_aplicado | float(1))\n  ) |\
-          \ round(0) | int\n}}"
-        xp_efectivo: "{{\n  [\n    (xp_con_racha | int)\n    -\n    (penalizaciones | int),\n    0\n  ] | max\n\
-          }}"
-    - variables:
-        nivel_inicio: "{{\n  (\n    (\n      states(\n        'input_number.luf_player1_points_total'\n      )\
-          \ | int(0)\n    ) // 500\n  ) + 1\n}}"
+        nivel_inicio: "{{\n  (\n    (\n      states(\n        'input_number.luf_player1_points_total'\n      ) |\
+          \ int(0)\n    ) // 500\n  ) + 1\n}}"
         nivel_fin: "{{\n  (\n    (\n      (\n        states(\n          'input_number.luf_player1_points_total'\n\
           \        ) | int(0)\n      )\n      +\n      (xp_efectivo | int)\n    ) // 500\n  ) + 1\n}}"
     - condition: template
@@ -458,8 +459,7 @@ template:
     unique_id: player1_nivel_luf
     default_entity_id: sensor.player1_nivel_luf
     icon: mdi:shield-star
-    state: '{% set total = states(''input_number.luf_player1_points_total'') | int(0) %} {{ (total // 500) + 1
-      }}'
+    state: '{% set total = states(''input_number.luf_player1_points_total'') | int(0) %} {{ (total // 500) + 1 }}'
   - name: player1 - XP nivel actual
     unique_id: player1_xp_nivel_actual
     unit_of_measurement: XP
@@ -538,19 +538,25 @@ template:
     icon: mdi:trophy-award
     state: "{{\n  (\n    states('sensor.player1_dias_perfectos_semana') | int(0)\n  )\n  *\n  (\n    states('input_number.luf_xp_daily_bonus')\
       \ | int(25)\n  )\n}}"
+    availability: '{{ has_value(''sensor.player1_dias_perfectos_semana'') and has_value(''input_number.luf_xp_daily_bonus'')
+      }}'
   - name: player1 - XP semana bruto
     unique_id: player1_xp_semana_bruto
     unit_of_measurement: XP
     icon: mdi:star-box
     state: "{{\n  (\n    states('sensor.player1_xp_tareas_semana') | int(0)\n  )\n  +\n  (\n    states('sensor.player1_xp_bonus_semana')\
       \ | int(0)\n  )\n}}"
+    availability: '{{ has_value(''sensor.player1_xp_tareas_semana'') and has_value(''sensor.player1_xp_bonus_semana'')
+      }}'
   - name: player1 - XP semana efectivo
     unique_id: player1_xp_semana_efectivo
     unit_of_measurement: XP
     icon: mdi:star-check
-    state: "{% set bruto =\n  states('sensor.player1_xp_semana_bruto') | int(0)\n%}\n{% set penalizaciones =\n \
-      \ states(\n    'input_number.luf_player1_penalties_this_week'\n  ) | int(0)\n%}\n{{ [bruto - penalizaciones,\
-      \ 0] | max }}"
+    state: '{% set gross = states(''sensor.player1_xp_semana_bruto'') | float(0) %} {% set multiplier = states(''sensor.player1_multiplicador_racha_semanal'')
+      | float(1) %} {% set penalties = states(''input_number.luf_player1_penalties_this_week'') | int(0) %} {{ [((gross
+      * multiplier) | round(0) | int) - penalties, 0] | max }}'
+    availability: '{{ has_value(''sensor.player1_xp_semana_bruto'') and has_value(''sensor.player1_multiplicador_racha_semanal'')
+      and has_value(''input_number.luf_player1_penalties_this_week'') }}'
   - name: player1 - Misiones previstas calculadas
     unique_id: player1_misiones_previstas_calculadas
     default_entity_id: sensor.player1_misiones_previstas_calculadas
@@ -572,22 +578,50 @@ template:
       {% endfor %}
 
       {{ ns.total }}'
+  - name: player1 - XP previstos semana
+    unique_id: player1_xp_previsto_semana
+    default_entity_id: sensor.player1_xp_previsto_semana
+    unit_of_measurement: XP
+    icon: mdi:star-outline
+    availability: '{{ has_value(''sensor.luf_task_catalog'') }}'
+    state: "{% set tasks = state_attr('sensor.luf_task_catalog','tasks') | default([], true) | selectattr('player','eq','player1')\
+      \ | list %}\n{% set ns = namespace(total=0) %}\n{% for task in tasks %}\n  {% if task.once %}\n    {% if task.days\
+      \ > 0 %}{% set ns.total = ns.total + task.xp %}{% endif %}\n  {% else %}\n    {% for b in [1,2,4,8,16,32,64]\
+      \ %}\n      {% if task.days | bitwise_and(b) %}{% set ns.total = ns.total + task.xp %}{% endif %}\n    {%\
+      \ endfor %}\n  {% endif %}\n{% endfor %}\n{{ ns.total }}"
+  - name: player1 - Multiplicador racha semanal
+    unique_id: player1_multiplicador_racha_semanal
+    default_entity_id: sensor.player1_multiplicador_racha_semanal
+    icon: mdi:creation
+    availability: '{{ has_value(''input_number.luf_player1_streak_weeks'') and has_value(''input_number.luf_weekly_streak_multiplier'')
+      }}'
+    state: '{{ states(''input_number.luf_weekly_streak_multiplier'') | float(1.25) if states(''input_number.luf_player1_streak_weeks'')
+      | int(0) >= 1 else 1 }}'
 - binary_sensor:
   - name: player1 - Objetivo semanal conseguido
     unique_id: player1_objetivo_semanal_conseguido
     icon: mdi:target-account
-    state: '{{ (states(''sensor.player1_misiones_previstas_calculadas'') | float(0)) > 0 and ((states(''sensor.player1_misiones_completadas_calculadas'')
-      | float(0)) / (states(''sensor.player1_misiones_previstas_calculadas'') | float(0)) * 100 if (states(''sensor.player1_misiones_previstas_calculadas'')
-      | float(0)) > 0 else 0) >= states(''input_number.luf_weekly_goal_pct'') | float(75) }}'
+    state: '{% set budget = states(''sensor.player1_xp_previsto_semana'') | float(0) %} {% set earned = states(''sensor.player1_xp_semana_efectivo'')
+      | float(0) %} {% set target %}{% set p = state_attr(''sensor.luf_family'',''players'') | default([], true)
+      | selectattr(''id'',''eq'',''player1'') | list %} {{ p[0].weekly_goal_pct | default(75) if p else 75 }}{%
+      endset %} {{ budget > 0 and earned * 100 >= budget * (target | float(75)) }}'
     attributes:
       misiones_completadas: "{{\n  states(\n    'sensor.player1_misiones_completadas_calculadas'\n  ) | int(0)\n\
         }}"
       misiones_previstas: '{{ states(''sensor.player1_misiones_previstas_calculadas'') | float(0) | int(0) }}'
-      porcentaje_actual: '{{ ((states(''sensor.player1_misiones_completadas_calculadas'') | float(0)) / (states(''sensor.player1_misiones_previstas_calculadas'')
-        | float(0)) * 100 if (states(''sensor.player1_misiones_previstas_calculadas'') | float(0)) > 0 else 0) |
-        round(2) }}'
-      objetivo_pct: "{{\n  states('input_number.luf_weekly_goal_pct')\n  | float(75)\n}}"
-    availability: '{{ has_value(''sensor.luf_task_catalog'') }}'
+      porcentaje_actual: '{% set budget = states(''sensor.player1_xp_previsto_semana'') | float(0) %} {{ (states(''sensor.player1_xp_semana_efectivo'')
+        | float(0) / budget * 100) | round(2) if budget > 0 else 0 }}'
+      objetivo_pct: '{% set p = state_attr(''sensor.luf_family'',''players'') | default([], true) | selectattr(''id'',''eq'',''player1'')
+        | list %} {{ p[0].weekly_goal_pct | default(75) if p else 75 }}'
+      xp_previsto: '{{ states(''sensor.player1_xp_previsto_semana'') | int(0) }}'
+      xp_efectivo: '{{ states(''sensor.player1_xp_semana_efectivo'') | int(0) }}'
+      xp_objetivo: '{% set target %}{% set p = state_attr(''sensor.luf_family'',''players'') | default([], true)
+        | selectattr(''id'',''eq'',''player1'') | list %} {{ p[0].weekly_goal_pct | default(75) if p else 75 }}{%
+        endset %} {{ (states(''sensor.player1_xp_previsto_semana'') | float(0) * (target | float(75)) / 100) | round(0,
+        ''ceil'') | int }}'
+      multiplicador: '{{ states(''sensor.player1_multiplicador_racha_semanal'') | float(1) }}'
+    availability: '{{ has_value(''sensor.luf_family'') and has_value(''sensor.player1_xp_previsto_semana'') and
+      has_value(''sensor.player1_xp_semana_efectivo'') }}'
 automation:
 - id: luf_player1_cierre_diario_0005
   alias: Level Up Family - player1 - Cierre diario 00:05

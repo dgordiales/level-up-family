@@ -325,12 +325,12 @@ views:
 
             const completed =
               Number(
-                goal.misiones_completadas || 0
+                goal.xp_efectivo ?? 0
               );
 
             const due =
               Number(
-                goal.misiones_previstas ?? 0
+                goal.xp_previsto ?? 0
               );
 
             const pct =
@@ -340,7 +340,7 @@ views:
 
             const target =
               Number(
-                goal.objetivo_pct || 75
+                goal.objetivo_pct ?? 75
               );
 
 
@@ -629,7 +629,7 @@ views:
 
                       opacity:.72;
                     ">
-                      ${completed} / ${due} MISIONES
+                      ${completed} / ${due} XP
                     </div>
 
                   </div>
@@ -1789,7 +1789,7 @@ views:
                 states['input_number.luf_player1_streak_weeks']?.state || 0
               );
 
-              return streak >= 2
+              return streak >= 1
                 ? `linear-gradient(
                     135deg,
                     ${t.success_primary || '#d99000'},
@@ -1805,7 +1805,7 @@ views:
               );
 
               return `1px solid ${
-                streak >= 2
+                streak >= 1
                   ? (t.success_border || 'rgba(255,200,35,.92)')
                   : (t.border || 'rgba(90,190,255,.40)')
               }`;
@@ -1817,7 +1817,7 @@ views:
                 states['input_number.luf_player1_streak_weeks']?.state || 0
               );
 
-              return streak >= 2
+              return streak >= 1
                 ? `0 0 18px ${t.success_glow || 'rgba(255,183,0,.95)'}`
                 : '0 7px 22px rgba(0,0,0,.32)';
             ]]]
@@ -1847,7 +1847,7 @@ views:
               states['input_number.luf_weekly_streak_multiplier']?.state || 1
             );
 
-            const active = streak >= 2;
+            const active = streak >= 1;
 
             const secondary = active
               ? 'rgba(0,0,0,.68)'

@@ -39,12 +39,11 @@ input_number:
     initial: 25
     icon: mdi:trophy-award
   luf_weekly_goal_pct:
-    name: Level Up Family - Objetivo semanal
+    name: Level Up Family - Objetivo global anterior (sin uso)
     min: 0
     max: 100
     step: 1
     mode: box
-    initial: 75
     unit_of_measurement: '%'
     icon: mdi:target
   luf_weekly_streak_multiplier:
@@ -93,15 +92,14 @@ template:
     unique_id: luf_season_folder
     default_entity_id: sensor.luf_season_folder
     icon: mdi:folder-image
-    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n\
-      \  season_0{{ temporada }}\n{% else %}\n  season_{{ temporada }}\n{% endif %}"
+    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n  season_0{{\
+      \ temporada }}\n{% else %}\n  season_{{ temporada }}\n{% endif %}"
   - name: Level Up Family - Ruta temporada
     unique_id: luf_season_path
     default_entity_id: sensor.luf_season_path
     icon: mdi:folder-multiple-image
-    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n\
-      \  /local/level_up_family/season_0{{ temporada }}\n{% else %}\n  /local/level_up_family/season_{{ temporada\
-      \ }}\n{% endif %}"
+    state: "{% set temporada = states('input_number.luf_season_number') | int(1) %} {% if temporada < 10 %}\n  /local/level_up_family/season_0{{\
+      \ temporada }}\n{% else %}\n  /local/level_up_family/season_{{ temporada }}\n{% endif %}"
 script:
   luf_marcar_mision:
     alias: Level Up Family - Marcar misión

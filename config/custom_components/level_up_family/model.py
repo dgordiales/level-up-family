@@ -38,6 +38,7 @@ def walk(value):
 def validate(data):
     if not isinstance(data, dict) or type(data.get('version')) is not int or data['version'] != 2:
         raise ValueError('La familia necesita un registro de versión 2.')
+    data = deepcopy(data)
     if type(data.get('revision')) is not int or data['revision'] < 0:
         raise ValueError('Revisión de familia inválida.')
     players = data.get('players')
@@ -51,6 +52,9 @@ def validate(data):
             raise ValueError('El nombre debe tener entre 1 y 40 caracteres, sin saltos de línea.')
         if p['name'] != p['name'].strip() or type(p.get('active')) is not bool:
             raise ValueError('Nombre o estado de jugador inválido.')
+        goal = p.setdefault('weekly_goal_pct', 75)
+        if type(goal) is not int or not 0 <= goal <= 100:
+            raise ValueError('El objetivo semanal debe ser un porcentaje entero entre 0 y 100.')
         for field, seen in [('id', identities), ('entity_prefix', prefixes), ('db_key', db_keys)]:
             value = p.get(field, '')
             if not isinstance(value, str) or not re.fullmatch(r'[a-z][a-z0-9_]{0,63}', value) or value in seen:
@@ -136,6 +140,20 @@ def public_players(registry):
                  daily_script=f"script.luf_{p['entity_prefix']}_cerrar_dia",
                  penalty_entity=f"input_number.luf_{p['entity_prefix']}_penalties_this_week")
             for p in registry['players']]
+
+
+def goal_change(registry, player_id, percentage, revision):
+    proposed = validate(registry)
+    if type(revision) is not int or revision != proposed['revision']:
+        raise ValueError('La familia ha cambiado en otra sesión. Recarga antes de guardar.')
+    player = next((p for p in proposed['players'] if p['id'] == player_id and p['active']), None)
+    if player is None:
+        raise ValueError('No se encuentra ese hijo activo.')
+    if type(percentage) is not int or not 0 <= percentage <= 100:
+        raise ValueError('El objetivo semanal debe ser un porcentaje entero entre 0 y 100.')
+    player['weekly_goal_pct'] = percentage
+    proposed['revision'] += 1
+    return proposed
 
 
 def escaped(name):
