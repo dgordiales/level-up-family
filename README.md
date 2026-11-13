@@ -18,6 +18,7 @@ Level Up Family is a household chores game for **Home Assistant**. Each child ge
 - Today's missions, their XP values, and completion checkboxes.
 - Weekly XP, level, daily streak, and weekly streak.
 - Weekly target, bonuses, penalties, and the reward selected by parents.
+- Continuous glitter on weekly progress bars, matching the active palette. See [progress particles and the optional compact home card](docs/PROGRESS_PARTICLES.md).
 
 Corrections for previous days are made in the parents' dashboard.
 
@@ -223,6 +224,7 @@ Level Up Family es un juego de tareas domésticas para **Home Assistant**. Cada 
 - Misiones del día, XP asignados y casillas de finalización.
 - XP acumulados durante la semana, nivel, racha diaria y racha semanal.
 - Objetivo semanal, bonificaciones, multas y recompensa elegida por los padres.
+- Purpurina continua en las barras semanales, con la paleta activa. Consulta [las partículas y la tarjeta compacta opcional para el inicio](docs/PROGRESS_PARTICLES.md).
 
 Las correcciones de días anteriores se realizan desde el panel de padres.
 

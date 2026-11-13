@@ -480,6 +480,23 @@ views:
             // HTML
             // ========================================================
 
+            const hasProgress = Number.isFinite(pct) && pct > 0;
+            const purpurina = () => Array.from({ length: 14 }, (_, i) => {
+              const origen = ((((i * 5) % 14) / 13) * 100).toFixed(2);
+              const tamano = (1.4 + (i % 4) * 0.45).toFixed(2);
+              const duracion = (1.55 + (i % 5) * 0.19).toFixed(2);
+              const retraso = (-i * 0.23).toFixed(2);
+              const deriva = -8 + ((i * 7) % 17);
+              const altura = -(8 + ((i * 7) % 9));
+              const giro = 75 + ((i * 53) % 210);
+              return `<span class="lf-particula" style="
+                --lf-origen:${origen}%;--lf-tamano:${tamano}px;
+                --lf-duracion:${duracion}s;--lf-retraso:${retraso}s;
+                --lf-deriva:${deriva}px;--lf-altura:${altura}px;
+                --lf-giro:${giro}deg;
+              "></span>`;
+            }).join('');
+
             return `
               <div style="
                 box-sizing:border-box;
@@ -830,6 +847,8 @@ views:
                         : ''
                     }
 
+                    ${hasProgress ? `<div class="lf-purpurina" aria-hidden="true" style="--lf-primary:${barPrimary};--lf-secondary:${barSecondary};--lf-highlight:${barHighlight};--lf-glow:${barGlow};">${purpurina()}</div>` : ''}
+
                   </div>
 
 
@@ -872,6 +891,66 @@ views:
               </div>
             `;
           ]]]
+      extra_styles: |
+        .lf-purpurina {
+          position: absolute;
+          left: 50%;
+          right: 0;
+          top: 50%;
+          height: 0;
+          pointer-events: none;
+          overflow: visible;
+          z-index: 4;
+        }
+        .lf-particula {
+          position: absolute;
+          left: var(--lf-origen);
+          top: -1px;
+          display: block;
+          width: var(--lf-tamano);
+          height: var(--lf-tamano);
+          border-radius: 25%;
+          color: var(--lf-secondary);
+          background: currentColor;
+          box-shadow: 0 0 3px var(--lf-glow);
+          opacity: 0;
+          animation: lf-purpurina-flotar var(--lf-duracion) linear infinite;
+          animation-delay: var(--lf-retraso);
+        }
+        .lf-particula:nth-child(3n) {
+          color: var(--lf-highlight);
+          clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%,
+            50% 100%, 38% 62%, 0% 50%, 38% 38%);
+          width: calc(var(--lf-tamano) * 1.7);
+          height: calc(var(--lf-tamano) * 1.7);
+        }
+        .lf-particula:nth-child(4n) {
+          color: var(--lf-primary);
+          border-radius: 50%;
+        }
+        @keyframes lf-purpurina-flotar {
+          0% {
+            opacity: 0;
+            transform: translate3d(0, 0, 0) rotate(0deg) scale(.6);
+          }
+          12% { opacity: .95; }
+          45% {
+            opacity: .8;
+            transform: translate3d(
+              calc(var(--lf-deriva) * .45), var(--lf-altura), 0
+            ) rotate(calc(var(--lf-giro) * .5)) scale(1);
+          }
+          72% { opacity: .5; }
+          100% {
+            opacity: 0;
+            transform: translate3d(
+              var(--lf-deriva), calc(var(--lf-altura) + 11px), 0
+            ) rotate(var(--lf-giro)) scale(.3);
+          }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .lf-purpurina { display: none; }
+        }
     - type: custom:button-card
       section_mode: true
       grid_options:

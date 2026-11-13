@@ -89,3 +89,9 @@ Las comprobaciones estáticas y las pruebas con adaptadores de HA no garantizan 
 Each child has a persistent percentage, editable by parents in Control. Scheduled mission XP forms the denominator; daily bonuses and the prior weekly streak multiply earned XP, while penalties subtract. Live progress, reward cards and weekly settlement now use this same score. See [Weekly goals](WEEKLY_GOALS.md).
 
 Cada hijo tiene un porcentaje persistente, editable desde Control. Los XP de las misiones previstas forman el 100 %; los bonus y la racha ayudan a alcanzarlo, mientras las multas restan. La barra infantil, la recompensa y el cierre semanal usan el mismo cálculo. La función se puede desplegar conservando los identificadores de una instalación anterior; no exige migrar la nomenclatura ni altera semanas ya cerradas.
+
+## Continuous progress glitter / Purpurina continua en el progreso
+
+Weekly progress bars emit particles from the right half of their filled segment whenever progress is positive. Particles follow the active bar palette and honor reduced-motion preferences. Both generic child dashboards and their provisioning templates include the effect. A complete optional compact home card is included; see [Progress particles](PROGRESS_PARTICLES.md). This visual change does not modify scoring or persistent data.
+
+Las barras semanales emiten partículas desde la mitad derecha del tramo relleno mientras el progreso sea positivo. La purpurina sigue la paleta activa de la barra y respeta la preferencia de movimiento reducido. El efecto se incluye en los dos paneles infantiles genéricos y en sus plantillas de aprovisionamiento. También se incorpora la tarjeta compacta opcional completa; consulta [Partículas de progreso](PROGRESS_PARTICLES.md). El cambio visual no modifica puntuaciones ni datos persistentes.
