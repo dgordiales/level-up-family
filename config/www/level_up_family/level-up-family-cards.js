@@ -386,13 +386,18 @@
     render() {
       const family=this._hass?.states['sensor.luf_family']?.attributes;
       const history=this._hass?.states['sensor.luf_historico'];
-      const signature=JSON.stringify([family,history,this._busy,this.record,this.review,this._message,this._error]);
+      const serviceReady=this._hass?.services===undefined||Boolean(this._hass.services.level_up_family?.edit_closed_week);
+      const maintenance=cleanState(this._hass,'input_boolean.luf_maintenance')==='on';
+      const signature=JSON.stringify([family,history,serviceReady,maintenance,this._busy,this.record,this.review,this._message,this._error]);
       if(signature===this.signature)return;
       this.signature=signature;
       const card=this.shell(),body=node('div',undefined,'body');card.append(body);
       body.append(node('h2','Editar semanas cerradas'));
       if(!this._hass.user?.is_admin){body.append(node('p','La edición del histórico está reservada a administradores.'));return;}
-      const disabled=Boolean(this._busy||family?.busy||family?.restart_pending||cleanState(this._hass,'input_boolean.luf_maintenance')==='on');
+      body.append(node('p','Elige una semana, corrige las tareas de cada día y revisa el recálculo antes de guardar.','hint'));
+      if(!serviceReady)body.append(node('p','Para editar, actualiza la integración Level Up Family a la versión 0.7.0 o posterior y reinicia Home Assistant. Actualizar solo esta tarjeta no habilita el guardado.','lock'));
+      if(!family)body.append(node('p','La configuración de la familia todavía no está disponible. Comprueba que la integración Level Up Family está cargada.','lock'));
+      const disabled=Boolean(this._busy||family?.busy||family?.restart_pending||maintenance||!serviceReady||!family);
       const weeks=history?.attributes?.weeks||[];
       const [label,select]=textField('Semana cerrada','select');select.disabled=disabled;
       const empty=node('option','Elige una semana');empty.value='';select.append(empty);

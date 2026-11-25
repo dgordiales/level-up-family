@@ -1109,6 +1109,12 @@ views:
   - type: grid
     column_span: 2
     cards:
+    - type: custom:level-up-family-history
+      grid_options:
+        columns: full
+  - type: grid
+    column_span: 2
+    cards:
     - type: custom:button-card
       entity: sensor.luf_historico
       show_icon: false
@@ -1120,6 +1126,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
         - border-radius: 20px
@@ -1133,12 +1142,15 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
           - justify-self: stretch
           - align-self: start
           - text-align: left
         grid:
         - grid-template-areas: '"content"'
-        - grid-template-columns: 1fr
+        - grid-template-columns: minmax(0,1fr)
         - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
@@ -1160,13 +1172,13 @@ views:
           \ `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(3,1fr);\n      gap:12px;\n\
           \      width:100%;\n    \">\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\"\
           >\n          SEMANAS REALES\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\"\
-          >\n          ${realWeeks.length}\n        </div>\n      </div>\n      <div style=\"text-align:center;\"\
+          >\n          ${new Set(realWeeks.map(x => `${Number(x.year)}-W${Number(x.iso_week)}`)).size}\n        </div>\n      </div>\n      <div style=\"text-align:center;\"\
           >\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          RESÚMENES ANUALES\n\
           \        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n    \
-          \      ${years.filter(x => Number(x.year) !== 2099).length}\n        </div>\n      </div>\n      <div\
+          \      ${new Set(years.filter(x => Number(x.year) !== 2099).map(x => Number(x.year))).size}\n        </div>\n      </div>\n      <div\
           \ style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n\
           \          DATOS DE PRUEBA\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\"\
-          >\n          ${testWeeks.length}\n        </div>\n      </div>\n    </div>\n  `;\n]]]\n"
+          >\n          ${new Set(testWeeks.map(x => `${Number(x.year)}-W${Number(x.iso_week)}`)).size}\n        </div>\n      </div>\n    </div>\n  `;\n]]]\n"
       grid_options:
         columns: full
         rows: auto
@@ -1194,6 +1206,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
         - border-radius: 20px
@@ -1207,6 +1222,16 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
+          - justify-self: stretch
+          - align-self: start
+          - text-align: left
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: minmax(0,1fr)
+        - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
         name:
@@ -1223,7 +1248,7 @@ views:
           \ || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player1' && Number(x.year) !== 2099\n\
           \  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\"\
           >\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n\
-          \  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;\"\
+          \  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;text-align:center;\"\
           >\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n\
           \        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span\
           \ style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span\
@@ -1256,6 +1281,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
         - border-radius: 20px
@@ -1269,6 +1297,16 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
+          - justify-self: stretch
+          - align-self: start
+          - text-align: left
+        grid:
+        - grid-template-areas: '"content"'
+        - grid-template-columns: minmax(0,1fr)
+        - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
         name:
@@ -1285,7 +1323,7 @@ views:
           \ || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player2' && Number(x.year) !== 2099\n\
           \  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\"\
           >\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n\
-          \  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;\"\
+          \  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;text-align:center;\"\
           >\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n\
           \        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span\
           \ style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span\
@@ -1322,6 +1360,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1336,12 +1377,15 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
           - justify-self: stretch
           - align-self: start
           - text-align: left
         grid:
         - grid-template-areas: '"content"'
-        - grid-template-columns: 1fr
+        - grid-template-columns: minmax(0,1fr)
         - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
@@ -1406,6 +1450,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1420,12 +1467,15 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
           - justify-self: stretch
           - align-self: start
           - text-align: left
         grid:
         - grid-template-areas: '"content"'
-        - grid-template-columns: 1fr
+        - grid-template-columns: minmax(0,1fr)
         - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
@@ -1442,7 +1492,7 @@ views:
           \ Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const weeks = states['sensor.luf_historico']?.attributes?.weeks\
           \ || [];\n\n  if (!weeks.length) {\n    return `<div style=\"text-align:center;opacity:.68;\">Sin datos.</div>`;\n\
           \  }\n\n  const player = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\
-          \n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fill,minmax(360px,420px));\n\
+          \n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));\n\
           \      gap:12px;\n      width:100%;\n    \">\n      ${weeks.map(x => `\n        <div style=\"\n      \
           \    padding:13px;\n          border:1px solid var(--lf-panel-border);\n          border-radius:12px;\n\
           \          background:var(--lf-panel-inset);\n          ${Number(x.year) === 2099 ? 'opacity:.72;' : ''}\n\
@@ -1490,6 +1540,9 @@ views:
       styles:
         card:
         - padding: 14px
+        - box-sizing: border-box
+        - width: 100%
+        - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1504,12 +1557,15 @@ views:
         custom_fields:
           content:
           - width: 100%
+          - min-width: 0
+          - position: relative
+          - box-sizing: border-box
           - justify-self: stretch
           - align-self: start
           - text-align: left
         grid:
         - grid-template-areas: '"content"'
-        - grid-template-columns: 1fr
+        - grid-template-columns: minmax(0,1fr)
         - grid-template-rows: auto
         icon:
         - color: var(--lf-accent)
@@ -1527,7 +1583,7 @@ views:
           \ || [];\n\n  if (!years.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\"\
           >\n        No hay resúmenes anuales.\n      </div>\n    `;\n  }\n\n  const player = p =>\n    p === 'player1'\
           \ ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\n  return `\n    <div style=\"\n      display:grid;\n\
-          \      grid-template-columns:repeat(auto-fill,minmax(360px,420px));\n      gap:12px;\n      width:100%;\n\
+          \      grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));\n      gap:12px;\n      width:100%;\n\
           \    \">\n      ${years.map(y => `\n        <div style=\"\n          padding:14px;\n          border:1px\
           \ solid var(--lf-panel-border);\n          border-radius:12px;\n          background:var(--lf-panel-inset);\n\
           \          ${Number(y.year) === 2099 ? 'opacity:.72;' : ''}\n        \">\n          <div style=\"display:flex;justify-content:space-between;\"\
@@ -1545,12 +1601,6 @@ views:
       grid_options:
         columns: full
         rows: auto
-  - type: grid
-    column_span: 2
-    cards:
-    - type: custom:level-up-family-history
-      grid_options:
-        columns: full
   theme: Catppuccin Mocha
   cards: []
 - title: Tareas y premios

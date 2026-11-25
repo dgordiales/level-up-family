@@ -22,7 +22,7 @@ El valor se guarda en `level_up_family/family.json`, en `players[].weekly_goal_p
 
 Al actualizar una instalación con actividad, se incorpora a cada hijo el objetivo global que estuviera en vigor, sin cambiar sus identidades, XP, misiones ni registros SQLite. Los cierres futuros usan el nuevo cálculo. El histórico ya cerrado conserva sus resultados originales; el porcentaje de misiones del histórico sigue siendo una estadística de tareas.
 
-Actualiza los paquetes de jugador, la integración, sus plantillas y los paneles conjuntamente. Registra el módulo `/local/level_up_family/level-up-family-cards.js?v=2.8.0`, reinicia HA para cargar la integración y recarga el navegador. En instalaciones antiguas conserva los identificadores y las rutas de la base de datos: esta función no exige migrar el prefijo de las entidades.
+Actualiza los paquetes de jugador, la integración, sus plantillas y los paneles conjuntamente. Registra el módulo `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, reinicia HA para cargar la integración y recarga el navegador. En instalaciones antiguas conserva los identificadores y las rutas de la base de datos: esta función no exige migrar el prefijo de las entidades.
 
 ## English
 

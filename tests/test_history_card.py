@@ -79,6 +79,11 @@ const Card=registry.get('level-up-family-history'),card=new Card();card.setConfi
  assert.equal(calls.filter(c=>c.service_data.operation==='apply').length,1);
  const child=new Card();child.setConfig({});child.hass={...hass,user:{is_admin:false}};
  assert(!nodes(child.shadowRoot).some(n=>n.tagName==='select'));
+ const oldIntegration=new Card();oldIntegration.setConfig({});oldIntegration.hass={...hass,services:{level_up_family:{manage_family:{}}}};
+ assert(nodes(oldIntegration.shadowRoot).some(n=>n.textContent.includes('actualiza la integración Level Up Family')));
+ assert(nodes(oldIntegration.shadowRoot).find(n=>n.tagName==='select').disabled);
+ oldIntegration.hass={...hass,services:{level_up_family:{edit_closed_week:{}}}};
+ assert.equal(nodes(oldIntegration.shadowRoot).find(n=>n.tagName==='select').disabled,false);
  console.log('History card controls passed');
 })().catch(error=>{console.error(error);process.exitCode=1;});
 """

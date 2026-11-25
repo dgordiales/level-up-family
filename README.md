@@ -62,7 +62,7 @@ Level Up Family combines **YAML packages, Python scripts, a local integration, a
 - Python 3 and SQLite in the environment running Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) and [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered.
 - The included local integration at `config/custom_components/level_up_family`.
-- `/local/level_up_family/level-up-family-cards.js?v=2.8.0`, registered as a **JavaScript module**.
+- `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, registered as a **JavaScript module**.
 - A full backup before changing an existing installation.
 
 **This is not a HACS installation.** HACS can be used for the external frontend cards, but the included local integration must be installed manually.
@@ -268,7 +268,7 @@ La instalación combina **paquetes YAML, scripts Python, una integración local 
 - Python 3 y SQLite en el entorno donde se ejecuta Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) y [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalados y registrados.
 - Integración local incluida en `config/custom_components/level_up_family`.
-- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.8.0`, registrado como **módulo JavaScript**.
+- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, registrado como **módulo JavaScript**.
 - Copia de seguridad completa antes de modificar una instalación existente.
 
 **No es una instalación mediante HACS.** HACS puede utilizarse para las tarjetas externas, pero la integración local se instala manualmente.

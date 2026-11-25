@@ -2,7 +2,9 @@
 
 ## English
 
-The parents' **History** tab includes **Edit closed weeks**. Choose a child and a closed week, change the task marks for the relevant dates, enter a reason, and select **Preview recalculation**. Review every affected week before confirming. Only Home Assistant administrators can use the service, including direct WebSocket calls.
+The parents' **History** tab includes **Edit closed weeks** directly below its introduction, before the counters and annual summaries. Choose a child and a closed week, change the task marks for the relevant dates, enter a reason, and select **Preview recalculation**. Review every affected week before confirming. Only Home Assistant administrators can use the service, including direct WebSocket calls. If only the card resource has been updated, the editor explains that the integration must also be updated and restarted.
+
+The overview counts distinct ISO year/week pairs and distinct years, rather than one record per child. Three shared weeks and one shared year therefore show **3 weeks / 1 year** while retaining all six child/week records and both annual summaries. Test periods (2099) are counted separately. The reader exposes unique period counts and separate record counts.
 
 The calculation uses the archived task names, schedules, XP values, once-per-week flags, daily bonus, weekly multiplier, goal percentage, and reward text. Weekly missions count once and do not participate in perfect-day checks. The previous week's achieved goal determines the multiplier of the next week. Penalties remain the amounts recorded in the closed weeks. Levels use the existing 500 XP rule.
 
@@ -20,7 +22,7 @@ If an edit would change an unarchived successor's multiplier, or its daily recor
 
 Update the complete custom integration (including `history.py` and `history_store.py`), `python/luf_db.py`, `python/prepare_reset.py`, both player packages, the parents' panel, generated `templates.json`, and the card resource. New player provisioning includes the archive action automatically. Keep existing stable player IDs, helper aliases and SQLite keys when adapting an existing installation; do not overwrite `family.json`, task configuration, activity data, or customized household dashboards with distribution defaults.
 
-Register the updated JavaScript resource as `/local/level_up_family/level-up-family-cards.js?v=2.8.0` and restart Home Assistant after updating the integration. The new card type is `custom:level-up-family-history`, placed inside the existing History view. The surrounding cards and their styling are unchanged. In an installation with custom helper aliases, the weekly-close action must pass the public family `player_id`, not its database key or helper prefix.
+Register the updated JavaScript resource as `/local/level_up_family/level-up-family-cards.js?v=2.8.1` and restart Home Assistant after updating the integration. The new card type is `custom:level-up-family-history`, placed inside the existing History view. The surrounding cards and their styling are unchanged. In an installation with custom helper aliases, the weekly-close action must pass the public family `player_id`, not its database key or helper prefix.
 
 Weekly close archives the complete original record **after the SQLite close and before resetting task masks**. Archive failure stops the reset, so the original marks remain available for retry. A retry cannot overwrite an existing snapshot or capture masks belonging to the following week.
 
@@ -32,7 +34,9 @@ After commit, a durable journal synchronizes absolute helper values. A failure l
 
 ## Español
 
-La pestaña **Histórico** del panel de padres incorpora **Editar semanas cerradas**. Selecciona una semana, cambia las tareas de los días que corresponda, explica el motivo y pulsa **Previsualizar recálculo**. Revisa las semanas afectadas y confirma el guardado. El servicio comprueba que el usuario sea administrador, también si se llama directamente por WebSocket.
+La pestaña **Histórico** del panel de padres incorpora **Editar semanas cerradas** justo debajo de la introducción, antes de los contadores y resúmenes. Selecciona una semana, cambia las tareas de los días que corresponda, explica el motivo y pulsa **Previsualizar recálculo**. Revisa las semanas afectadas y confirma el guardado. El servicio comprueba que el usuario sea administrador, también si se llama directamente por WebSocket. Si solo se ha actualizado el recurso de tarjetas, se indica que también debes actualizar la integración y reiniciar Home Assistant.
+
+Los contadores distinguen períodos únicos: las tres mismas semanas de dos hijos aparecen como **3 semanas y 1 año**, conservando las seis filas semanales y los dos resúmenes individuales. El año 2099 se cuenta aparte como datos de prueba. Los detalles ocupan el ancho disponible y los resúmenes individuales no reservan columnas para iconos ocultos.
 
 El recálculo utiliza las tareas y reglas archivadas de cada semana: nombres, días previstos, XP, tareas de una vez por semana, bonus diario, multiplicador, objetivo y texto de la recompensa. Las tareas semanales cuentan una sola vez y no intervienen en el día perfecto. El objetivo de una semana determina la racha y el multiplicador de la siguiente. Se conservan las multas registradas. Los niveles siguen usando 500 XP por nivel.
 

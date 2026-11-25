@@ -10,7 +10,7 @@
 - Python 3 in the environment running Home Assistant; SQLite is included with Python.
 - [button-card](https://github.com/custom-cards/button-card), installed and registered as a JavaScript resource, for the existing dashboard design.
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered as a JavaScript resource, to style native cards in the parents' dashboard.
-- Local module `/local/level_up_family/level-up-family-cards.js?v=2.8.0`, which registers the cards included in this repository.
+- Local module `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, which registers the cards included in this repository.
 - Access to `/config` and write permissions for Home Assistant in `/config/level_up_family/data`.
 
 The game uses YAML packages and a small local integration for family management. Copy `custom_components/level_up_family` as well; this integration is **not installed through HACS**. Local validation checks syntax and references. You must still validate configuration against your installed HA version and visually check its cards.
@@ -66,7 +66,7 @@ Files in `www/level_up_family/season_01` are served at `/local/level_up_family/s
 - Python 3 en el entorno donde se ejecuta Home Assistant; SQLite forma parte de Python.
 - La tarjeta [button-card](https://github.com/custom-cards/button-card), instalada y registrada como recurso JavaScript, para el diseño existente de los paneles.
 - [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalado y registrado como recurso JavaScript, para aplicar el estilo de Level Up Family a las tarjetas nativas del panel de padres.
-- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.8.0`, que registra las tarjetas incluidas en este repositorio.
+- El módulo local `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, que registra las tarjetas incluidas en este repositorio.
 - Acceso al directorio `/config` y permisos de escritura para Home Assistant en `/config/level_up_family/data`.
 
 El juego utiliza paquetes YAML y una pequeña integración local para administrar la familia. Copia también `custom_components/level_up_family`; no se instala desde HACS. La validación local comprueba sintaxis y referencias; la comprobación de configuración de la versión de Home Assistant instalada y la revisión visual de sus tarjetas siguen siendo necesarias.
