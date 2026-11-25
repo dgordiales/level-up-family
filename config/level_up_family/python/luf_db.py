@@ -890,6 +890,11 @@ def rebuild_year_summary(conn, player_id, year):
     best_daily_streak = max(
         (int(r["daily_streak_end"]) for r in rows), default=0
     )
+    # A run may peak midweek and end before Sunday.
+    best_daily_streak = max(best_daily_streak, conn.execute(
+        'SELECT COALESCE(MAX(daily_streak_end),0) FROM days WHERE player_id=? AND year=? AND day_date<=?',
+        (player_id, year, rows[-1]['week_end']),
+    ).fetchone()[0])
     best_weekly_streak = max(
         (int(r["weekly_streak_end"]) for r in rows), default=0
     )

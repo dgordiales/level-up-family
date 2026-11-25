@@ -20,14 +20,14 @@ Level Up Family is a household chores game for **Home Assistant**. Each child ge
 - Weekly target, bonuses, penalties, and the reward selected by parents.
 - Continuous glitter on weekly progress bars, matching the active palette. See [progress particles and the optional compact home card](docs/PROGRESS_PARTICLES.md).
 
-Corrections for previous days are made in the parents' dashboard.
+Corrections for previous days are made in the parents' dashboard. Closed weeks include a preview, automatic recalculation and an audit trail; see [editing closed weeks](docs/CLOSED_WEEKS.md).
 
 ### Parents' dashboard
 
 | Tab | What it does |
 | --- | --- |
 | **Control** | Monitor progress, correct missions in the active week, apply penalties, and cancel them by ID. |
-| **History** | View closed weeks and annual summaries stored in SQLite. |
+| **History** | View closed weeks and annual summaries; [correct past tasks and recalculate progress](docs/CLOSED_WEEKS.md). |
 | **Tasks & Rewards** | Edit task name, difficulty, XP, player, days, frequency, and weekly rewards. |
 | **Family** | Change display names, prepare new players, and retire players without deleting their history. |
 
@@ -62,7 +62,7 @@ Level Up Family combines **YAML packages, Python scripts, a local integration, a
 - Python 3 and SQLite in the environment running Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) and [card-mod](https://github.com/thomasloven/lovelace-card-mod), installed and registered.
 - The included local integration at `config/custom_components/level_up_family`.
-- `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, registered as a **JavaScript module**.
+- `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, registered as a **JavaScript module**.
 - A full backup before changing an existing installation.
 
 **This is not a HACS installation.** HACS can be used for the external frontend cards, but the included local integration must be installed manually.
@@ -268,7 +268,7 @@ La instalación combina **paquetes YAML, scripts Python, una integración local 
 - Python 3 y SQLite en el entorno donde se ejecuta Home Assistant.
 - [button-card](https://github.com/custom-cards/button-card) y [card-mod](https://github.com/thomasloven/lovelace-card-mod), instalados y registrados.
 - Integración local incluida en `config/custom_components/level_up_family`.
-- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.7.0`, registrado como **módulo JavaScript**.
+- Recurso `/local/level_up_family/level-up-family-cards.js?v=2.8.1`, registrado como **módulo JavaScript**.
 - Copia de seguridad completa antes de modificar una instalación existente.
 
 **No es una instalación mediante HACS.** HACS puede utilizarse para las tarjetas externas, pero la integración local se instala manualmente.
@@ -409,3 +409,5 @@ Consulta la [hoja de ruta](docs/ROADMAP.md) para conocer otras mejoras y su esta
 **¿Qué pasa si falla un alta?** Conserva la copia de seguridad y consulta el error en Familia. Si la recuperación falla, el juego permanece en mantenimiento. Sigue la guía de recuperación antes de reanudarlo.
 
 See [Individual weekly XP goals / Objetivos semanales por hijo](docs/WEEKLY_GOALS.md) for scoring, streaks and persistent settings.
+
+[Editing closed weeks / Editar semanas cerradas](docs/CLOSED_WEEKS.md) — original task records, previews, automatic recalculation, backups and recovery.

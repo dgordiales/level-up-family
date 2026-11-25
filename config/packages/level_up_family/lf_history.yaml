@@ -21,6 +21,11 @@ command_line:
       json_attributes:
         - weeks_count
         - years_count
+        - real_weeks_count
+        - real_years_count
+        - test_weeks_count
+        - week_records_count
+        - year_records_count
         - weeks
         - years
         - error

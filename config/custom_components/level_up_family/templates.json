@@ -1676,6 +1676,18 @@
             "column_span": 2,
             "cards": [
               {
+                "type": "custom:level-up-family-history",
+                "grid_options": {
+                  "columns": "full"
+                }
+              }
+            ]
+          },
+          {
+            "type": "grid",
+            "column_span": 2,
+            "cards": [
+              {
                 "type": "custom:button-card",
                 "entity": "sensor.luf_historico",
                 "show_icon": false,
@@ -1689,6 +1701,15 @@
                   "card": [
                     {
                       "padding": "14px"
+                    },
+                    {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
                     },
                     {
                       "background": "rgba(4,14,38,.94)"
@@ -1724,6 +1745,15 @@
                         "width": "100%"
                       },
                       {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
                         "justify-self": "stretch"
                       },
                       {
@@ -1739,7 +1769,7 @@
                       "grid-template-areas": "\"content\""
                     },
                     {
-                      "grid-template-columns": "1fr"
+                      "grid-template-columns": "minmax(0,1fr)"
                     },
                     {
                       "grid-template-rows": "auto"
@@ -1767,7 +1797,7 @@
                   ]
                 },
                 "custom_fields": {
-                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const e = states['sensor.luf_historico'];\n  const weeks = e?.attributes?.weeks || [];\n  const years = e?.attributes?.years || [];\n  const error = e?.attributes?.error;\n\n  if (error) {\n    return `\n      <div style=\"padding:8px;color:var(--error-color);\">\n        ⚠️ Base de datos no disponible.\n      </div>\n    `;\n  }\n\n  const realWeeks = weeks.filter(x => Number(x.year) !== 2099);\n  const testWeeks = weeks.filter(x => Number(x.year) === 2099);\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(3,1fr);\n      gap:12px;\n      width:100%;\n    \">\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          SEMANAS REALES\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${realWeeks.length}\n        </div>\n      </div>\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          RESÚMENES ANUALES\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${years.filter(x => Number(x.year) !== 2099).length}\n        </div>\n      </div>\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          DATOS DE PRUEBA\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${testWeeks.length}\n        </div>\n      </div>\n    </div>\n  `;\n]]]\n"
+                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const e = states['sensor.luf_historico'];\n  const weeks = e?.attributes?.weeks || [];\n  const years = e?.attributes?.years || [];\n  const error = e?.attributes?.error;\n\n  if (error) {\n    return `\n      <div style=\"padding:8px;color:var(--error-color);\">\n        ⚠️ Base de datos no disponible.\n      </div>\n    `;\n  }\n\n  const realWeeks = weeks.filter(x => Number(x.year) !== 2099);\n  const testWeeks = weeks.filter(x => Number(x.year) === 2099);\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(3,1fr);\n      gap:12px;\n      width:100%;\n    \">\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          SEMANAS REALES\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${new Set(realWeeks.map(x => `${Number(x.year)}-W${Number(x.iso_week)}`)).size}\n        </div>\n      </div>\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          RESÚMENES ANUALES\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${new Set(years.filter(x => Number(x.year) !== 2099).map(x => Number(x.year))).size}\n        </div>\n      </div>\n      <div style=\"text-align:center;\">\n        <div style=\"font-size:11px;opacity:.65;font-weight:800;\">\n          DATOS DE PRUEBA\n        </div>\n        <div style=\"font-size:26px;font-weight:900;color:var(--lf-accent);\">\n          ${new Set(testWeeks.map(x => `${Number(x.year)}-W${Number(x.iso_week)}`)).size}\n        </div>\n      </div>\n    </div>\n  `;\n]]]\n"
                 },
                 "grid_options": {
                   "columns": "full",
@@ -1803,6 +1833,15 @@
                       "padding": "14px"
                     },
                     {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
+                    },
+                    {
                       "background": "rgba(4,14,38,.94)"
                     },
                     {
@@ -1834,9 +1873,38 @@
                     "content": [
                       {
                         "width": "100%"
+                      },
+                      {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
+                        "justify-self": "stretch"
+                      },
+                      {
+                        "align-self": "start"
+                      },
+                      {
+                        "text-align": "left"
                       }
                     ]
                   },
+                  "grid": [
+                    {
+                      "grid-template-areas": "\"content\""
+                    },
+                    {
+                      "grid-template-columns": "minmax(0,1fr)"
+                    },
+                    {
+                      "grid-template-rows": "auto"
+                    }
+                  ],
                   "icon": [
                     {
                       "color": "var(--lf-accent)"
@@ -1859,7 +1927,7 @@
                   ]
                 },
                 "custom_fields": {
-                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player1' && Number(x.year) !== 2099\n  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;\">\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span style=\"opacity:.65;font-size:11px;\">MISIONES</span></div>\n        <div><b>${Number(y.completion_pct).toFixed(1)}%</b><br><span style=\"opacity:.65;font-size:11px;\">COMPLETADO</span></div>\n        <div><b>${y.effective_xp} XP</b><br><span style=\"opacity:.65;font-size:11px;\">XP EFECTIVO</span></div>\n        <div><b>${y.perfect_days}</b><br><span style=\"opacity:.65;font-size:11px;\">DÍAS PERFECTOS</span></div>\n        <div><b>${y.weekly_goals_achieved}</b><br><span style=\"opacity:.65;font-size:11px;\">OBJETIVOS</span></div>\n      </div>\n    </div>\n  `;\n]]]\n"
+                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player1' && Number(x.year) !== 2099\n  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;text-align:center;\">\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span style=\"opacity:.65;font-size:11px;\">MISIONES</span></div>\n        <div><b>${Number(y.completion_pct).toFixed(1)}%</b><br><span style=\"opacity:.65;font-size:11px;\">COMPLETADO</span></div>\n        <div><b>${y.effective_xp} XP</b><br><span style=\"opacity:.65;font-size:11px;\">XP EFECTIVO</span></div>\n        <div><b>${y.perfect_days}</b><br><span style=\"opacity:.65;font-size:11px;\">DÍAS PERFECTOS</span></div>\n        <div><b>${y.weekly_goals_achieved}</b><br><span style=\"opacity:.65;font-size:11px;\">OBJETIVOS</span></div>\n      </div>\n    </div>\n  `;\n]]]\n"
                 }
               }
             ]
@@ -1891,6 +1959,15 @@
                       "padding": "14px"
                     },
                     {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
+                    },
+                    {
                       "background": "rgba(4,14,38,.94)"
                     },
                     {
@@ -1922,9 +1999,38 @@
                     "content": [
                       {
                         "width": "100%"
+                      },
+                      {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
+                        "justify-self": "stretch"
+                      },
+                      {
+                        "align-self": "start"
+                      },
+                      {
+                        "text-align": "left"
                       }
                     ]
                   },
+                  "grid": [
+                    {
+                      "grid-template-areas": "\"content\""
+                    },
+                    {
+                      "grid-template-columns": "minmax(0,1fr)"
+                    },
+                    {
+                      "grid-template-rows": "auto"
+                    }
+                  ],
                   "icon": [
                     {
                       "color": "var(--lf-accent)"
@@ -1947,7 +2053,7 @@
                   ]
                 },
                 "custom_fields": {
-                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player2' && Number(x.year) !== 2099\n  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;\">\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span style=\"opacity:.65;font-size:11px;\">MISIONES</span></div>\n        <div><b>${Number(y.completion_pct).toFixed(1)}%</b><br><span style=\"opacity:.65;font-size:11px;\">COMPLETADO</span></div>\n        <div><b>${y.effective_xp} XP</b><br><span style=\"opacity:.65;font-size:11px;\">XP EFECTIVO</span></div>\n        <div><b>${y.perfect_days}</b><br><span style=\"opacity:.65;font-size:11px;\">DÍAS PERFECTOS</span></div>\n        <div><b>${y.weekly_goals_achieved}</b><br><span style=\"opacity:.65;font-size:11px;\">OBJETIVOS</span></div>\n      </div>\n    </div>\n  `;\n]]]\n"
+                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n  const rows = years.filter(x =>\n    x.player_key === 'player2' && Number(x.year) !== 2099\n  );\n\n  if (!rows.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        Aún no hay años reales con semanas cerradas.\n      </div>\n    `;\n  }\n\n  const y = rows[0];\n  return `\n    <div style=\"width:100%;\">\n      <div style=\"font-size:18px;font-weight:900;margin-bottom:12px;text-align:center;\">\n        ${y.year}\n      </div>\n      <div style=\"\n        display:grid;\n        grid-template-columns:repeat(3,1fr);\n        gap:12px;\n        text-align:center;\n      \">\n        <div><b>${y.weeks_played}</b><br><span style=\"opacity:.65;font-size:11px;\">SEMANAS</span></div>\n        <div><b>${y.tasks_completed}/${y.tasks_due}</b><br><span style=\"opacity:.65;font-size:11px;\">MISIONES</span></div>\n        <div><b>${Number(y.completion_pct).toFixed(1)}%</b><br><span style=\"opacity:.65;font-size:11px;\">COMPLETADO</span></div>\n        <div><b>${y.effective_xp} XP</b><br><span style=\"opacity:.65;font-size:11px;\">XP EFECTIVO</span></div>\n        <div><b>${y.perfect_days}</b><br><span style=\"opacity:.65;font-size:11px;\">DÍAS PERFECTOS</span></div>\n        <div><b>${y.weekly_goals_achieved}</b><br><span style=\"opacity:.65;font-size:11px;\">OBJETIVOS</span></div>\n      </div>\n    </div>\n  `;\n]]]\n"
                 }
               }
             ]
@@ -1982,6 +2088,15 @@
                   "card": [
                     {
                       "padding": "14px"
+                    },
+                    {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
                     },
                     {
                       "text-align": "left"
@@ -2020,6 +2135,15 @@
                         "width": "100%"
                       },
                       {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
                         "justify-self": "stretch"
                       },
                       {
@@ -2035,7 +2159,7 @@
                       "grid-template-areas": "\"content\""
                     },
                     {
-                      "grid-template-columns": "1fr"
+                      "grid-template-columns": "minmax(0,1fr)"
                     },
                     {
                       "grid-template-rows": "auto"
@@ -2104,6 +2228,15 @@
                       "padding": "14px"
                     },
                     {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
+                    },
+                    {
                       "text-align": "left"
                     },
                     {
@@ -2140,6 +2273,15 @@
                         "width": "100%"
                       },
                       {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
                         "justify-self": "stretch"
                       },
                       {
@@ -2155,7 +2297,7 @@
                       "grid-template-areas": "\"content\""
                     },
                     {
-                      "grid-template-columns": "1fr"
+                      "grid-template-columns": "minmax(0,1fr)"
                     },
                     {
                       "grid-template-rows": "auto"
@@ -2183,7 +2325,7 @@
                   ]
                 },
                 "custom_fields": {
-                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const weeks = states['sensor.luf_historico']?.attributes?.weeks || [];\n\n  if (!weeks.length) {\n    return `<div style=\"text-align:center;opacity:.68;\">Sin datos.</div>`;\n  }\n\n  const player = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fill,minmax(360px,420px));\n      gap:12px;\n      width:100%;\n    \">\n      ${weeks.map(x => `\n        <div style=\"\n          padding:13px;\n          border:1px solid var(--lf-panel-border);\n          border-radius:12px;\n          background:var(--lf-panel-inset);\n          ${Number(x.year) === 2099 ? 'opacity:.72;' : ''}\n        \">\n          <div style=\"display:flex;justify-content:space-between;gap:10px;\">\n            <b>${player(x.player_key)}</b>\n            <b>${x.year}-W${String(x.iso_week).padStart(2,'0')}</b>\n          </div>\n          <div style=\"font-size:11px;opacity:.62;margin:4px 0 10px;\">\n            ${x.week_start} → ${x.week_end}\n            ${Number(x.year) === 2099 ? ' · 🧪 PRUEBA' : ''}\n          </div>\n          <div style=\"line-height:1.75;font-size:12px;\">\n            🎯 Misiones: <b>${x.tasks_completed}/${x.tasks_due}</b>\n            (${Number(x.completion_pct).toFixed(1)}%)<br>\n            ⭐ Tareas: <b>${x.task_xp} XP</b> · Bonus:\n            <b>+${x.bonus_xp}</b><br>\n            🚨 Multas: <b>−${x.penalty_xp} XP</b> · Final:\n            <b>${x.effective_xp} XP</b><br>\n            🏆 Días perfectos: <b>${x.perfect_days}</b> · Objetivo:\n            <b>${Number(x.weekly_goal_achieved) === 1 ? 'Sí' : 'No'}</b><br>\n            🔥 Racha diaria: <b>${x.daily_streak_end}</b> · Semanal:\n            <b>${x.weekly_streak_end}</b><br>\n            🛡️ Nivel: <b>${x.level_start} → ${x.level_end}</b> ·\n            Temporada: <b>${x.season_number ?? '—'}</b>\n          </div>\n        </div>\n      `).join('')}\n    </div>\n  `;\n]]]\n"
+                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const weeks = states['sensor.luf_historico']?.attributes?.weeks || [];\n\n  if (!weeks.length) {\n    return `<div style=\"text-align:center;opacity:.68;\">Sin datos.</div>`;\n  }\n\n  const player = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));\n      gap:12px;\n      width:100%;\n    \">\n      ${weeks.map(x => `\n        <div style=\"\n          padding:13px;\n          border:1px solid var(--lf-panel-border);\n          border-radius:12px;\n          background:var(--lf-panel-inset);\n          ${Number(x.year) === 2099 ? 'opacity:.72;' : ''}\n        \">\n          <div style=\"display:flex;justify-content:space-between;gap:10px;\">\n            <b>${player(x.player_key)}</b>\n            <b>${x.year}-W${String(x.iso_week).padStart(2,'0')}</b>\n          </div>\n          <div style=\"font-size:11px;opacity:.62;margin:4px 0 10px;\">\n            ${x.week_start} → ${x.week_end}\n            ${Number(x.year) === 2099 ? ' · 🧪 PRUEBA' : ''}\n          </div>\n          <div style=\"line-height:1.75;font-size:12px;\">\n            🎯 Misiones: <b>${x.tasks_completed}/${x.tasks_due}</b>\n            (${Number(x.completion_pct).toFixed(1)}%)<br>\n            ⭐ Tareas: <b>${x.task_xp} XP</b> · Bonus:\n            <b>+${x.bonus_xp}</b><br>\n            🚨 Multas: <b>−${x.penalty_xp} XP</b> · Final:\n            <b>${x.effective_xp} XP</b><br>\n            🏆 Días perfectos: <b>${x.perfect_days}</b> · Objetivo:\n            <b>${Number(x.weekly_goal_achieved) === 1 ? 'Sí' : 'No'}</b><br>\n            🔥 Racha diaria: <b>${x.daily_streak_end}</b> · Semanal:\n            <b>${x.weekly_streak_end}</b><br>\n            🛡️ Nivel: <b>${x.level_start} → ${x.level_end}</b> ·\n            Temporada: <b>${x.season_number ?? '—'}</b>\n          </div>\n        </div>\n      `).join('')}\n    </div>\n  `;\n]]]\n"
                 },
                 "grid_options": {
                   "columns": "full",
@@ -2224,6 +2366,15 @@
                       "padding": "14px"
                     },
                     {
+                      "box-sizing": "border-box"
+                    },
+                    {
+                      "width": "100%"
+                    },
+                    {
+                      "min-width": 0
+                    },
+                    {
                       "text-align": "left"
                     },
                     {
@@ -2260,6 +2411,15 @@
                         "width": "100%"
                       },
                       {
+                        "min-width": 0
+                      },
+                      {
+                        "position": "relative"
+                      },
+                      {
+                        "box-sizing": "border-box"
+                      },
+                      {
                         "justify-self": "stretch"
                       },
                       {
@@ -2275,7 +2435,7 @@
                       "grid-template-areas": "\"content\""
                     },
                     {
-                      "grid-template-columns": "1fr"
+                      "grid-template-columns": "minmax(0,1fr)"
                     },
                     {
                       "grid-template-rows": "auto"
@@ -2303,7 +2463,7 @@
                   ]
                 },
                 "custom_fields": {
-                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n\n  if (!years.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        No hay resúmenes anuales.\n      </div>\n    `;\n  }\n\n  const player = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fill,minmax(360px,420px));\n      gap:12px;\n      width:100%;\n    \">\n      ${years.map(y => `\n        <div style=\"\n          padding:14px;\n          border:1px solid var(--lf-panel-border);\n          border-radius:12px;\n          background:var(--lf-panel-inset);\n          ${Number(y.year) === 2099 ? 'opacity:.72;' : ''}\n        \">\n          <div style=\"display:flex;justify-content:space-between;\">\n            <b style=\"font-size:17px;\">${player(y.player_key)}</b>\n            <b style=\"font-size:17px;\">${y.year}${Number(y.year) === 2099 ? ' 🧪' : ''}</b>\n          </div>\n          <div style=\"margin-top:11px;line-height:1.8;font-size:12px;\">\n            📅 Semanas jugadas: <b>${y.weeks_played}</b><br>\n            🎯 Misiones: <b>${y.tasks_completed}/${y.tasks_due}</b>\n            (${Number(y.completion_pct).toFixed(1)}%)<br>\n            ⭐ XP tareas: <b>${y.task_xp}</b> · Bonus:\n            <b>+${y.bonus_xp}</b> · Multas:\n            <b>−${y.penalty_xp}</b><br>\n            ⚡ XP efectivo: <b>${y.effective_xp}</b><br>\n            🏆 Días perfectos: <b>${y.perfect_days}</b> ·\n            Objetivos: <b>${y.weekly_goals_achieved}</b><br>\n            🛡️ Nivel: <b>${y.level_start} → ${y.level_end}</b> ·\n            Niveles ganados: <b>${y.levels_gained}</b><br>\n            🌌 Temporadas: <b>${y.seasons_completed}</b><br>\n            🔥 Mejor racha diaria: <b>${y.best_daily_streak}</b> ·\n            semanal: <b>${y.best_weekly_streak}</b>\n          </div>\n        </div>\n      `).join('')}\n    </div>\n  `;\n]]]\n"
+                  "content": "[[[\n  const dbEntity = states['sensor.luf_historico'];\n  if (!dbEntity || ['unknown', 'unavailable'].includes(dbEntity.state)\n      || dbEntity.attributes?.error || !Array.isArray(dbEntity.attributes?.weeks) || !Array.isArray(dbEntity.attributes?.years)) {\n    return `<div style=\"padding:8px;color:var(--error-color);\">\n      ⚠️ Base de datos no disponible. Revisa el sensor y los registros de Home Assistant.\n    </div>`;\n  }\n\n  const years = states['sensor.luf_historico']?.attributes?.years || [];\n\n  if (!years.length) {\n    return `\n      <div style=\"text-align:center;opacity:.68;padding:12px;\">\n        No hay resúmenes anuales.\n      </div>\n    `;\n  }\n\n  const player = p =>\n    p === 'player1' ? 'player1' :\n    p === 'player2' ? 'player2' : p;\n\n  return `\n    <div style=\"\n      display:grid;\n      grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));\n      gap:12px;\n      width:100%;\n    \">\n      ${years.map(y => `\n        <div style=\"\n          padding:14px;\n          border:1px solid var(--lf-panel-border);\n          border-radius:12px;\n          background:var(--lf-panel-inset);\n          ${Number(y.year) === 2099 ? 'opacity:.72;' : ''}\n        \">\n          <div style=\"display:flex;justify-content:space-between;\">\n            <b style=\"font-size:17px;\">${player(y.player_key)}</b>\n            <b style=\"font-size:17px;\">${y.year}${Number(y.year) === 2099 ? ' 🧪' : ''}</b>\n          </div>\n          <div style=\"margin-top:11px;line-height:1.8;font-size:12px;\">\n            📅 Semanas jugadas: <b>${y.weeks_played}</b><br>\n            🎯 Misiones: <b>${y.tasks_completed}/${y.tasks_due}</b>\n            (${Number(y.completion_pct).toFixed(1)}%)<br>\n            ⭐ XP tareas: <b>${y.task_xp}</b> · Bonus:\n            <b>+${y.bonus_xp}</b> · Multas:\n            <b>−${y.penalty_xp}</b><br>\n            ⚡ XP efectivo: <b>${y.effective_xp}</b><br>\n            🏆 Días perfectos: <b>${y.perfect_days}</b> ·\n            Objetivos: <b>${y.weekly_goals_achieved}</b><br>\n            🛡️ Nivel: <b>${y.level_start} → ${y.level_end}</b> ·\n            Niveles ganados: <b>${y.levels_gained}</b><br>\n            🌌 Temporadas: <b>${y.seasons_completed}</b><br>\n            🔥 Mejor racha diaria: <b>${y.best_daily_streak}</b> ·\n            semanal: <b>${y.best_weekly_streak}</b>\n          </div>\n        </div>\n      `).join('')}\n    </div>\n  `;\n]]]\n"
                 },
                 "grid_options": {
                   "columns": "full",
@@ -4264,6 +4424,18 @@
           {
             "condition": "template",
             "value_template": "{{\n  respuesta_db.ok | default(false)\n  and\n  states(\n    'input_text.luf_player2_last_applied_week'\n  ) != clave_semana\n}}"
+          },
+          {
+            "action": "level_up_family.archive_week",
+            "data": {
+              "player_id": "player2",
+              "week_id": "{{ respuesta_db.week_id | int }}"
+            },
+            "response_variable": "archivo_semana"
+          },
+          {
+            "condition": "template",
+            "value_template": "{{ archivo_semana.ok | default(false) }}"
           },
           {
             "action": "input_number.set_value",

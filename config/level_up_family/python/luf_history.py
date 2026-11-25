@@ -8,10 +8,24 @@ from pathlib import Path
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "luf.db"
 
 
+def summary_counts(weeks, years):
+    """Count calendar periods once, keeping per-player records in the detail."""
+    periods = {(int(row['year']), int(row['iso_week'])) for row in weeks}
+    annual = {int(row['year']) for row in years}
+    return {
+        'weeks_count': len(periods),
+        'years_count': len(annual),
+        'real_weeks_count': sum(year != 2099 for year, _ in periods),
+        'real_years_count': sum(year != 2099 for year in annual),
+        'test_weeks_count': sum(year == 2099 for year, _ in periods),
+        'week_records_count': len(weeks),
+        'year_records_count': len(years),
+    }
+
+
 def main():
     result = {
-        "weeks_count": 0,
-        "years_count": 0,
+        **summary_counts([], []),
         "weeks": [],
         "years": [],
     }
@@ -85,8 +99,7 @@ def main():
 
             result["weeks"] = [dict(row) for row in weeks]
             result["years"] = [dict(row) for row in years]
-            result["weeks_count"] = len(result["weeks"])
-            result["years_count"] = len(result["years"])
+            result.update(summary_counts(result['weeks'], result['years']))
 
     except Exception as exc:
         result["error"] = str(exc)

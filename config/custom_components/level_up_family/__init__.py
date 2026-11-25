@@ -291,6 +291,8 @@ class FamilyManager:
 
     async def started(self, event=None):
         try:
+            if hasattr(self, 'history'):
+                await self.history.recover()
             if self.pending_file.exists():
                 pending = await self.hass.async_add_executor_job(lambda: json.loads(self.pending_file.read_text(encoding='utf-8')))
                 await self.maintenance(True)
@@ -330,5 +332,7 @@ async def async_setup(hass, config):
                               vol.Required('revision'): int})
     async_register_admin_service(hass, DOMAIN, 'set_weekly_goal', manager.set_weekly_goal,
                                  schema=goal_schema, supports_response=SupportsResponse.ONLY)
+    from .history import register_history
+    manager.history = register_history(manager, vol)
     hass.bus.async_listen_once(EVENT_HOMEASSISTANT_STARTED, manager.started)
     return True

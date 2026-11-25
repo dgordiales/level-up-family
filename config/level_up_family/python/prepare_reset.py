@@ -23,6 +23,10 @@ EXPECTED_COLUMNS = {
     "years": "id player_id year weeks_played tasks_due tasks_completed completion_pct task_xp bonus_xp penalty_xp effective_xp perfect_days weekly_goals_achieved level_start level_end levels_gained seasons_completed best_daily_streak best_weekly_streak closed_at",
     "penalties": "id player_id penalty_date year iso_week amount reason cancelled cancelled_at created_at",
 }
+OPTIONAL_COLUMNS = {
+    'week_history': 'id player_id week_id snapshot_json revision audit_json updated_at',
+    'history_sync': 'id player_id helpers_json updated_at',
+}
 NOTICE = (
     "Database activity only: Home Assistant helpers have NOT been reset. "
     "This operation does NOT start a season or put the app into production. "
@@ -52,11 +56,11 @@ def validate_schema(conn):
     tables = {row[0] for row in conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'"
     )}
-    if tables != set(EXPECTED_COLUMNS):
+    if not set(EXPECTED_COLUMNS) <= tables or tables - set(EXPECTED_COLUMNS) - set(OPTIONAL_COLUMNS):
         raise ValueError("Unrecognized database tables; refusing reset")
     if conn.execute("SELECT 1 FROM sqlite_master WHERE type='trigger' LIMIT 1").fetchone():
         raise ValueError("Database contains triggers; refusing reset")
-    for table, expected in EXPECTED_COLUMNS.items():
+    for table, expected in {**EXPECTED_COLUMNS, **{k:v for k,v in OPTIONAL_COLUMNS.items() if k in tables}}.items():
         actual = [row[1] for row in conn.execute('PRAGMA table_info("' + table + '")')]
         if actual != expected.split():
             raise ValueError("Unrecognized columns in " + table + "; refusing reset")
@@ -64,6 +68,9 @@ def validate_schema(conn):
         if table == "players":
             if foreign_keys:
                 raise ValueError("Unexpected players foreign keys; refusing reset")
+        elif table == 'week_history':
+            if {tuple(row[2:5]) for row in foreign_keys} != {('players','player_id','id'), ('weeks','week_id','id')}:
+                raise ValueError('Unexpected history foreign keys; refusing reset')
         elif len(foreign_keys) != 1 or foreign_keys[0][2:5] != ("players", "player_id", "id"):
             raise ValueError("Unexpected foreign keys in " + table + "; refusing reset")
     if conn.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
@@ -73,13 +80,15 @@ def validate_schema(conn):
 
 
 def make_plan(conn, database, start):
+    optional = [table for table in OPTIONAL_COLUMNS if conn.execute(
+        "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?", (table,)).fetchone()]
     return {
         "ok": True,
         "mode": "simulation",
         "database": str(database),
         "delete_counts": {
             table: conn.execute('SELECT COUNT(*) FROM "' + table + '"').fetchone()[0]
-            for table in ACTIVITY_TABLES
+            for table in (*optional, *ACTIVITY_TABLES)
         },
         "players_preserved": conn.execute("SELECT COUNT(*) FROM players").fetchone()[0],
         "preserve_player_ids": True,
@@ -137,7 +146,7 @@ def prepare_reset(database, start_date, apply=False, backup_directory=None):
             players = conn.execute("SELECT * FROM players ORDER BY id").fetchall()
             sequences = conn.execute("SELECT * FROM sqlite_sequence ORDER BY name").fetchall()
             backup = create_backup(database, Path(backup_directory).expanduser().resolve())
-            for table in ACTIVITY_TABLES:
+            for table in plan['delete_counts']:
                 conn.execute('DELETE FROM "' + table + '"')
             if conn.execute("SELECT * FROM players ORDER BY id").fetchall() != players:
                 raise RuntimeError("Player preservation verification failed")

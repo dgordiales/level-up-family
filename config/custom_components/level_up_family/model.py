@@ -221,11 +221,17 @@ def parents_views(templates, registry):
     corrections['cards'] = [make(sections[5]['cards'][0], p) for p in active]
     control['sections'] = [sections[0], *[make(sections[1], p) for p in active], fines, sections[4], corrections, sections[6]]
     sections = history['sections']
-    years = [make(sections[2], p) for p in players]
+    summary_sections = [section for section in sections
+                        if (section.get('cards') or [{}])[0].get('heading') in ('player1', 'player2')]
+    if len(summary_sections) != 2:
+        raise ValueError('Faltan las plantillas de resumen anual de los jugadores.')
+    years = [make(summary_sections[0], p) for p in players]
     for section, p in zip(years, players):
         if not p['active']:
             section['cards'][0]['heading'] += ' (retirado)'
-    history['sections'] = [*sections[:2], *years, *sections[4:]]
+    history['sections'] = [item for section in sections
+                           for item in (years if section is summary_sections[0]
+                                        else [] if section is summary_sections[1] else [section])]
     admin = editor['sections'][0]['cards'][0]
     admin['players'] = {p['id']: p['name'] for p in active}
     admin['rewards'] = {p['id']: f"input_text.luf_{p['entity_prefix']}_weekly_reward" for p in active}
