@@ -1545,6 +1545,12 @@ views:
       grid_options:
         columns: full
         rows: auto
+  - type: grid
+    column_span: 2
+    cards:
+    - type: custom:level-up-family-history
+      grid_options:
+        columns: full
   theme: Catppuccin Mocha
   cards: []
 - title: Tareas y premios

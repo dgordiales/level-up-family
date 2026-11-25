@@ -382,10 +382,138 @@
       finally{this._busy=false;this.render();}
     }
   }
-  for(const [type,element] of [['level-up-family-reward',FamilyReward],['level-up-family-goal',FamilyGoal],['level-up-family-missions',FamilyMissions],['level-up-family-admin',FamilyAdmin],['level-up-family-roster',FamilyRoster]]){
+  class FamilyHistory extends FamilyCard {
+    render() {
+      const family=this._hass?.states['sensor.luf_family']?.attributes;
+      const history=this._hass?.states['sensor.luf_historico'];
+      const signature=JSON.stringify([family,history,this._busy,this.record,this.review,this._message,this._error]);
+      if(signature===this.signature)return;
+      this.signature=signature;
+      const card=this.shell(),body=node('div',undefined,'body');card.append(body);
+      body.append(node('h2','Editar semanas cerradas'));
+      if(!this._hass.user?.is_admin){body.append(node('p','La edición del histórico está reservada a administradores.'));return;}
+      const disabled=Boolean(this._busy||family?.busy||family?.restart_pending||cleanState(this._hass,'input_boolean.luf_maintenance')==='on');
+      const weeks=history?.attributes?.weeks||[];
+      const [label,select]=textField('Semana cerrada','select');select.disabled=disabled;
+      const empty=node('option','Elige una semana');empty.value='';select.append(empty);
+      for(const week of weeks){
+        const player=family?.players?.find(p=>p.db_key===week.player_key);
+        if(!player)continue;
+        const option=node('option',`${player.name} · ${week.year}-W${String(week.iso_week).padStart(2,'0')}`);
+        option.value=String(week.week_id);select.append(option);
+      }
+      select.value=this.selected||'';
+      select.addEventListener('change',()=>{
+        this.selected=select.value;this.record=null;this.review=null;this.reason='';
+        const week=weeks.find(w=>String(w.week_id)===this.selected);
+        this.player=family?.players?.find(p=>p.db_key===week?.player_key)?.id;
+        if(week)this.run({operation:'load'});else this.render();
+      });body.append(label);
+      if(this.record){
+        const record=this.record,legacy=!record.snapshot,snapshot=this.draft;
+        const week=record.week;
+        body.append(node('h3',`${week.week_start} → ${week.week_end}`));
+        body.append(node('p',`Guardado: ${week.tasks_completed}/${week.tasks_due} misiones · ${week.effective_xp} XP · ${week.perfect_days} días perfectos · racha semanal ${week.weekly_streak_end}.`));
+        if(legacy){
+          body.append(node('p','Esta semana solo conserva su resumen. Completa primero el registro original: las tareas, los días y las reglas deben coincidir con lo que ya está guardado. Después podrás corregirlo.','lock'));
+          body.append(node('p','La propuesta utiliza el catálogo y la recompensa actuales. Revisa los datos originales de esa semana; no se pueden deducir del resumen. Validar el registro conserva todos los totales.','hint'));
+          const form=node('div',undefined,'form');
+          for(const [key,title,min,max,step] of [
+            ['daily_bonus','Bonus por día perfecto',0,10000,1],['weekly_multiplier','Multiplicador semanal',1,10,.01],
+            ['goal_pct','Objetivo semanal (%)',0,100,1],['weekly_streak_before','Racha semanal antes de esta semana',0,100000,1],
+            ['daily_streak_before','Racha diaria antes del lunes',0,100000,1]]){
+            const [holder,input]=textField(title);input.type='number';input.min=min;input.max=max;input.step=step;
+            input.value=snapshot.rules[key];input.disabled=disabled;
+            input.addEventListener('input',()=>{snapshot.rules[key]=Number(input.value);this.review=null;});form.append(holder);
+          }
+          const [holder,reward]=textField('Recompensa original');reward.maxLength=255;reward.value=snapshot.rules.reward;reward.disabled=disabled;
+          reward.addEventListener('input',()=>{snapshot.rules.reward=reward.value;});form.append(holder);body.append(form);
+        }else{
+          body.append(node('p',`Reglas archivadas: bonus ${snapshot.rules.daily_bonus} XP · multiplicador ×${snapshot.rules.weekly_multiplier} · objetivo ${snapshot.rules.goal_pct}%. Recompensa: ${snapshot.rules.reward||'Sin especificar'}.`,'hint'));
+          if(snapshot.rules.xp_adjustment)body.append(node('p',`Se conserva un ajuste histórico de ${snapshot.rules.xp_adjustment} XP.`,'hint'));
+        }
+        for(const task of snapshot.tasks){
+          const row=node('div',undefined,'week-task');
+          if(legacy){
+            const form=node('div',undefined,'form'),[nl,ni]=textField('Tarea original'),[xl,xi]=textField('XP por misión');
+            ni.value=task.name;ni.maxLength=255;ni.disabled=disabled;ni.addEventListener('input',()=>{task.name=ni.value;});
+            xi.type='number';xi.min=0;xi.max=10000;xi.step=1;xi.value=task.xp;xi.disabled=disabled;
+            xi.addEventListener('input',()=>{task.xp=Number(xi.value);});form.append(nl,xl);row.append(form);
+            const once=node('label',undefined,'check'),check=node('input');check.type='checkbox';check.checked=task.once;check.disabled=disabled;
+            check.addEventListener('change',()=>{task.once=check.checked;});once.append(check,node('span','Una vez por semana'));row.append(once);
+            const planned=node('div',undefined,'days');planned.setAttribute('aria-label',`Días previstos: ${task.name}`);
+            for(let i=0;i<7;i++){
+              const holder=node('label',undefined,'day-label'),input=node('input');input.type='checkbox';input.checked=Boolean(task.days&(1<<i));input.disabled=disabled;
+              input.setAttribute('aria-label',`${task.name}: previsto ${DAY_NAMES[i]}`);
+              input.addEventListener('change',()=>{task.days=input.checked?task.days|(1<<i):task.days&~(1<<i);task.progress&=task.days;this.signature=null;this.render();});
+              holder.append(input,node('span',DAYS[i]));planned.append(holder);
+            }row.append(planned);
+          }else row.append(node('div',`${task.name} · ${task.xp} XP${task.once?' · una vez por semana':''}`,'name'));
+          const days=node('div',undefined,'week-days');
+          for(let i=0;i<7;i++){
+            const bit=1<<i,done=Boolean(task.progress&bit),button=node('button',`${DAYS[i]} ${done?'✓':'·'}`,done?'done':'');button.type='button';
+            button.disabled=disabled||!(task.days&bit);button.setAttribute('aria-label',`${task.name}: ${DAY_NAMES[i]}`);button.setAttribute('aria-pressed',String(done));
+            button.addEventListener('click',()=>{task.progress=done?task.progress&~bit:task.once?bit:task.progress|bit;this.review=null;this.signature=null;this.render();});days.append(button);
+          }row.append(days);body.append(row);
+        }
+        const actions=node('div',undefined,'actions');
+        const button=(text,action,secondary=false)=>{const b=node('button',text,secondary?'secondary':'');b.type='button';b.disabled=disabled;b.addEventListener('click',action);return b;};
+        if(legacy)actions.append(button('Validar registro original',()=>this.run({operation:'baseline',snapshot:this.draft,revision:record.revision})));
+        else{
+          const [holder,reason]=textField('Motivo de la corrección','textarea');reason.value=this.reason||'';reason.maxLength=500;reason.disabled=disabled;
+          reason.addEventListener('input',()=>{this.reason=reason.value;if(this.review){this.review=null;this.signature=null;this.render();}});body.append(holder);
+          actions.append(button('Previsualizar recálculo',()=>this.run({operation:'preview',revision:record.revision,
+            progress:Object.fromEntries(snapshot.tasks.map(t=>[t.id,t.progress])),reason:this.reason||''})));
+        }
+        actions.append(button('Descartar cambios',()=>this.run({operation:'load'}),true));body.append(actions);
+        if(this.review){
+          const review=node('div',undefined,'lock');review.setAttribute('aria-label','Revisar corrección');
+          review.append(node('h3',this.review.unchanged?'Sin cambios':`Cambio total: ${this.review.xp_delta>=0?'+':''}${this.review.xp_delta} XP`));
+          for(const change of this.review.changes){
+            review.append(node('h3',`${change.after.year}-W${String(change.after.iso_week).padStart(2,'0')}`));
+            const table=node('table');table.style.width='100%';
+            const head=node('tr');for(const text of ['Campo','Antes','Después'])head.append(node('th',text));table.append(head);
+            for(const [key,title] of [['tasks_completed','Misiones'],['task_xp','XP tareas'],['perfect_days','Días perfectos'],['bonus_xp','Bonus'],
+              ['penalty_xp','Multas'],['effective_xp','XP final'],['weekly_goal_achieved','Objetivo / recompensa'],['daily_streak_end','Racha diaria'],
+              ['weekly_streak_end','Racha semanal'],['level_start','Nivel inicial'],['level_end','Nivel final']]){
+              const tr=node('tr');tr.append(node('td',title));for(const side of ['before','after'])tr.append(node('td',key==='weekly_goal_achieved'?(change[side][key]?'Sí':'No'):String(change[side][key])));table.append(tr);
+            }review.append(table);
+            review.append(node('p',`Multiplicador: ${change.multiplier===null?'Conservado':'×'+change.multiplier}. Recompensa: ${change.reward||'Sin registro del texto original'} · ${change.reward_earned?'conseguida':'pendiente'}.`));
+          }
+          review.append(node('p','El guardado actualizará las semanas afectadas, el resumen anual y el progreso vivo. Las recompensas ya entregadas se revisan manualmente.','hint'));
+          const confirm=node('div',undefined,'actions');confirm.append(button('Confirmar y guardar corrección',()=>this.run({operation:'apply',token:this.review.token})),
+            button('Volver a editar',()=>{this.review=null;this.signature=null;this.render();},true));review.append(confirm);body.append(review);
+        }
+        if(record.audit?.length){const details=node('details'),summary=node('summary','Últimos cambios');details.append(summary);
+          for(const item of record.audit)details.append(node('p',`${item.at} · ${item.reason||item.message||item.operation}`));body.append(details);}
+      }
+      this.status=node('p',this._message||'','message'+(this._error?' error':''));this.status.setAttribute('role','status');body.append(this.status);
+    }
+    async run(payload){
+      if(this._busy)return;
+      this._busy=true;this._error=false;this._message='Comprobando…';this.signature=null;this.render();
+      const call=async data=>{
+        const result=await this._hass.callWS({type:'call_service',domain:'level_up_family',service:'edit_closed_week',
+          service_data:{player_id:this.player,week_id:Number(this.selected),...data},return_response:true});
+        if(!result?.response?.ok)throw new Error(result?.response?.error||'Home Assistant no ha confirmado el cambio.');return result.response;
+      };
+      try{
+        let reply=await call(payload);
+        if(payload.operation==='preview'){this.review=reply;this._message=reply.unchanged?'El registro ya coincide.':'Revisa los cambios antes de guardarlos.';}
+        else{
+          if(payload.operation==='apply')reply=await call({operation:'load'});
+          this.record=reply;this.draft=JSON.parse(JSON.stringify(reply.snapshot||reply.draft));this.review=null;this.reason='';
+          this._message=payload.operation==='apply'?'Corrección guardada y progreso actualizado.':payload.operation==='baseline'?'Registro original validado. Ya puedes corregir las tareas.':'';
+        }
+      }catch(error){this._error=true;this._message=error.message||'No se ha podido guardar la corrección.';}
+      finally{this._busy=false;this.signature=null;this.render();}
+    }
+  }
+  for(const [type,element] of [['level-up-family-history',FamilyHistory],['level-up-family-reward',FamilyReward],['level-up-family-goal',FamilyGoal],['level-up-family-missions',FamilyMissions],['level-up-family-admin',FamilyAdmin],['level-up-family-roster',FamilyRoster]]){
     if(!customElements.get(type))customElements.define(type,element);
   }
   window.customCards=window.customCards||[];
+  if(!window.customCards.some(card=>card.type==='level-up-family-history'))window.customCards.push({type:'level-up-family-history',name:'Level Up Family · Histórico',preview:false,description:'Corregir semanas cerradas'});
   for(const [type,name] of [['level-up-family-goal','Level Up Family · Objetivo semanal'],['level-up-family-admin','Level Up Family · Administración'],['level-up-family-missions','Level Up Family · Misiones'],['level-up-family-reward','Level Up Family · Recompensa'],['level-up-family-roster','Level Up Family · Familia']]){
     if(!window.customCards.some(card=>card.type===type))window.customCards.push({type,name,preview:false,description:'Level Up Family'});
   }

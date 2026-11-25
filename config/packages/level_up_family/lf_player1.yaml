@@ -408,6 +408,13 @@ script:
     - condition: template
       value_template: "{{\n  respuesta_db.ok | default(false)\n  and\n  states(\n    'input_text.luf_player1_last_applied_week'\n\
         \  ) != clave_semana\n}}"
+    - action: level_up_family.archive_week
+      data:
+        player_id: player1
+        week_id: '{{ respuesta_db.week_id | int }}'
+      response_variable: archivo_semana
+    - condition: template
+      value_template: '{{ archivo_semana.ok | default(false) }}'
     - action: input_number.set_value
       target:
         entity_id: input_number.luf_player1_points_total

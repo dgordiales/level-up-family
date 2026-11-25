@@ -2311,6 +2311,18 @@
                 }
               }
             ]
+          },
+          {
+            "type": "grid",
+            "column_span": 2,
+            "cards": [
+              {
+                "type": "custom:level-up-family-history",
+                "grid_options": {
+                  "columns": "full"
+                }
+              }
+            ]
           }
         ],
         "theme": "Catppuccin Mocha",
@@ -4264,6 +4276,18 @@
           {
             "condition": "template",
             "value_template": "{{\n  respuesta_db.ok | default(false)\n  and\n  states(\n    'input_text.luf_player2_last_applied_week'\n  ) != clave_semana\n}}"
+          },
+          {
+            "action": "level_up_family.archive_week",
+            "data": {
+              "player_id": "player2",
+              "week_id": "{{ respuesta_db.week_id | int }}"
+            },
+            "response_variable": "archivo_semana"
+          },
+          {
+            "condition": "template",
+            "value_template": "{{ archivo_semana.ok | default(false) }}"
           },
           {
             "action": "input_number.set_value",
