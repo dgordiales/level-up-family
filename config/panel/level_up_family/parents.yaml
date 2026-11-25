@@ -1127,7 +1127,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1207,7 +1206,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1282,7 +1280,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - background: rgba(4,14,38,.94)
         - border: 1px solid rgba(101,221,255,.35)
@@ -1361,7 +1358,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
@@ -1451,7 +1447,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
@@ -1541,7 +1536,6 @@ views:
         card:
         - padding: 14px
         - box-sizing: border-box
-        - width: 100%
         - min-width: 0
         - text-align: left
         - background: rgba(4,14,38,.94)
